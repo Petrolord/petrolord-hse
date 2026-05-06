@@ -10,7 +10,6 @@ import TeamLeaderboard from '@/components/gamification/TeamLeaderboard';
 
 // AI Components
 import PredictiveInsightsDashboard from '@/components/analytics/PredictiveInsightsDashboard';
-import AITestPanel from '@/components/analytics/AITestPanel';
 
 // Organization Setup Components
 import { OrganizationSetupAdvisory } from './OrganizationSetupAdvisory';
@@ -68,10 +67,6 @@ export default function HSEDashboard() {
 
   return (
     <div className="h-[calc(100vh-64px)] overflow-y-auto bg-[var(--bg-app)] p-6 pb-24">
-      
-      {/* 1. DIAGNOSTIC PANEL - MUST BE VISIBLE IF RENDERING IS WORKING */}
-      <AITestPanel />
-
       {/* Organization Setup Advisory Banner */}
       {shouldShowAdvisory && (
         <OrganizationSetupAdvisory 
