@@ -85,28 +85,32 @@ export default function HSEDashboard() {
         </div>
       )}
 
-      {/* 2. AI PREDICTION SECTION - DIRECT EMBED */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-            <Brain className="h-6 w-6 text-[#8b5cf6]" />
-            AI Safety Predictor (Integrated)
-          </h2>
-          <Button 
-            onClick={handleGoToAI}
-            className="bg-[#8b5cf6] hover:bg-[#7c3aed] text-white flex items-center gap-2"
-          >
-            Full AI Dashboard <ArrowRight className="h-4 w-4" />
-          </Button>
-        </div>
-        
-        {/* CONTAINER WITH CLEAR DIMENSIONS TO PREVENT COLLAPSE */}
-        <div className="w-full bg-[#131320] border-2 border-[#8b5cf6] rounded-xl p-1 min-h-[400px]">
-          <PredictiveInsightsDashboard isEmbedded={true} />
-        </div>
-      </div>
+      {/* AI Safety Predictor — hidden until real AI predictions are wired (currently uses mock data).
+          To re-enable: change `false` to `true` below. The section's UI is preserved. */}
+      {false && (
+        <>
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                <Brain className="h-6 w-6 text-[#8b5cf6]" />
+                AI Safety Predictor (Integrated)
+              </h2>
+              <Button 
+                onClick={handleGoToAI}
+                className="bg-[#8b5cf6] hover:bg-[#7c3aed] text-white flex items-center gap-2"
+              >
+                Full AI Dashboard <ArrowRight className="h-4 w-4" />
+              </Button>
+            </div>
+            
+            <div className="w-full bg-[#131320] border-2 border-[#8b5cf6] rounded-xl p-1 min-h-[400px]">
+              <PredictiveInsightsDashboard isEmbedded={true} />
+            </div>
+          </div>
 
-      <div className="my-8 h-px bg-[#3a3a5a]" />
+          <div className="my-8 h-px bg-[#3a3a5a]" />
+        </>
+      )}
 
       {/* Gamification Top Row */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-8">
@@ -145,7 +149,7 @@ export default function HSEDashboard() {
            />
            <KpiCard 
              title="Permits Active" 
-             value="8" 
+             value="--" 
              color="text-orange-500" 
              icon={FileText} 
              loading={dataLoading}
