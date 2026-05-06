@@ -1,0 +1,77 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-app: #f8f9fa;
+    --bg-card: #ffffff;
+    --bg-hover: #f1f3f5;
+    --text-primary: #111827;
+    --text-secondary: #4b5563;
+    --text-muted: #9ca3af;
+    --border-color: #e5e7eb;
+    --accent: #FFC107;
+    --accent-hover: #e0a800;
+    --accent-foreground: #000000;
+    
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --bg-app: #0F1B2E;
+    --bg-card: #1a1a2e;
+    --bg-hover: #252541;
+    --text-primary: #f9fafb;
+    --text-secondary: #d1d5db;
+    --text-muted: #6b7280;
+    --border-color: #3a3a5a;
+    --accent: #FFC107;
+    --accent-hover: #ffcd38;
+    --accent-foreground: #000000;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-[var(--border-color)];
+  }
+  body {
+    @apply bg-[var(--bg-app)] text-[var(--text-primary)];
+  }
+}
+
+/* Scrollbar Styles */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #4b5563;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+/* React Grid Layout Fixes */
+.react-grid-item.react-grid-placeholder {
+  background: rgba(139, 92, 246, 0.3) !important;
+  opacity: 0.5;
+  border-radius: 8px;
+}
+
+.react-resizable-handle {
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.react-grid-item:hover .react-resizable-handle {
+  opacity: 1;
+}

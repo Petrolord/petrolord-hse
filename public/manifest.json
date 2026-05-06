@@ -1,0 +1,30 @@
+{
+  "name": "Petrolord HSE",
+  "short_name": "Petrolord",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a1a2e",
+  "theme_color": "#FFC107",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "https://horizons-cdn.hostinger.com/b49b4b29-7343-48e8-91d9-c4b871e9bda0/1a7d16041054312d35ba07ca93fc4117.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://horizons-cdn.hostinger.com/b49b4b29-7343-48e8-91d9-c4b871e9bda0/1a7d16041054312d35ba07ca93fc4117.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "https://horizons-cdn.hostinger.com/b49b4b29-7343-48e8-91d9-c4b871e9bda0/046754b00008ad42902396493cf91e75.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ],
+  "categories": ["business", "productivity", "utilities"]
+}

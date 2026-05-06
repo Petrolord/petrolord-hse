@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .header {
+      background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+      color: white;
+      padding: 40px 20px;
+      text-align: center;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 600;
+    }
+    .header p {
+      margin: 10px 0 0 0;
+      font-size: 16px;
+      opacity: 0.9;
+    }
+    .content {
+      padding: 40px 30px;
+    }
+    .greeting {
+      font-size: 18px;
+      font-weight: 500;
+      margin-bottom: 20px;
+      color: #1e40af;
+    }
+    .message {
+      font-size: 16px;
+      margin-bottom: 30px;
+      color: #555;
+      line-height: 1.8;
+    }
+    .cta-button {
+      display: inline-block;
+      background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+      color: white;
+      padding: 14px 40px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 16px;
+      margin: 30px 0;
+      transition: transform 0.2s;
+    }
+    .cta-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+    }
+    .features {
+      background-color: #f0f4ff;
+      border-left: 4px solid #1e40af;
+      padding: 20px;
+      margin: 30px 0;
+      border-radius: 4px;
+    }
+    .features h3 {
+      margin-top: 0;
+      color: #1e40af;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .features ul {
+      margin: 10px 0;
+      padding-left: 20px;
+    }
+    .features li {
+      margin: 8px 0;
+      color: #555;
+      font-size: 15px;
+    }
+    .next-steps {
+      background-color: #fffbeb;
+      border-left: 4px solid #f59e0b;
+      padding: 20px;
+      margin: 30px 0;
+      border-radius: 4px;
+    }
+    .next-steps h3 {
+      margin-top: 0;
+      color: #d97706;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .next-steps ol {
+      margin: 10px 0;
+      padding-left: 20px;
+    }
+    .next-steps li {
+      margin: 8px 0;
+      color: #555;
+      font-size: 15px;
+    }
+    .info-box {
+      background-color: #f0f9ff;
+      border-left: 4px solid #0284c7;
+      padding: 20px;
+      border-radius: 4px;
+      margin: 30px 0;
+    }
+    .info-box h3 {
+      margin-top: 0;
+      color: #0284c7;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .info-box ul {
+      margin: 10px 0;
+      padding-left: 20px;
+    }
+    .info-box li {
+      margin: 8px 0;
+      color: #555;
+      font-size: 15px;
+    }
+    .support {
+      background-color: #f5f5f5;
+      padding: 20px;
+      border-radius: 4px;
+      margin: 30px 0;
+      text-align: center;
+    }
+    .support p {
+      margin: 0;
+      color: #666;
+      font-size: 14px;
+    }
+    .support a {
+      color: #1e40af;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .footer {
+      background-color: #f9f9f9;
+      padding: 30px;
+      text-align: center;
+      border-top: 1px solid #eee;
+      font-size: 14px;
+      color: #888;
+    }
+    .footer p {
+      margin: 0 0 10px 0;
+    }
+    .footer a {
+      color: #1e40af;
+      text-decoration: none;
+    }
+    .divider {
+      height: 1px;
+      background-color: #eee;
+      margin: 30px 0;
+    }
+    .code-block {
+      background-color: #f5f5f5;
+      padding: 12px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 12px;
+      word-break: break-all;
+      margin: 15px 0;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1>Welcome to Petrolord! 🚀</h1>
+      <p>Confirm your email to get started</p>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+      <div class="greeting">Hi there,</div>
+
+      <div class="message">
+        Welcome to <strong>Petrolord</strong>! We're excited to have you on board. To complete your registration and access your applications, please confirm your email address by clicking the button below.
+      </div>
+
+      <!-- CTA Button -->
+      <div style="text-align: center;">
+        <a href="{{ .ConfirmationURL }}" class="cta-button">Confirm Your Email</a>
+      </div>
+
+      <div style="text-align: center; color: #888; font-size: 14px; margin-top: 15px;">
+        Or copy this link: <br>
+        <div class="code-block">{{ .ConfirmationURL }}</div>
+      </div>
+
+      <!-- Features -->
+      <div class="features">
+        <h3>✨ What You Can Access</h3>
+        <ul>
+          <li><strong>HSE Module</strong> - Health, Safety & Environment management</li>
+          <li><strong>Petrolord Suite</strong> - Comprehensive oil & gas operations platform</li>
+          <li><strong>Team Collaboration</strong> - Work with your team members</li>
+          <li><strong>Advanced Analytics</strong> - Monitor key metrics and trends</li>
+        </ul>
+      </div>
+
+      <!-- Next Steps -->
+      <div class="next-steps">
+        <h3>📋 Next Steps</h3>
+        <ol>
+          <li>Click the button above to confirm your email</li>
+          <li>Log in to your Petrolord dashboard</li>
+          <li>Access your applications and modules</li>
+          <li>Invite your team members to collaborate</li>
+        </ol>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Getting Started -->
+      <div class="info-box">
+        <h3>🎯 Getting Started</h3>
+        <p style="margin: 0 0 15px 0; color: #555;">
+          After confirming your email, you'll be taken to your Petrolord dashboard where you can:
+        </p>
+        <ul>
+          <li>Access your HSE module</li>
+          <li>Explore Petrolord Suite features</li>
+          <li>Manage your organization</li>
+          <li>Upgrade to premium features</li>
+        </ul>
+      </div>
+
+      <!-- Support -->
+      <div class="support">
+        <p>
+          <strong>Need help?</strong> <br>
+          Contact our support team at <a href="mailto:support@petrolord.com">support@petrolord.com</a>
+        </p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p>
+        <strong>Petrolord</strong> - Oil & Gas Operations Management Platform
+      </p>
+      <p>
+        © 2024 Petrolord. All rights reserved. | 
+        <a href="https://petrolord.com/privacy">Privacy Policy</a> | 
+        <a href="https://petrolord.com/terms">Terms of Service</a>
+      </p>
+    </div>
+  </div>
+</body>
+</html>
