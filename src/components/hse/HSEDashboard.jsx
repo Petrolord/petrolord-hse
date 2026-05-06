@@ -159,10 +159,13 @@ export default function HSEDashboard() {
 
       {/* REMOVED HSE OPERATIONAL MODULES SECTION COMPLETELY */}
 
-      {/* NEW: World Heatmap Section */}
-      <div className="mb-8">
-        <WorldHeatmap />
-      </div>
+      {/* World Heatmap (Global Operations Risk Map) — hidden until real site/risk data is wired.
+          Currently uses static visualization with mock continent colors. To re-enable: change `false` to `true`. */}
+      {false && (
+        <div className="mb-8">
+          <WorldHeatmap />
+        </div>
+      )}
 
     </div>
   );
