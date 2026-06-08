@@ -2,11 +2,13 @@ import React from 'react';
 import { motion } from 'framer-motion';
 
 export default function ComplianceScoreGauge({ score }) {
+  const hasScore = score != null;
   const radius = 60;
   const circumference = 2 * Math.PI * radius;
-  const offset = circumference - (score / 100) * circumference;
-  
+  const offset = circumference - ((hasScore ? score : 0) / 100) * circumference;
+
   const getColor = (s) => {
+    if (!hasScore) return '#3a3a5a'; // Grey — no data
     if (s >= 90) return '#22c55e'; // Green
     if (s >= 70) return '#eab308'; // Yellow
     return '#ef4444'; // Red
@@ -29,7 +31,7 @@ export default function ComplianceScoreGauge({ score }) {
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
-        <span className="text-3xl font-bold">{score}</span>
+        <span className="text-3xl font-bold">{hasScore ? score : '--'}</span>
         <span className="text-[10px] text-gray-400 uppercase tracking-widest">Score</span>
       </div>
     </div>

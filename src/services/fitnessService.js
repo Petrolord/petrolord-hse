@@ -29,11 +29,12 @@ export const fitnessService = {
   },
 
   logActivity: async (activityData) => {
+    if (!activityData?.organization_id) throw new Error('logActivity requires organization_id');
     const { data, error } = await supabase
       .from('fitness_activities')
       .insert([activityData])
       .select();
-    
+
     if (error) throw error;
     return data;
   },

@@ -28,8 +28,7 @@ export const fireSafetyService = {
       complianceScore,
       maintenanceScore,
       drillsCount: drills.data?.length || 0,
-      incidentsCount: incidents.data?.length || 0,
-      trainingCompletion: 85 // Mocked for now as training table is complex linkage
+      incidentsCount: incidents.data?.length || 0
     };
   },
 
@@ -39,6 +38,7 @@ export const fireSafetyService = {
     return data || [];
   },
   async createRisk(payload) {
+    if (!payload?.org_id) throw new Error('createRisk requires org_id');
     const { data, error } = await supabase.from('fire_safety_risks').insert(payload).select().single();
     if (error) throw error; return data;
   },
@@ -49,6 +49,7 @@ export const fireSafetyService = {
     return data || [];
   },
   async createEquipment(payload) {
+    if (!payload?.org_id) throw new Error('createEquipment requires org_id');
     const { data, error } = await supabase.from('fire_equipment_inventory').insert(payload).select().single();
     if (error) throw error; return data;
   },
@@ -59,6 +60,7 @@ export const fireSafetyService = {
     return data || [];
   },
   async logDrill(payload) {
+    if (!payload?.org_id) throw new Error('logDrill requires org_id');
     const { data, error } = await supabase.from('fire_drills').insert(payload).select().single();
     if (error) throw error; return data;
   },
@@ -69,6 +71,7 @@ export const fireSafetyService = {
     return data || [];
   },
   async createIncident(payload) {
+    if (!payload?.org_id) throw new Error('createIncident requires org_id');
     const { data, error } = await supabase.from('fire_incidents').insert(payload).select().single();
     if (error) throw error; return data;
   },

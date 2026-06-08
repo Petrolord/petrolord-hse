@@ -23,6 +23,7 @@ export const riskService = {
   },
 
   async createRisk(risk) {
+    if (!risk?.org_id) throw new Error('createRisk requires org_id');
     // Auto-calculate rating
     const score = risk.likelihood * risk.impact;
     let rating = 'Low';
@@ -40,14 +41,26 @@ export const riskService = {
   },
 
   async updateRisk(id, updates) {
+    // Recompute rating when likelihood/impact change so it stays consistent.
+    const patch = { ...updates, updated_at: new Date() };
+    if (updates.likelihood != null && updates.impact != null) {
+      const score = updates.likelihood * updates.impact;
+      patch.rating = score >= 15 ? 'Critical' : score >= 10 ? 'High' : score >= 5 ? 'Medium' : 'Low';
+    }
     const { data, error } = await supabase
       .from('risk_register')
-      .update({ ...updates, updated_at: new Date() })
+      .update(patch)
       .eq('id', id)
       .select()
       .single();
     if (error) throw error;
     return data;
+  },
+
+  async deleteRisk(id) {
+    const { error } = await supabase.from('risk_register').delete().eq('id', id);
+    if (error) throw error;
+    return true;
   },
 
   // --- Mitigation ---
@@ -60,6 +73,18 @@ export const riskService = {
     return data;
   },
 
+  // All mitigation actions for an org, with their parent risk. Scoped via the
+  // risk_register!inner join (risk_mitigation_actions has no org_id of its own).
+  async getAllMitigations(orgId) {
+    const { data, error } = await supabase
+      .from('risk_mitigation_actions')
+      .select(`*, risk:risk_register!inner(id, risk_id, title, category, org_id)`)
+      .eq('risk_register.org_id', orgId)
+      .order('due_date', { ascending: true });
+    if (error) throw error;
+    return data;
+  },
+
   async createMitigation(action) {
     const { data, error } = await supabase
       .from('risk_mitigation_actions')
@@ -68,6 +93,62 @@ export const riskService = {
       .single();
     if (error) throw error;
     return data;
+  },
+
+  async updateMitigation(id, patch) {
+    const { data, error } = await supabase
+      .from('risk_mitigation_actions')
+      .update(patch)
+      .eq('id', id)
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  },
+
+  async deleteMitigation(id) {
+    const { error } = await supabase.from('risk_mitigation_actions').delete().eq('id', id);
+    if (error) throw error;
+    return true;
+  },
+
+  // --- Scenarios (what-if planning) ---
+  async getScenarios(orgId) {
+    const { data, error } = await supabase
+      .from('risk_scenarios')
+      .select('*')
+      .eq('org_id', orgId)
+      .order('impact_financial', { ascending: false });
+    if (error) throw error;
+    return data;
+  },
+
+  async createScenario(scenario) {
+    if (!scenario?.org_id) throw new Error('createScenario requires org_id');
+    const { data, error } = await supabase
+      .from('risk_scenarios')
+      .insert(scenario)
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  },
+
+  async updateScenario(id, patch) {
+    const { data, error } = await supabase
+      .from('risk_scenarios')
+      .update(patch)
+      .eq('id', id)
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  },
+
+  async deleteScenario(id) {
+    const { error } = await supabase.from('risk_scenarios').delete().eq('id', id);
+    if (error) throw error;
+    return true;
   },
 
   // --- KRIs ---

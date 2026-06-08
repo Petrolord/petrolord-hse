@@ -6,14 +6,13 @@ import { ShieldAlert, LayoutDashboard, List, Search, Sliders, Activity, FileText
 import RiskDashboard from './risk/RiskDashboard';
 import RiskRegister from './risk/RiskRegister';
 import RiskAssessment from './risk/RiskAssessment';
-// Placeholders for other tabs to ensure file completeness without exceeding token limit
-const PlaceholderTab = ({ name }) => (
-  <div className="p-12 text-center border-2 border-dashed border-[#3a3a5a] rounded-xl text-gray-500 m-4">
-    <ShieldAlert className="h-16 w-16 mx-auto mb-4 opacity-30" />
-    <h3 className="text-xl font-bold text-white mb-2">{name}</h3>
-    <p>This module is currently being provisioned. Please check back shortly.</p>
-  </div>
-);
+import RiskMitigation from './risk/RiskMitigation';
+import RiskMonitoring from './risk/RiskMonitoring';
+import RiskReporting from './risk/RiskReporting';
+import RiskAnalytics from './risk/RiskAnalytics';
+import RiskAppetite from './risk/RiskAppetite';
+import ScenarioPlanning from './risk/ScenarioPlanning';
+import RiskCulture from './risk/RiskCulture';
 
 export default function RiskManagementModule() {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -60,13 +59,13 @@ export default function RiskManagementModule() {
             <TabsContent value="dashboard" className="m-0 p-6 h-full"><RiskDashboard /></TabsContent>
             <TabsContent value="register" className="m-0 p-6 h-full"><RiskRegister /></TabsContent>
             <TabsContent value="assessment" className="m-0 p-6 h-full"><RiskAssessment /></TabsContent>
-            <TabsContent value="mitigation" className="m-0 h-full"><PlaceholderTab name="Risk Mitigation Strategy" /></TabsContent>
-            <TabsContent value="monitoring" className="m-0 h-full"><PlaceholderTab name="Monitoring & KRIs" /></TabsContent>
-            <TabsContent value="reporting" className="m-0 h-full"><PlaceholderTab name="Risk Reporting Engine" /></TabsContent>
-            <TabsContent value="analytics" className="m-0 h-full"><PlaceholderTab name="Predictive Analytics" /></TabsContent>
-            <TabsContent value="appetite" className="m-0 h-full"><PlaceholderTab name="Risk Appetite Framework" /></TabsContent>
-            <TabsContent value="scenario" className="m-0 h-full"><PlaceholderTab name="Scenario Modeling" /></TabsContent>
-            <TabsContent value="culture" className="m-0 h-full"><PlaceholderTab name="Risk Culture & Training" /></TabsContent>
+            <TabsContent value="mitigation" className="m-0 p-6 h-full"><RiskMitigation /></TabsContent>
+            <TabsContent value="monitoring" className="m-0 p-6 h-full"><RiskMonitoring /></TabsContent>
+            <TabsContent value="reporting" className="m-0 p-6 h-full"><RiskReporting /></TabsContent>
+            <TabsContent value="analytics" className="m-0 p-6 h-full"><RiskAnalytics /></TabsContent>
+            <TabsContent value="appetite" className="m-0 p-6 h-full"><RiskAppetite /></TabsContent>
+            <TabsContent value="scenario" className="m-0 p-6 h-full"><ScenarioPlanning /></TabsContent>
+            <TabsContent value="culture" className="m-0 p-6 h-full"><RiskCulture /></TabsContent>
           </div>
         </Tabs>
       </div>

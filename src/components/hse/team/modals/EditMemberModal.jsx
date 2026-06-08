@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { teamService } from '@/services/teamService';
+import { useHSE } from '@/context/HSEContext';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -10,6 +11,7 @@ import { Loader2 } from 'lucide-react';
 
 export default function EditMemberModal({ isOpen, onClose, onSuccess, member, teams, roles }) {
   const { toast } = useToast();
+  const { currentOrganization } = useHSE();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     first_name: '', last_name: '', role_id: '', team_id: null 
@@ -36,7 +38,7 @@ export default function EditMemberModal({ isOpen, onClose, onSuccess, member, te
           last_name: formData.last_name,
           role: formData.role_id,
           team_id: formData.team_id
-      }, member.type);
+      }, member.type, currentOrganization?.id);
       
       toast({ title: "Updated", description: "Member details updated." });
       onSuccess();

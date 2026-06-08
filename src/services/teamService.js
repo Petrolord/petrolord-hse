@@ -349,7 +349,7 @@ export const teamService = {
   },
 
   // Delete Member/Invitation
-  async deleteMember(id, type) {
+  async deleteMember(id, type, orgId) {
       try {
           if (type === 'invite') {
               const { error } = await supabase
@@ -358,10 +358,15 @@ export const teamService = {
                   .eq('id', id);
               if (error) throw error;
           } else {
+              // organization_users is keyed by (organization_id, user_id): a user can
+              // belong to several orgs, so the delete MUST be scoped to the active org
+              // or it would remove the member from every org they're in.
+              if (!orgId) throw new Error('deleteMember requires an organization id');
               const { error } = await supabase
                   .from('organization_users')
                   .delete()
-                  .eq('user_id', id); 
+                  .eq('user_id', id)
+                  .eq('organization_id', orgId);
               if (error) throw error;
           }
           return true;
@@ -372,7 +377,7 @@ export const teamService = {
   },
 
   // Update Member Details
-  async updateMember(memberId, updates, type = 'member') {
+  async updateMember(memberId, updates, type = 'member', orgId) {
     try {
         const { role, team_id, first_name, last_name } = updates;
 
@@ -388,10 +393,15 @@ export const teamService = {
                 .eq('id', memberId);
         } else {
             if (role) {
+                // Scope the role change to the active org — organization_users is
+                // keyed by (organization_id, user_id), so a user_id-only update would
+                // rewrite the member's role in every org they belong to.
+                if (!orgId) throw new Error('updateMember requires an organization id to change a role');
                 await supabase
                     .from('organization_users')
-                    .update({ role: 'member', user_role: role }) 
-                    .eq('user_id', memberId);
+                    .update({ role: 'member', user_role: role })
+                    .eq('user_id', memberId)
+                    .eq('organization_id', orgId);
             }
             if (first_name || last_name || team_id !== undefined) {
                 const fullName = `${first_name} ${last_name}`.trim();
