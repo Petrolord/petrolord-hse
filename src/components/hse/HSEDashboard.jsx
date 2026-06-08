@@ -85,15 +85,15 @@ export default function HSEDashboard() {
         </div>
       )}
 
-      {/* AI Safety Predictor — hidden until real AI predictions are wired (currently uses mock data).
-          To re-enable: change `false` to `true` below. The section's UI is preserved. */}
-      {false && (
+      {/* AI Safety Predictor — now wired to real forecasts (forecast-safety edge fn →
+          OpenAI → predictions table). The AI Forecast tab is the default view. */}
+      {currentOrganization && (
         <>
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-2xl font-bold text-white flex items-center gap-2">
                 <Brain className="h-6 w-6 text-[#8b5cf6]" />
-                AI Safety Predictor (Integrated)
+                AI Safety Predictor
               </h2>
               <Button 
                 onClick={handleGoToAI}
