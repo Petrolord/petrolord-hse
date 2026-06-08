@@ -1,15 +1,29 @@
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Rocket, LayoutGrid, GitBranch, HelpCircle, LifeBuoy, ChevronRight, Home } from 'lucide-react';
+import { Rocket, LayoutGrid, GitBranch, HelpCircle, LifeBuoy } from 'lucide-react';
 import SearchBar from './SearchBar';
 import GettingStarted from './GettingStarted';
 import ModuleGuides from './ModuleGuides';
 import FeaturesWorkflows from './FeaturesWorkflows';
 import FAQs from './FAQs';
 import SupportContact from './SupportContact';
+import HelpSearchResults from './HelpSearchResults';
+import { searchHelp } from '@/data/helpContent/searchHelp';
 
 export default function HelpCenter() {
   const [activeTab, setActiveTab] = useState('start');
+  const [query, setQuery] = useState('');
+  // {id, token} — bumping token re-opens the same guide from a fresh search.
+  const [guideRequest, setGuideRequest] = useState({ id: null, token: 0 });
+
+  const searching = query.trim().length > 0;
+  const results = searching ? searchHelp(query) : null;
+
+  const openGuide = (id) => {
+    setGuideRequest((r) => ({ id, token: r.token + 1 }));
+    setActiveTab('modules');
+    setQuery('');
+  };
 
   return (
     <div className="min-h-screen bg-[#1a1a2e] text-white flex flex-col">
@@ -23,43 +37,53 @@ export default function HelpCenter() {
           <p className="text-xl text-[#b0b0c0] mb-10 max-w-2xl mx-auto">
             Find guides, documentation, and support for all your HSE management needs.
           </p>
-          <SearchBar onSearch={(q) => console.log('Searching:', q)} />
+          <SearchBar value={query} onChange={setQuery} />
         </div>
       </div>
 
-      {/* Main Navigation */}
+      {/* Main content: search results when searching, otherwise the tabs */}
       <div className="flex-1 max-w-7xl mx-auto w-full px-6 py-10">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
-          <TabsList className="bg-[#252541] border border-[#3a3a5a] p-1.5 h-auto rounded-xl flex-wrap justify-start sm:justify-center">
-            <HelpTabTrigger value="start" icon={Rocket} label="Getting Started" />
-            <HelpTabTrigger value="modules" icon={LayoutGrid} label="Module Guides" />
-            <HelpTabTrigger value="workflows" icon={GitBranch} label="Features & Workflows" />
-            <HelpTabTrigger value="faqs" icon={HelpCircle} label="FAQs" />
-            <HelpTabTrigger value="support" icon={LifeBuoy} label="Support" />
-          </TabsList>
+        {searching ? (
+          <HelpSearchResults
+            query={query}
+            results={results}
+            onOpenGuide={openGuide}
+            onClearSearch={() => setQuery('')}
+            onGoToFaqs={() => { setQuery(''); setActiveTab('faqs'); }}
+          />
+        ) : (
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
+            <TabsList className="bg-[#252541] border border-[#3a3a5a] p-1.5 h-auto rounded-xl flex-wrap justify-start sm:justify-center">
+              <HelpTabTrigger value="start" icon={Rocket} label="Getting Started" />
+              <HelpTabTrigger value="modules" icon={LayoutGrid} label="Module Guides" />
+              <HelpTabTrigger value="workflows" icon={GitBranch} label="Features & Workflows" />
+              <HelpTabTrigger value="faqs" icon={HelpCircle} label="FAQs" />
+              <HelpTabTrigger value="support" icon={LifeBuoy} label="Support" />
+            </TabsList>
 
-          <div className="min-h-[500px]">
-            <TabsContent value="start" className="focus-visible:outline-none animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <GettingStarted />
-            </TabsContent>
-            
-            <TabsContent value="modules" className="focus-visible:outline-none animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <ModuleGuides />
-            </TabsContent>
-            
-            <TabsContent value="workflows" className="focus-visible:outline-none animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <FeaturesWorkflows />
-            </TabsContent>
-            
-            <TabsContent value="faqs" className="focus-visible:outline-none animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <FAQs />
-            </TabsContent>
-            
-            <TabsContent value="support" className="focus-visible:outline-none animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <SupportContact />
-            </TabsContent>
-          </div>
-        </Tabs>
+            <div className="min-h-[500px]">
+              <TabsContent value="start" className="focus-visible:outline-none animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <GettingStarted />
+              </TabsContent>
+
+              <TabsContent value="modules" className="focus-visible:outline-none animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <ModuleGuides openGuideId={guideRequest.id} openToken={guideRequest.token} />
+              </TabsContent>
+
+              <TabsContent value="workflows" className="focus-visible:outline-none animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <FeaturesWorkflows />
+              </TabsContent>
+
+              <TabsContent value="faqs" className="focus-visible:outline-none animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <FAQs />
+              </TabsContent>
+
+              <TabsContent value="support" className="focus-visible:outline-none animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <SupportContact />
+              </TabsContent>
+            </div>
+          </Tabs>
+        )}
       </div>
     </div>
   );

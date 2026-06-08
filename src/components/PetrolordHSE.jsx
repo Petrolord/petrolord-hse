@@ -113,7 +113,7 @@ function PetrolordHSE() {
 
       <footer className="bg-[var(--bg-card)] border-t border-[var(--border-color)] py-4 px-6 transition-colors duration-200">
         <p className="text-center text-sm text-[var(--text-secondary)]">
-          © 2025 Lordsway Energy. All Rights Reserved.
+          © 2026 Lordsway Energy. All Rights Reserved.
         </p>
       </footer>
 
