@@ -33,9 +33,9 @@ const ConfirmationPage = () => {
           <CheckCircle className="h-10 w-10 text-emerald-400" />
         </div>
         
-        <h2 className="text-2xl font-bold text-white mb-2">Email Confirmed!</h2>
+        <h2 className="text-2xl font-bold text-white mb-2">Account Created!</h2>
         <p className="text-[#b0b0c0] mb-6">
-          Your account has been successfully verified. You can now access the Petrolord Platform.
+          Your organization has been set up. You can now sign in to the Petrolord Platform with your new password.
         </p>
         
         <div className="space-y-4">

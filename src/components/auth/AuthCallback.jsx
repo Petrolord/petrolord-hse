@@ -25,7 +25,7 @@ const AuthCallback = () => {
         // The URL hash usually contains type=recovery if it's a reset flow.
         const hash = window.location.hash;
         if (hash && hash.includes('type=recovery')) {
-           navigate('/reset-password');
+           navigate('/auth/reset-password');
            return;
         }
 
