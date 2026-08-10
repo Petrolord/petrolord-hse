@@ -1,38 +1,37 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Shield, AlertTriangle, Lock, CheckCircle, GraduationCap, FileText, Phone, ExternalLink, ArrowUpRight } from 'lucide-react';
+import { Shield, AlertTriangle, CheckCircle, GraduationCap, Phone, ExternalLink, ArrowUpRight } from 'lucide-react';
 import SecurityRiskGauge from './SecurityRiskGauge';
-import TrainingProgress from './TrainingProgress';
 import { useHSE } from '@/context/HSEContext';
 import { securityRiskService } from '@/services/securityRiskService';
+import { securityService } from '@/services/securityService';
 import { incidentService } from '@/services/incidentService';
 
 export default function SecurityDashboard({ setActiveTab }) {
   const { currentOrganization, currentUser } = useHSE();
   const [riskScore, setRiskScore] = useState(0);
   const [recentIncidents, setRecentIncidents] = useState([]);
+  const [stats, setStats] = useState({ incidentsYTD: 0, pendingTrainings: 0, expiringCredentials: 0 });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       if (currentOrganization && currentUser) {
         setLoading(true);
-        const score = await securityRiskService.calculateRiskScore(currentUser.id, currentOrganization.id);
-        const incidents = await incidentService.getSecurityIncidents(currentOrganization.id);
+        const [score, incidents, secStats] = await Promise.all([
+          securityRiskService.calculateRiskScore(currentUser.id, currentOrganization.id),
+          incidentService.getSecurityIncidents(currentOrganization.id),
+          securityService.getSecurityStats(currentOrganization.id),
+        ]);
         setRiskScore(score);
         setRecentIncidents(incidents.slice(0, 5));
+        setStats(secStats);
         setLoading(false);
       }
     };
     fetchData();
   }, [currentOrganization, currentUser]);
-
-  const mockTraining = [
-    { module: 'Cyber Awareness 2025', progress: 100 },
-    { module: 'Phishing Defense Advanced', progress: 45 },
-    { module: 'Physical Security Protocols', progress: 10 }
-  ];
 
   return (
     <div className="space-y-6 pb-8 animate-in fade-in duration-500">
@@ -55,14 +54,11 @@ export default function SecurityDashboard({ setActiveTab }) {
           </CardContent>
         </Card>
 
-        {/* Stats Cards */}
-        <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <StatsCard title="Awareness Score" value="85/100" icon={GraduationCap} color="text-purple-400" bg="bg-purple-500/10" />
-          <StatsCard title="Training Status" value="2 Pending" icon={CheckCircle} color="text-yellow-400" bg="bg-yellow-500/10" />
-          <StatsCard title="Access Level" value="Level 3" icon={Lock} color="text-blue-400" bg="bg-blue-500/10" />
-          <StatsCard title="Incidents (YTD)" value={recentIncidents.length.toString()} icon={AlertTriangle} color="text-orange-400" bg="bg-orange-500/10" />
-          <StatsCard title="Compliance" value="98%" icon={FileText} color="text-green-400" bg="bg-green-500/10" />
-          <StatsCard title="Credential Health" value="1 Expiring" icon={Shield} color="text-red-400" bg="bg-red-500/10" />
+        {/* Stats Cards — only metrics backed by real data are shown */}
+        <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <StatsCard title="Incidents (YTD)" value={stats.incidentsYTD.toString()} icon={AlertTriangle} color="text-orange-400" bg="bg-orange-500/10" />
+          <StatsCard title="Training Status" value={`${stats.pendingTrainings} Pending`} icon={CheckCircle} color="text-yellow-400" bg="bg-yellow-500/10" />
+          <StatsCard title="Credential Health" value={`${stats.expiringCredentials} Expiring`} icon={Shield} color="text-red-400" bg="bg-red-500/10" />
         </div>
       </div>
 
@@ -76,10 +72,11 @@ export default function SecurityDashboard({ setActiveTab }) {
             </CardTitle>
             <Button variant="ghost" size="sm" onClick={() => setActiveTab('incidents')} className="text-gray-400 hover:text-white">View All</Button>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <AlertItem type="critical" title="Urgent: Patch Required" desc="Update your OS to latest version immediately." />
-            <AlertItem type="warning" title="New Device Login" desc="Login from Safari on macOS detected at 10:45 AM." />
-            <AlertItem type="info" title="Policy Update" desc="New Remote Work policy effective Feb 1st." />
+          <CardContent>
+            <div className="flex flex-col items-center justify-center h-40 text-gray-500">
+              <CheckCircle className="h-10 w-10 mb-2 opacity-20" />
+              <p className="text-sm">No active security alerts.</p>
+            </div>
           </CardContent>
         </Card>
 
@@ -92,7 +89,10 @@ export default function SecurityDashboard({ setActiveTab }) {
             <Button variant="ghost" size="sm" onClick={() => setActiveTab('awareness')} className="text-gray-400 hover:text-white">Go to Learning</Button>
           </CardHeader>
           <CardContent>
-            <TrainingProgress trainings={mockTraining} />
+            <div className="flex flex-col items-center justify-center h-40 text-gray-500">
+              <GraduationCap className="h-10 w-10 mb-2 opacity-20" />
+              <p className="text-sm">No training assigned yet.</p>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -172,17 +172,6 @@ function StatsCard({ title, value, icon: Icon, color, bg }) {
         </div>
       </CardContent>
     </Card>
-  );
-}
-
-function AlertItem({ type, title, desc }) {
-  const color = type === 'critical' ? 'text-red-400' : type === 'warning' ? 'text-orange-400' : 'text-blue-400';
-  const border = type === 'critical' ? 'border-l-red-500' : type === 'warning' ? 'border-l-orange-500' : 'border-l-blue-500';
-  return (
-    <div className={`pl-3 border-l-2 ${border} py-1`}>
-      <h4 className={`text-sm font-bold ${color}`}>{title}</h4>
-      <p className="text-xs text-gray-400 mt-0.5">{desc}</p>
-    </div>
   );
 }
 

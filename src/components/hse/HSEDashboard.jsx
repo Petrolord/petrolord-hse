@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useHSE } from '@/context/HSEContext';
-import { Activity, Shield, Droplet, FileText, Brain, ArrowRight } from 'lucide-react';
+import { Activity, Shield, Droplet, FileText, Brain, ArrowRight, AlertTriangle, Users, ClipboardCheck, GraduationCap } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 
 // Gamification Components
@@ -18,19 +18,22 @@ import { OrganizationSetup } from './OrganizationSetup';
 // New World Heatmap
 import WorldHeatmap from '@/components/petrolord/WorldHeatmap';
 
-// Services
-import { fetchHealthData } from '../../services/healthService';
-import { fetchSecurityData } from '../../services/securityService';
+// Services — each tile is backed by a real aggregation (no mock fallbacks)
+import { getHealthScore } from '../../services/healthService';
+import { securityService } from '../../services/securityService';
 import { fetchEnvironmentData } from '../../services/environmentService';
+import { permitsService } from '../../services/permitsService';
+import { riskService } from '../../services/riskService';
+import { contractorService } from '../../services/contractorService';
+import { auditService } from '../../services/auditService';
+import { trainingService } from '../../services/trainingService';
 
 export default function HSEDashboard() {
   const { setActiveModule, currentOrganization, role } = useHSE();
   const [showSetupWizard, setShowSetupWizard] = useState(false);
   
-  // New Data States
-  const [healthData, setHealthData] = useState(null);
-  const [securityData, setSecurityData] = useState(null);
-  const [environmentData, setEnvironmentData] = useState(null);
+  // KPI metrics — one honest value per pillar (null = no data yet → '--')
+  const [metrics, setMetrics] = useState(null);
   const [dataLoading, setDataLoading] = useState(false);
 
   // Check if user is an admin to show setup advisory
@@ -44,16 +47,30 @@ export default function HSEDashboard() {
   }, [currentOrganization?.id]);
 
   const loadAllData = async () => {
+    const orgId = currentOrganization.id;
     try {
       setDataLoading(true);
-      const [health, security, environment] = await Promise.all([
-        fetchHealthData(currentOrganization.id).catch(() => null),
-        fetchSecurityData(currentOrganization.id).catch(() => null),
-        fetchEnvironmentData(currentOrganization.id).catch(() => null),
+      const [health, security, environment, permits, risk, contractor, audit, training] = await Promise.all([
+        getHealthScore(orgId).catch(() => null),
+        securityService.getIncidentCount(orgId).catch(() => null),
+        fetchEnvironmentData(orgId).catch(() => null),
+        permitsService.getStats(orgId).catch(() => null),
+        riskService.getDashboardStats(orgId).catch(() => null),
+        contractorService.getDashboardMetrics(orgId).catch(() => null),
+        auditService.getDashboardStats(orgId).catch(() => null),
+        trainingService.getDashboardStats(orgId).catch(() => null),
       ]);
-      setHealthData(health);
-      setSecurityData(security);
-      setEnvironmentData(environment);
+
+      setMetrics({
+        healthScore: health,
+        securityCount: security,
+        envScore: environment?.environmental_score ?? null,
+        permitsActive: permits?.active ?? null,
+        criticalRisks: risk?.critical ?? null,
+        activeContractors: contractor?.activeContractors ?? null,
+        openFindings: audit?.openFindings ?? null,
+        trainingRecords: training?.trainingRecords ?? null,
+      });
     } catch (error) {
       console.error('❌ [HSE DASHBOARD] Error loading data:', error);
     } finally {
@@ -67,10 +84,10 @@ export default function HSEDashboard() {
 
   return (
     <div className="h-[calc(100vh-64px)] overflow-y-auto bg-[var(--bg-app)] p-6 pb-24">
-      {/* Organization Setup Advisory Banner */}
+      {/* PETROLORD ORG SETUP BANNER v2 (2026-05-09): navigates to hub */}
       {shouldShowAdvisory && (
         <OrganizationSetupAdvisory 
-          onSetupClick={() => setShowSetupWizard(true)}
+          onSetupClick={() => setActiveModule({ id: 'admin-setup-hub', label: 'Setup Hub' })}
           onDismiss={() => {}}
         />
       )}
@@ -124,36 +141,16 @@ export default function HSEDashboard() {
           <TeamLeaderboard organizationId={currentOrganization?.id} />
         </div>
         
-        {/* KPI Cards */}
+        {/* KPI Cards — every pillar, each backed by a real aggregation */}
         <div className="md:col-span-8 grid grid-cols-2 md:grid-cols-4 gap-4">
-           <KpiCard 
-             title="Health Score" 
-             value={healthData ? `${healthData.health_score}%` : '--'} 
-             color="text-green-500" 
-             icon={Activity} 
-             loading={dataLoading}
-           />
-           <KpiCard 
-             title="Security Incidents" 
-             value={securityData ? securityData.total_incidents : '--'} 
-             color="text-red-500" 
-             icon={Shield} 
-             loading={dataLoading}
-           />
-           <KpiCard 
-             title="Env Score" 
-             value={environmentData ? `${environmentData.environmental_score}%` : '--'} 
-             color="text-blue-500" 
-             icon={Droplet} 
-             loading={dataLoading}
-           />
-           <KpiCard 
-             title="Permits Active" 
-             value="--" 
-             color="text-orange-500" 
-             icon={FileText} 
-             loading={dataLoading}
-           />
+           <KpiCard title="Health Score"       value={fmtPct(metrics?.healthScore)}      color="text-green-500"  icon={Activity}       loading={dataLoading} />
+           <KpiCard title="Security Incidents"  value={fmtNum(metrics?.securityCount)}    color="text-red-500"    icon={Shield}         loading={dataLoading} />
+           <KpiCard title="Env Score"           value={fmtPct(metrics?.envScore)}         color="text-blue-500"   icon={Droplet}        loading={dataLoading} />
+           <KpiCard title="Permits Active"      value={fmtNum(metrics?.permitsActive)}    color="text-orange-500" icon={FileText}       loading={dataLoading} />
+           <KpiCard title="Critical Risks"      value={fmtNum(metrics?.criticalRisks)}    color="text-yellow-500" icon={AlertTriangle}  loading={dataLoading} />
+           <KpiCard title="Active Contractors"  value={fmtNum(metrics?.activeContractors)} color="text-cyan-500"  icon={Users}          loading={dataLoading} />
+           <KpiCard title="Open Findings"       value={fmtNum(metrics?.openFindings)}     color="text-purple-500" icon={ClipboardCheck} loading={dataLoading} />
+           <KpiCard title="Training Records"    value={fmtNum(metrics?.trainingRecords)}  color="text-pink-500"   icon={GraduationCap}  loading={dataLoading} />
         </div>
       </div>
 
@@ -170,6 +167,10 @@ export default function HSEDashboard() {
     </div>
   );
 }
+
+// Honest formatters: null/undefined → '--' (no data), never a faked number.
+const fmtNum = (v) => (v == null ? '--' : v);
+const fmtPct = (v) => (v == null ? '--' : `${v}%`);
 
 function KpiCard({ title, value, color, icon: Icon, loading }) {
   return (

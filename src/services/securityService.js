@@ -1,121 +1,117 @@
 import { supabase } from '../lib/customSupabaseClient';
 
 /**
- * Get mock security data for fallback
- */
-const getMockSecurityData = () => ({
-  totalEvents: 154,
-  criticalIncidents: 3,
-  accessViolations: 12,
-  uptime: "99.9%",
-  incidents: [
-    { 
-      id: 1, 
-      title: "Unauthorized Access at Main Gate", 
-      report_type: "Unauthorized Access",
-      severity: "High", 
-      status: "Open", 
-      incident_date: new Date().toISOString(),
-      reference_code: "SEC-1001"
-    },
-    { 
-      id: 2, 
-      title: "Lost Badge Reported", 
-      report_type: "Physical Security",
-      severity: "Low", 
-      status: "Resolved", 
-      incident_date: new Date(Date.now() - 86400000).toISOString(),
-      reference_code: "SEC-1002"
-    }
-  ],
-  accessLogs: [
-    { id: 1, user: "John Doe", location: "Server Room", status: "Denied", timestamp: new Date().toISOString() },
-    { id: 2, user: "Jane Smith", location: "Main Entrance", status: "Granted", timestamp: new Date(Date.now() - 3600000).toISOString() }
-  ]
-});
-
-/**
- * Security Service object
+ * Security service. The live security incident flow (logging + lists) goes
+ * through `incidentService` against `public.security_incidents`; this service
+ * provides the org-scoped aggregations the Security dashboard and analytics
+ * read from that same table. No mock data — empty orgs return honest zeros/[].
  */
 export const securityService = {
   /**
-   * Get aggregated security statistics
+   * Aggregated security statistics for the Security dashboard cards:
+   *   - incidentsYTD: security_incidents reported this calendar year
+   *   - pendingTrainings: upcoming scheduled training sessions
+   *   - expiringCredentials: competencies expiring within the next 30 days
    */
   getSecurityStats: async (orgId) => {
-    // In a real implementation, this would aggregate data from the database
-    // For now, we return mock data structure
-    const mock = getMockSecurityData();
-    return {
-      totalEvents: mock.totalEvents,
-      criticalIncidents: mock.criticalIncidents,
-      accessViolations: mock.accessViolations,
-      uptime: mock.uptime
-    };
-  },
-
-  /**
-   * Get security incidents
-   */
-  getIncidents: async (orgId) => {
+    const empty = { incidentsYTD: 0, pendingTrainings: 0, expiringCredentials: 0 };
+    if (!orgId) return empty;
     try {
-      const { data, error } = await supabase
-        .from('incidents')
-        .select('*')
-        .eq('organization_id', orgId)
-        .eq('hazard_category', 'Security')
-        .order('incident_date', { ascending: false });
+      const now = new Date();
+      const yearStart = new Date(now.getFullYear(), 0, 1).toISOString();
+      const today = now.toISOString().slice(0, 10);
+      const nowIso = now.toISOString();
+      const in30Days = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString();
+      const hse = supabase.schema('hse');
 
-      if (error) throw error;
-      return data.length > 0 ? data : getMockSecurityData().incidents;
-    } catch (error) {
-      console.error('Error fetching security incidents:', error);
-      return getMockSecurityData().incidents;
-    }
-  },
+      const [incidents, pending, expiring] = await Promise.all([
+        supabase.from('security_incidents').select('id', { count: 'exact', head: true }).eq('organization_id', orgId).gte('incident_date', yearStart),
+        hse.from('training_schedule').select('id', { count: 'exact', head: true }).eq('org_id', orgId).gte('scheduled_date', today),
+        hse.from('competency_records').select('id', { count: 'exact', head: true }).eq('org_id', orgId).not('expiry_date', 'is', null).gte('expiry_date', nowIso).lte('expiry_date', in30Days),
+      ]);
 
-  /**
-   * Get access logs
-   */
-  getAccessLogs: async (orgId) => {
-    // Mocking access logs as there is no specific table in the schema
-    return getMockSecurityData().accessLogs;
-  },
-
-  /**
-   * Create a new security incident
-   */
-  createSecurityIncident: async (payload) => {
-    try {
-      const dbPayload = {
-        organization_id: payload.org_id,
-        reference_code: payload.incident_code,
-        title: payload.title,
-        report_type: payload.type,
-        hazard_category: 'Security',
-        severity: payload.severity,
-        site_id: payload.location_id,
-        description: payload.description,
-        incident_date: payload.date,
-        status: payload.status,
-        created_by: payload.created_by,
-        // Store assigned_to in people_involved JSONB column
-        people_involved: payload.assigned_to ? [{ role: 'Investigator', user_id: payload.assigned_to }] : []
+      return {
+        incidentsYTD: incidents.count || 0,
+        pendingTrainings: pending.count || 0,
+        expiringCredentials: expiring.count || 0,
       };
-
-      const { data, error } = await supabase
-        .from('incidents')
-        .insert([dbPayload])
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    } catch (error) {
-      console.error('Error creating security incident:', error);
-      throw error;
+    } catch (e) {
+      console.error('Error getting security stats:', e);
+      return empty;
     }
-  }
-};
+  },
 
-// Backward compatibility export if needed
-export const fetchSecurityData = securityService.getIncidents;
+  /**
+   * Total count of security incidents for an org. Used by the main HSE
+   * dashboard tile.
+   */
+  getIncidentCount: async (orgId) => {
+    if (!orgId) return 0;
+    const { count, error } = await supabase
+      .from('security_incidents')
+      .select('id', { count: 'exact', head: true })
+      .eq('organization_id', orgId);
+
+    if (error) {
+      console.error('Error counting security incidents:', error);
+      return 0;
+    }
+    return count || 0;
+  },
+
+  /**
+   * Chart data for the Security Analytics tab, derived from a single
+   * `security_incidents` read (org-scoped):
+   *   - severityDistribution: incident count by severity (pie), ordered
+   *     Critical -> High -> Medium -> Low so the red->green palette lines up
+   *   - incidentTrend: incidents per month over the trailing 6 months (line)
+   * Returns []/all-zero when the org has no incidents.
+   */
+  getIncidentAnalytics: async (orgId) => {
+    const empty = { severityDistribution: [], incidentTrend: [] };
+    if (!orgId) return empty;
+    try {
+      const { data, error } = await supabase
+        .from('security_incidents')
+        .select('severity, incident_date')
+        .eq('organization_id', orgId);
+      if (error) throw error;
+      const rows = data || [];
+
+      // Pie: count by severity, in a fixed high->low order.
+      const order = ['Critical', 'High', 'Medium', 'Low'];
+      const counts = {};
+      rows.forEach(r => {
+        const key = r.severity || 'Unspecified';
+        counts[key] = (counts[key] || 0) + 1;
+      });
+      const ordered = [
+        ...order.filter(s => counts[s]),
+        ...Object.keys(counts).filter(s => !order.includes(s)),
+      ];
+      const severityDistribution = ordered.map(name => ({ name, value: counts[name] }));
+
+      // Line: incidents per month over the trailing 6 months.
+      const now = new Date();
+      const months = [];
+      const monthIndex = {};
+      for (let i = 5; i >= 0; i--) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        monthIndex[key] = months.length;
+        months.push({ month: d.toLocaleString('default', { month: 'short' }), incidents: 0 });
+      }
+      rows.forEach(r => {
+        if (!r.incident_date) return;
+        const d = new Date(r.incident_date);
+        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        if (key in monthIndex) months[monthIndex[key]].incidents += 1;
+      });
+
+      return { severityDistribution, incidentTrend: months };
+    } catch (e) {
+      console.error('Error getting incident analytics:', e);
+      return empty;
+    }
+  },
+};
