@@ -158,7 +158,6 @@ export default function PrivacyPolicyPage() {
               <p>If you have any questions about this Privacy Policy, please contact us:</p>
               <ul className="list-none space-y-2 mt-4 text-white">
                 <li><strong>By email:</strong> privacy@petrolord.com</li>
-                <li><strong>By mail:</strong> 8 The Providence Street, Lekki Phase 1, Lagos, Nigeria</li>
               </ul>
             </DocumentationSection>
           </main>
