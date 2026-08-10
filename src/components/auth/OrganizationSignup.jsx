@@ -3,8 +3,9 @@
 // Replaces the prior register-org-admin edge function path. Calls
 // supabase.auth.signUp() directly, passing primary_app: 'hse' in metadata.
 // The consolidated handle_new_user trigger handles all org/member/app
-// provisioning. After confirmation email, user lands on www.petrolord.com
-// dashboard (unified Suite + HSE landing).
+// provisioning. The confirmation email redirects back to this app's origin
+// (/auth/callback), which requires the origin to be in the Supabase auth
+// uri_allow_list. site_url stays www.petrolord.com (shared with the Suite).
 
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -163,6 +164,7 @@ const OrganizationSignup = () => {
         email: formData.email,
         password: formData.password,
         options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
           data: {
             full_name: formData.fullName,
             organization_name: formData.orgName,
