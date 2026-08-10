@@ -21,15 +21,20 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
+import { QRCodeCanvas } from 'qrcode.react';
 import { orgAdminService } from '@/services/orgAdminService';
 
+// Must stay in sync with the organization_sites_site_type_check constraint
+// (migration 20260810210000).
 const SITE_TYPES = [
-  { value: 'rig',     label: 'Rig' },
-  { value: 'plant',   label: 'Plant / Refinery' },
-  { value: 'office',  label: 'Office' },
-  { value: 'depot',   label: 'Depot / Warehouse' },
-  { value: 'field',   label: 'Field / Outdoor' },
-  { value: 'other',   label: 'Other' },
+  { value: 'rig',       label: 'Rig' },
+  { value: 'plant',     label: 'Plant / Refinery' },
+  { value: 'facility',  label: 'Facility' },
+  { value: 'office',    label: 'Office' },
+  { value: 'depot',     label: 'Depot' },
+  { value: 'warehouse', label: 'Warehouse' },
+  { value: 'field',     label: 'Field / Outdoor' },
+  { value: 'other',     label: 'Other' },
 ];
 
 const emptyForm = {
@@ -55,13 +60,75 @@ export default function SitesAdmin() {
   const [showQrFor, setShowQrFor] = useState(null);
   const [copiedUrl, setCopiedUrl] = useState(false);
 
+  const [qrBusy, setQrBusy] = useState(false);
+  const [confirmRegenerate, setConfirmRegenerate] = useState(false);
+
   const buildQrUrl = (token) => {
     if (!token) return '';
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
     return origin + '/observe/' + token;
   };
-  const buildQrImage = (url) =>
-    'https://api.qrserver.com/v1/create-qr-code/?size=400x400&margin=10&data=' + encodeURIComponent(url);
+
+  // Open a minimal window with a poster layout and print it, instead of
+  // window.print() which printed the whole dark app chrome.
+  const printPoster = (site) => {
+    const canvas = document.getElementById('site-qr-canvas');
+    if (!canvas) return;
+    const dataUrl = canvas.toDataURL('image/png');
+    const w = window.open('', '_blank', 'width=800,height=1000');
+    if (!w) return;
+    w.document.write(`<!doctype html><html><head><title>Safety Observation QR: ${site.name}</title>
+      <style>
+        body { font-family: Arial, Helvetica, sans-serif; margin: 0; padding: 40px; color: #0f172a; text-align: center; }
+        .brand { background: #facc15; padding: 14px; font-weight: bold; font-size: 22px; border-radius: 8px; }
+        h1 { font-size: 30px; margin: 28px 0 6px; }
+        .site { font-size: 22px; color: #334155; margin-bottom: 24px; }
+        img { width: 340px; height: 340px; }
+        .steps { text-align: left; display: inline-block; font-size: 17px; line-height: 1.7; margin-top: 24px; }
+        .foot { margin-top: 28px; font-size: 13px; color: #64748b; }
+        @media print { body { padding: 20px; } }
+      </style></head><body>
+      <div class="brand">Petrolord HSE</div>
+      <h1>See something unsafe? Report it.</h1>
+      <div class="site">${site.name}</div>
+      <img src="${dataUrl}" alt="QR code" />
+      <div class="steps">
+        1. Scan the code with your phone camera<br/>
+        2. Describe what you saw. Add a photo or voice note<br/>
+        3. Submit. No login or app needed
+      </div>
+      <div class="foot">Reports go directly to the site safety team. You can report anonymously.</div>
+      <script>window.onload = function(){ window.print(); }<\/script>
+      </body></html>`);
+    w.document.close();
+  };
+
+  const handleRegenerate = async (site) => {
+    setQrBusy(true);
+    const { data, error } = await orgAdminService.regenerateQrToken(site.id);
+    setQrBusy(false);
+    setConfirmRegenerate(false);
+    if (error) {
+      toast({ title: 'Could not regenerate code', description: error.message, variant: 'destructive' });
+      return;
+    }
+    toast({ title: 'New QR code issued', description: 'Previously printed posters for this site no longer work.' });
+    setShowQrFor(data);
+    await refresh();
+  };
+
+  const handleToggleQr = async (site) => {
+    setQrBusy(true);
+    const { data, error } = await orgAdminService.setQrEnabled(site.id, !site.qr_enabled);
+    setQrBusy(false);
+    if (error) {
+      toast({ title: 'Could not update QR status', description: error.message, variant: 'destructive' });
+      return;
+    }
+    toast({ title: data.qr_enabled ? 'QR submissions enabled' : 'QR submissions disabled' });
+    setShowQrFor(data);
+    await refresh();
+  };
 
   const copyUrl = async (url) => {
     try {
@@ -321,7 +388,7 @@ export default function SitesAdmin() {
       </Dialog>
 
       {/* QR display dialog */}
-      <Dialog open={!!showQrFor} onOpenChange={() => setShowQrFor(null)}>
+      <Dialog open={!!showQrFor} onOpenChange={() => { setShowQrFor(null); setConfirmRegenerate(false); }}>
         <DialogContent className="bg-white border-slate-300 text-slate-900 max-w-lg">
           <DialogHeader>
             <DialogTitle className="text-slate-900">QR code for {showQrFor?.name}</DialogTitle>
@@ -331,13 +398,20 @@ export default function SitesAdmin() {
           </DialogHeader>
           {showQrFor && (
             <div className="py-4 flex flex-col items-center gap-4">
-              <img
-                src={buildQrImage(buildQrUrl(showQrFor.qr_token))}
-                alt="QR code"
-                className="border border-slate-200 rounded-lg max-w-full h-auto"
-                width={300}
-                height={300}
-              />
+              {showQrFor.qr_enabled === false && (
+                <div className="w-full text-xs text-red-700 bg-red-50 border border-red-200 rounded p-2 text-center">
+                  QR submissions are currently disabled for this site. Anyone scanning the code sees a "disabled" message.
+                </div>
+              )}
+              <div className={`border border-slate-200 rounded-lg p-3 bg-white ${showQrFor.qr_enabled === false ? 'opacity-40' : ''}`}>
+                <QRCodeCanvas
+                  id="site-qr-canvas"
+                  value={buildQrUrl(showQrFor.qr_token)}
+                  size={300}
+                  marginSize={2}
+                  level="M"
+                />
+              </div>
               <div className="w-full">
                 <div className="text-xs text-slate-500 mb-1">Public URL</div>
                 <div className="flex items-center gap-2">
@@ -355,6 +429,36 @@ export default function SitesAdmin() {
                   </Button>
                 </div>
               </div>
+
+              {confirmRegenerate ? (
+                <div className="w-full text-xs bg-amber-50 border border-amber-300 rounded p-3">
+                  <div className="text-amber-800 mb-2">
+                    Issue a new code? Every previously printed poster for this site will stop working.
+                  </div>
+                  <div className="flex gap-2 justify-end">
+                    <Button variant="outline" size="sm" onClick={() => setConfirmRegenerate(false)}>Cancel</Button>
+                    <Button size="sm" disabled={qrBusy} onClick={() => handleRegenerate(showQrFor)} className="bg-amber-600 hover:bg-amber-700 text-white">
+                      {qrBusy ? 'Working...' : 'Yes, issue new code'}
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="w-full flex items-center justify-between gap-2">
+                  <Button variant="outline" size="sm" disabled={qrBusy} onClick={() => setConfirmRegenerate(true)}>
+                    <RefreshCw className="w-3.5 h-3.5 mr-1" /> Regenerate code
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={qrBusy}
+                    onClick={() => handleToggleQr(showQrFor)}
+                    className={showQrFor.qr_enabled === false ? 'text-green-700' : 'text-red-600'}
+                  >
+                    {showQrFor.qr_enabled === false ? 'Enable submissions' : 'Disable submissions'}
+                  </Button>
+                </div>
+              )}
+
               <div className="w-full text-xs text-slate-500 bg-slate-50 border border-slate-200 rounded p-2">
                 Tip: print the QR on a laminated card and post it at the site entrance, near the safety briefing board.
               </div>
@@ -363,10 +467,11 @@ export default function SitesAdmin() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowQrFor(null)}>Close</Button>
             <Button
-              onClick={() => window.print()}
+              onClick={() => printPoster(showQrFor)}
+              disabled={showQrFor?.qr_enabled === false}
               className="bg-blue-600 hover:bg-blue-700"
             >
-              Print
+              Print poster
             </Button>
           </DialogFooter>
         </DialogContent>

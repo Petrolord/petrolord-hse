@@ -148,6 +148,50 @@ export const orgAdminService = {
     }
   },
 
+  // Issue a fresh QR token for a site. Any previously printed QR posters for
+  // this site stop working immediately.
+  regenerateQrToken: async (siteId) => {
+    if (!siteId) return { data: null, error: new Error('siteId is required') };
+    try {
+      const { data, error } = await supabase
+        .from('organization_sites')
+        .update({ qr_token: crypto.randomUUID(), updated_at: new Date().toISOString() })
+        .eq('id', siteId)
+        .select()
+        .single();
+      if (!error && data) {
+        await safeAuditLog(data.organization_id, 'org.site.qr_regenerated', siteId, {
+          site_name: data.name
+        });
+      }
+      return { data, error };
+    } catch (err) {
+      return { data: null, error: err };
+    }
+  },
+
+  // Enable or disable public QR submissions for a site without changing the
+  // token. Disabled sites show a clear message to anyone scanning the code.
+  setQrEnabled: async (siteId, enabled) => {
+    if (!siteId) return { data: null, error: new Error('siteId is required') };
+    try {
+      const { data, error } = await supabase
+        .from('organization_sites')
+        .update({ qr_enabled: !!enabled, updated_at: new Date().toISOString() })
+        .eq('id', siteId)
+        .select()
+        .single();
+      if (!error && data) {
+        await safeAuditLog(data.organization_id, enabled ? 'org.site.qr_enabled' : 'org.site.qr_disabled', siteId, {
+          site_name: data.name
+        });
+      }
+      return { data, error };
+    } catch (err) {
+      return { data: null, error: err };
+    }
+  },
+
   // =========================================================================
   // DEPARTMENTS
   // =========================================================================
