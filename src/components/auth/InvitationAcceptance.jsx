@@ -94,7 +94,10 @@ export default function InvitationAcceptance() {
             organization_id: invite.org_id,
             // handle_new_user defaults role to 'owner' when absent, which would
             // make every invitee an org admin. Always pass the invited role.
-            role: invite.role || 'member'
+            role: invite.role || 'member',
+            // ...and it defaults primary_app to 'suite', which would provision
+            // a Suite trial app onto this HSE org. Pin it to hse.
+            primary_app: 'hse'
           }
         }
       });
