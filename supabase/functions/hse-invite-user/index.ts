@@ -15,15 +15,8 @@
 // behaviour.
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import nodemailer from 'https://esm.sh/nodemailer@6.9.13';
 import { corsHeaders } from './cors.ts';
-
-const SMTP_HOST = Deno.env.get('BREVO_SMTP_HOST');
-const SMTP_PORT = parseInt(Deno.env.get('BREVO_SMTP_PORT') || '587');
-const SMTP_USER = Deno.env.get('BREVO_SMTP_USER');
-const SMTP_PASS = Deno.env.get('BREVO_SMTP_PASSWORD');
-const SENDER_EMAIL = Deno.env.get('BREVO_SENDER_EMAIL') || 'no-reply@petrolord.com';
-const SENDER_NAME = Deno.env.get('BREVO_SENDER_NAME') || 'Petrolord HSE';
+import { sendEmail } from '../_shared/email.ts';
 
 const supabaseAdmin = createClient(
   Deno.env.get('SUPABASE_URL') ?? '',
@@ -121,46 +114,30 @@ Deno.serve(async (req) => {
     const origin = req.headers.get('origin') || 'https://hse.petrolord.com';
     const inviteLink = `${origin}/accept-invite/${invite.token}`;
 
-    // Best-effort email. Any failure falls through to the link fallback.
-    let emailSent = false;
-    let emailError: string | null = null;
-    if (SMTP_HOST && SMTP_USER && SMTP_PASS) {
-      try {
-        const transporter = nodemailer.createTransport({
-          host: SMTP_HOST,
-          port: SMTP_PORT,
-          secure: SMTP_PORT === 465,
-          auth: { user: SMTP_USER, pass: SMTP_PASS },
-        });
-        const info = await transporter.sendMail({
-          from: `"${SENDER_NAME}" <${SENDER_EMAIL}>`,
-          to: email,
-          subject: 'You have been invited to join an organization on Petrolord HSE',
-          html: `
-            <div style="font-family: Arial, sans-serif; padding: 20px; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #eee; border-radius: 8px;">
-              <h1 style="color: #1a1a2e; margin-bottom: 16px;">Invitation to Join</h1>
-              <p style="font-size: 16px; line-height: 1.5; margin-bottom: 24px;">
-                You have been invited to join an organization on <strong>Petrolord HSE</strong> as a <strong>${invite.role}</strong>.
-              </p>
-              <div style="text-align: center; margin: 32px 0;">
-                <a href="${inviteLink}" style="padding: 14px 28px; background-color: #2563eb; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block; font-size: 16px;">Accept Invitation</a>
-              </div>
-              <p style="font-size: 14px; color: #666; text-align: center;">
-                This link is valid for 7 days.
-              </p>
-            </div>
-          `,
-        });
-        emailSent = true;
-        console.log('[hse-invite-user] email sent:', info.messageId);
-      } catch (err) {
-        emailError = err?.message || 'Email delivery failed.';
-        console.error('[hse-invite-user] email send failed:', emailError);
-      }
-    } else {
-      emailError = 'Email service not configured.';
-      console.error('[hse-invite-user] SMTP env vars missing');
-    }
+    // Best-effort email via the shared Resend -> Brevo HTTP API helper (the
+    // same path the Suite invite flow uses). Delivery failure never fails the
+    // request: the caller shows the invite link as a copy/share fallback.
+    const html = `
+      <div style="font-family: Arial, sans-serif; padding: 20px; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #eee; border-radius: 8px;">
+        <h1 style="color: #1a1a2e; margin-bottom: 16px;">Invitation to Join</h1>
+        <p style="font-size: 16px; line-height: 1.5; margin-bottom: 24px;">
+          You have been invited to join an organization on <strong>Petrolord HSE</strong> as a <strong>${invite.role}</strong>.
+        </p>
+        <div style="text-align: center; margin: 32px 0;">
+          <a href="${inviteLink}" style="padding: 14px 28px; background-color: #2563eb; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block; font-size: 16px;">Accept Invitation</a>
+        </div>
+        <p style="font-size: 14px; color: #666; text-align: center;">
+          This link is valid for 7 days.
+        </p>
+      </div>
+    `;
+    const emailSent = await sendEmail({
+      to: email,
+      subject: 'You have been invited to join an organization on Petrolord HSE',
+      html,
+      logPrefix: '[hse-invite-user]',
+    });
+    const emailError = emailSent ? null : 'Email delivery failed. Share the invite link directly.';
 
     return json({ success: true, emailSent, emailError, invite, inviteLink });
   } catch (error) {
