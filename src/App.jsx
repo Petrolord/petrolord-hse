@@ -21,6 +21,8 @@ import SuiteDashboard from '@/components/suite/SuiteDashboard';
 import AdvancedAnalyticsDashboard from '@/components/hse/analytics/AdvancedAnalyticsDashboard';
 import SafetyContentAuditor from '@/components/admin/SafetyContentAuditor';
 import OrganizationSettings from '@/pages/OrganizationSettings';
+import UpgradePage from '@/pages/UpgradePage';
+import PaymentVerifyPage from '@/pages/PaymentVerifyPage';
 import { HSEProvider } from '@/context/HSEContext';
 import { AuthProvider } from '@/contexts/SupabaseAuthContext';
 import { GlobalUIProvider } from '@/context/GlobalUIContext';
@@ -88,12 +90,18 @@ function App() {
                             {/* Set/Update Password Route - Protected by magic link session or auth state */}
                             {/* FIXED: Path updated to match what edge functions redirect to */}
                             <Route path="/auth/reset-password" element={<SetPassword />} />
+
+                            {/* Payment provider redirect target — public so the
+                                confirmation always renders even if the session
+                                needs a refresh; verification is idempotent. */}
+                            <Route path="/payment/verify" element={<PaymentVerifyPage />} />
                             
                             {/* ================================================================== */}
                             {/* PROTECTED ROUTES - Require Authentication via ProtectedRoute */}
                             {/* ================================================================== */}
                             
                             <Route element={<ProtectedRoute />}>
+                               <Route path="/dashboard/upgrade" element={<UpgradePage />} />
                                <Route path="/dashboard/*" element={<PetrolordHSE />} />
                                <Route path="/dashboard/analytics/advanced" element={<AdvancedAnalyticsDashboard />} />
                                <Route path="/suite/*" element={<SuiteDashboard />} />

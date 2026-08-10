@@ -5,10 +5,12 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { pricingTiers, professionalPricing } from './data';
+import { useAuth } from '@/contexts/SupabaseAuthContext';
 import { cn } from '@/lib/utils';
 
 export default function PricingCards({ isAnnual }) {
   const [proTierIndex, setProTierIndex] = useState(0);
+  const { session } = useAuth() || {};
 
   const proDetails = professionalPricing[proTierIndex];
   const proPrice = isAnnual ? proDetails.annual : proDetails.monthly;
@@ -31,6 +33,13 @@ export default function PricingCards({ isAnnual }) {
   };
 
   const isInternal = (href) => href.startsWith('/');
+
+  // Signed-in users go straight to in-app checkout instead of re-signing up.
+  const resolveHref = (tier) => {
+    if (session && tier.id === 'professional') return '/dashboard/upgrade';
+    if (session && tier.id === 'free') return '/dashboard';
+    return tier.href;
+  };
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto px-4 relative z-10">
@@ -129,9 +138,9 @@ export default function PricingCards({ isAnnual }) {
               )}
               asChild
             >
-              {isInternal(tier.href)
-                ? <Link to={tier.href}>{tier.cta}</Link>
-                : <a href={tier.href}>{tier.cta}</a>}
+              {isInternal(resolveHref(tier))
+                ? <Link to={resolveHref(tier)}>{tier.cta}</Link>
+                : <a href={resolveHref(tier)}>{tier.cta}</a>}
             </Button>
           </CardFooter>
         </Card>

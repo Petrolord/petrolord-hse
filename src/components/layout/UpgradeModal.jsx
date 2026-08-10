@@ -40,7 +40,7 @@ export function UpgradeModal({ open, onOpenChange }) {
 
   const handleUpgrade = () => {
     onOpenChange(false);
-    navigate('/pricing');
+    navigate('/dashboard/upgrade');
   };
 
   return (
