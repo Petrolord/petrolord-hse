@@ -43,11 +43,12 @@ const SetupCard = ({ icon: Icon, title, description, count, label, complete, onC
 );
 
 export default function OrgSetupHub() {
-  const { currentOrganization, setActiveModule } = useHSE();
+  const { currentOrganization, setActiveModule, refreshContext } = useHSE();
   const [status, setStatus] = useState({
     siteCount: 0,
     departmentCount: 0,
     memberCount: 0,
+    pendingInviteCount: 0,
     setupComplete: false
   });
   const [loading, setLoading] = useState(true);
@@ -59,6 +60,18 @@ export default function OrgSetupHub() {
       setLoading(false);
     });
   }, [currentOrganization?.id]);
+
+  // Persist completion on the organization the first time the structural
+  // steps are all done (see also LaunchChecklist, which does the same from
+  // the dashboard side).
+  useEffect(() => {
+    const structuralDone = status.siteCount > 0 && status.departmentCount > 0
+      && (status.memberCount > 1 || status.pendingInviteCount > 0);
+    if (!structuralDone || !currentOrganization || currentOrganization.setup_completed) return;
+    orgAdminService.completeOrgSetup(currentOrganization.id).then(({ error }) => {
+      if (!error) refreshContext();
+    });
+  }, [status, currentOrganization?.id]);
 
   const goTo = (moduleId, label) => {
     setActiveModule({ id: moduleId, label });

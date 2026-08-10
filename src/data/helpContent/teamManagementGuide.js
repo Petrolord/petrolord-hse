@@ -29,7 +29,7 @@ export const teamManagementGuide = {
           { title: 'Confirm it was sent', description: 'A confirmation message appears, and the invitation shows up under "Pending Invitations" until it is accepted.' }
         ]},
         { type: 'alert', variant: 'info', title: 'Resending an invite', text: 'If a colleague does not receive their invitation, find them under "Pending Invitations" and click "Resend". A short cooldown applies before you can resend the same invite again.' },
-        { type: 'alert', variant: 'warning', title: 'Email service must be configured', text: 'Invitations are delivered through the Brevo email service. If email credentials are not set up, the invite will fail and you will be shown configuration steps. Contact your administrator if this happens.' }
+        { type: 'alert', variant: 'warning', title: 'If the email cannot be delivered', text: 'The invitation still gets created. Its link is copied to your clipboard with a notice, so you can share it with the person directly over chat or any channel you like. The link works exactly like the emailed one.' }
       ]
     },
     {

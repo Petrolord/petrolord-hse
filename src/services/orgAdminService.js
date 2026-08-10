@@ -477,18 +477,24 @@ export const orgAdminService = {
       return { data: null, error: new Error('organizationId is required') };
     }
     try {
-      const [sites, departments, members] = await Promise.all([
+      const [sites, departments, members, invites, reports] = await Promise.all([
         supabase.from('organization_sites').select('id', { count: 'exact', head: true })
           .eq('organization_id', organizationId).eq('is_active', true),
         supabase.from('departments').select('id', { count: 'exact', head: true })
           .eq('organization_id', organizationId).eq('is_active', true),
         supabase.from('organization_members').select('user_id', { count: 'exact', head: true })
+          .eq('organization_id', organizationId),
+        supabase.from('invitations').select('id', { count: 'exact', head: true })
+          .eq('org_id', organizationId).eq('status', 'pending'),
+        supabase.from('quick_reports').select('id', { count: 'exact', head: true })
           .eq('organization_id', organizationId)
       ]);
 
       const siteCount = sites.count || 0;
       const departmentCount = departments.count || 0;
       const memberCount = members.count || 0;
+      const pendingInviteCount = invites.count || 0;
+      const reportCount = reports.count || 0;
       // Setup is "complete enough" once there's at least one site and one department.
       // Members start at 1 (the org admin themselves) so that's not a useful gate.
       const setupComplete = siteCount > 0 && departmentCount > 0;
@@ -498,12 +504,31 @@ export const orgAdminService = {
           siteCount,
           departmentCount,
           memberCount,
+          pendingInviteCount,
+          reportCount,
           setupComplete
         },
         error: null
       };
     } catch (err) {
       console.error('getSetupStatus failed:', err);
+      return { data: null, error: err };
+    }
+  },
+
+  // Persist setup completion on the organization. RLS only lets super admins
+  // update organizations, so this goes through the narrow SECURITY DEFINER
+  // RPC (migration 20260810220000), which verifies the caller is an active
+  // org admin of that org.
+  completeOrgSetup: async (organizationId) => {
+    if (!organizationId) return { data: null, error: new Error('organizationId is required') };
+    try {
+      const { data, error } = await supabase.rpc('hse_complete_org_setup', { p_org_id: organizationId });
+      if (!error) {
+        await safeAuditLog(organizationId, 'org.setup.completed', organizationId, {});
+      }
+      return { data, error };
+    } catch (err) {
       return { data: null, error: err };
     }
   }
