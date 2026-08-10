@@ -61,7 +61,7 @@ export default function MyReportsList({ reports, onViewDetails }) {
                 </Badge>
               </td>
               <td className="px-6 py-4 text-xs">
-                {report.assignee?.raw_user_meta_data?.full_name || report.assignee?.email || 'Pending...'}
+                {report.assignee_name || (report.assigned_to ? 'Loading...' : <span className="text-slate-500 italic">Unassigned</span>)}
               </td>
               <td className="px-6 py-4 text-right">
                 <Button 
