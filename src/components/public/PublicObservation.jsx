@@ -34,8 +34,8 @@ export default function PublicObservation() {
   const [result, setResult] = useState(null);
   const [submitError, setSubmitError] = useState(null);
 
-  // Resolve the token via the public_qr_sites view to greet the reporter
-  // with the actual site name. Read-only; doesn't need auth.
+  // Resolve the token via the resolve_qr_token RPC, which returns at most
+  // the single site matching this token. No auth needed.
   useEffect(() => {
     if (!token) {
       setSiteError('Missing token in URL.');
@@ -43,9 +43,7 @@ export default function PublicObservation() {
       return;
     }
     supabase
-      .from('public_qr_sites')
-      .select('site_id, name, qr_enabled, organization_id')
-      .eq('qr_token', token)
+      .rpc('resolve_qr_token', { p_token: token })
       .maybeSingle()
       .then(({ data, error }) => {
         if (error || !data) {
