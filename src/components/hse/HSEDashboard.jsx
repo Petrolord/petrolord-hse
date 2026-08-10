@@ -11,9 +11,8 @@ import TeamLeaderboard from '@/components/gamification/TeamLeaderboard';
 // AI Components
 import PredictiveInsightsDashboard from '@/components/analytics/PredictiveInsightsDashboard';
 
-// Organization Setup Components
-import { OrganizationSetupAdvisory } from './OrganizationSetupAdvisory';
-import { OrganizationSetup } from './OrganizationSetup';
+// Organization Setup
+import LaunchChecklist from './LaunchChecklist';
 
 // New World Heatmap
 import WorldHeatmap from '@/components/petrolord/WorldHeatmap';
@@ -29,16 +28,11 @@ import { auditService } from '../../services/auditService';
 import { trainingService } from '../../services/trainingService';
 
 export default function HSEDashboard() {
-  const { setActiveModule, currentOrganization, role } = useHSE();
-  const [showSetupWizard, setShowSetupWizard] = useState(false);
-  
+  const { setActiveModule, currentOrganization } = useHSE();
+
   // KPI metrics — one honest value per pillar (null = no data yet → '--')
   const [metrics, setMetrics] = useState(null);
   const [dataLoading, setDataLoading] = useState(false);
-
-  // Check if user is an admin to show setup advisory
-  const isOrgAdmin = role === 'org_admin' || role === 'super_admin' || role === 'owner';
-  const shouldShowAdvisory = isOrgAdmin && currentOrganization && !currentOrganization.setup_completed;
 
   useEffect(() => {
     if (currentOrganization?.id) {
@@ -84,23 +78,8 @@ export default function HSEDashboard() {
 
   return (
     <div className="h-[calc(100vh-64px)] overflow-y-auto bg-[var(--bg-app)] p-6 pb-24">
-      {/* PETROLORD ORG SETUP BANNER v2 (2026-05-09): navigates to hub */}
-      {shouldShowAdvisory && (
-        <OrganizationSetupAdvisory 
-          onSetupClick={() => setActiveModule({ id: 'admin-setup-hub', label: 'Setup Hub' })}
-          onDismiss={() => {}}
-        />
-      )}
-
-      {/* Organization Setup Modal */}
-      {showSetupWizard && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-           <OrganizationSetup 
-             onComplete={() => setShowSetupWizard(false)}
-             onCancel={() => setShowSetupWizard(false)}
-           />
-        </div>
-      )}
+      {/* Setup checklist for org admins until setup_completed is persisted */}
+      <LaunchChecklist />
 
       {/* AI Safety Predictor — now wired to real forecasts (forecast-safety edge fn →
           OpenAI → predictions table). The AI Forecast tab is the default view. */}

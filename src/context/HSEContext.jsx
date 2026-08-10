@@ -201,10 +201,10 @@ export function HSEProvider({ children }) {
             setRealRole(mappedRole);
             // userModules now derived from organization_apps in the access check below
             
-            // Only update if organization truly changed
-            if (!currentOrganization || currentOrganization.id !== activeMembership.organization.id) {
-                setCurrentOrganization(activeMembership.organization);
-            }
+            // Always take the freshly fetched org object so field changes
+            // (e.g. setup_completed) propagate; refreshContext only runs on
+            // mount, SIGNED_IN, and explicit calls, so this cannot loop.
+            setCurrentOrganization(activeMembership.organization);
             
             setSubscription({
                 tier: activeMembership.organization?.subscription_tier || 'free',
@@ -372,7 +372,7 @@ export function HSEProvider({ children }) {
     checkPermission, isFeatureAvailable, trackUsage, refreshContext,
     setCurrentOrganization: handleSetCurrentOrganization
   }), [
-    isAuthenticated, isLoading, currentUser, currentOrganization?.id, organizations.length, 
+    isAuthenticated, isLoading, currentUser, currentOrganization?.id, currentOrganization?.setup_completed, organizations.length,
     role, realRole, simulatedRole, 
     activeModule.id, sidebarCounts.incidents, sidebarCounts.observations, sidebarCounts.actions
   ]);
