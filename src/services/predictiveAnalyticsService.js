@@ -1,5 +1,9 @@
 import { supabase } from '@/lib/customSupabaseClient';
 
+// Minimum combined quick reports + incidents before a forecast is worth the
+// AI call; below this the model has nothing real to reason from.
+const MIN_FORECAST_DATA_POINTS = 5;
+
 /**
  * Petrolord AI Safety Predictor - Phase 1: Data Aggregation & Foundation
  * This service aggregates data from Incidents, Actions, Audits, and Environment
@@ -268,6 +272,17 @@ export const predictiveAnalyticsService = {
 
     const summary = await this.buildForecastSummary(orgId);
 
+    // A forecast from an empty history is noise (and a wasted AI call).
+    // Require a handful of real data points before invoking the model.
+    const dataPoints =
+      (summary?.submitted_reports?.total || 0) +
+      (summary?.incidents?.total || 0);
+    if (dataPoints < MIN_FORECAST_DATA_POINTS) {
+      throw new Error(
+        `Not enough safety data to forecast yet. Submit at least ${MIN_FORECAST_DATA_POINTS} observations or incidents first (you have ${dataPoints}).`
+      );
+    }
+
     const { data, error } = await supabase.functions.invoke('forecast-safety', {
       body: { summary, priorAccuracy },
     });
@@ -282,8 +297,10 @@ export const predictiveAnalyticsService = {
     const horizon = forecast.horizon_days || 30;
     const expiresAt = new Date(Date.now() + horizon * 24 * 60 * 60 * 1000).toISOString();
 
-    // Headline row — full forecast object, used for display.
-    await supabase.from('predictions').insert({
+    // Headline row — full forecast object, used for display. A silent RLS
+    // rejection here previously made the forecast render once and then
+    // vanish on reload, so surface the failure.
+    const { error: headlineError } = await supabase.from('predictions').insert({
       organization_id: orgId,
       prediction_type: 'safety_forecast',
       predicted_value: forecast,
@@ -291,6 +308,10 @@ export const predictiveAnalyticsService = {
       timeframe: `${horizon} days`,
       expires_at: expiresAt,
     });
+    if (headlineError) {
+      console.error('persistForecast: headline insert failed:', headlineError);
+      throw new Error('The forecast was generated but could not be saved. Please try again or contact support.');
+    }
 
     // One row per predicted incident — these drive the feedback loop.
     const incidentRows = (forecast.predicted_incidents || []).map(pi => ({
@@ -303,7 +324,14 @@ export const predictiveAnalyticsService = {
       affected_department: pi.department || null,
       expires_at: expiresAt,
     }));
-    if (incidentRows.length) await supabase.from('predictions').insert(incidentRows);
+    if (incidentRows.length) {
+      const { error: incidentsError } = await supabase.from('predictions').insert(incidentRows);
+      if (incidentsError) {
+        // Headline persisted, so the forecast still displays; the feedback
+        // loop just skips this round. Log rather than fail.
+        console.error('persistForecast: incident rows insert failed:', incidentsError);
+      }
+    }
 
     // Best-effort insight record (ai_insights has no RLS we depend on).
     try {

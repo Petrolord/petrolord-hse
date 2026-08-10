@@ -56,9 +56,44 @@ export const getLeaderboard = async (orgId, limit = 10) => {
   }
 };
 
+// All badge definitions (badge catalog shown on the dashboard).
+export const getAllBadges = async () => {
+  try {
+    const { data, error } = await supabase
+      .from('badge_definitions')
+      .select('id, name, description, icon, requirement_type, requirement_count, rarity')
+      .order('requirement_count', { ascending: true });
+    if (error) throw error;
+    return data || [];
+  } catch (error) {
+    console.warn('Error fetching badge definitions:', error);
+    return [];
+  }
+};
+
+// Badges this user has unlocked in this organization.
+export const getUserBadges = async (userId, orgId) => {
+  try {
+    if (!userId) return [];
+    let query = supabase
+      .from('user_badges')
+      .select('badge_id, unlocked_at')
+      .eq('user_id', userId);
+    if (orgId) query = query.eq('organization_id', orgId);
+    const { data, error } = await query;
+    if (error) throw error;
+    return data || [];
+  } catch (error) {
+    console.warn('Error fetching user badges:', error);
+    return [];
+  }
+};
+
 export const gamificationService = {
   getUserScore,
-  getLeaderboard
+  getLeaderboard,
+  getAllBadges,
+  getUserBadges
 };
 
 export default gamificationService;

@@ -193,7 +193,16 @@ async function analyzeFromTranscriptionOnly(transcription: string): Promise<any>
 // error), we allow the analysis and log it. The quota protects the OpenAI
 // bill; a metering hiccup must never block a safety report. Explicit
 // outcomes (no auth, no org, over quota) still deny.
-async function checkQuota(req: Request): Promise<{ allowed: boolean; code?: string; usage?: any }> {
+function jwtRole(jwt: string): string | null {
+  try {
+    const payload = JSON.parse(atob(jwt.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+    return payload?.role || null;
+  } catch {
+    return null;
+  }
+}
+
+async function checkQuota(req: Request, body?: any): Promise<{ allowed: boolean; code?: string; usage?: any }> {
   const authHeader = req.headers.get('Authorization') || '';
   const jwt = authHeader.replace(/^Bearer\s+/i, '');
   if (!jwt) return { allowed: false, code: 'AUTH_REQUIRED' };
@@ -202,6 +211,24 @@ async function checkQuota(req: Request): Promise<{ allowed: boolean; code?: stri
     const admin = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
       auth: { persistSession: false },
     });
+
+    // Internal callers (submit-public-observation) invoke this function with
+    // the service-role key and name the org to meter against. Only holders of
+    // the service-role key can take this path, so the org id is trusted.
+    if (jwtRole(jwt) === 'service_role' && body?.metering_org_id) {
+      const { data: usage, error: rpcErr } = await admin.rpc('hse_check_and_increment_ai_usage', {
+        p_organization_id: body.metering_org_id,
+        p_user_id: null,
+      });
+      if (rpcErr) {
+        console.error('quota(service): rpc failed, allowing:', rpcErr);
+        return { allowed: true };
+      }
+      if (usage && usage.allowed === false) {
+        return { allowed: false, code: 'QUOTA_EXCEEDED', usage };
+      }
+      return { allowed: true, usage };
+    }
 
     const { data: userData, error: userErr } = await admin.auth.getUser(jwt);
     const userId = userData?.user?.id;
@@ -266,7 +293,7 @@ Deno.serve(async (req: Request) => {
 
     // Step 0: enforce the monthly AI usage quota (after input validation so a
     // bad request never consumes an analysis).
-    const quota = await checkQuota(req);
+    const quota = await checkQuota(req, body);
     if (!quota.allowed) {
       const messages: Record<string, string> = {
         AUTH_REQUIRED: 'Sign in to use AI analysis. You can still fill the report manually.',

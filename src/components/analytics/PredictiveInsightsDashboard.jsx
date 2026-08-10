@@ -13,6 +13,12 @@ import AdvancedDashboard from './AdvancedDashboard';
 import ContinuousLearningDashboard from './ContinuousLearningDashboard';
 import ForecastView from './ForecastView';
 
+// The Advanced Analytics / Continuous Learning / Recommendations tabs render
+// hardcoded demo data (and the recommendation engine seeded fabricated rows
+// into the customer's database). They are withheld from the launch build
+// until they run on real data; only the flag below re-enables them.
+const SHOW_PREVIEW_TABS = false;
+
 export default function PredictiveInsightsDashboard({ isEmbedded = false }) {
   const { currentOrganization } = useHSE();
   const { toast } = useToast();
@@ -110,15 +116,19 @@ export default function PredictiveInsightsDashboard({ isEmbedded = false }) {
           <TabsTrigger value="forecast" className="data-[state=active]:bg-[#8b5cf6] data-[state=active]:text-white flex gap-2">
             <Sparkles className="h-4 w-4" /> AI Forecast
           </TabsTrigger>
-          <TabsTrigger value="advanced" className="data-[state=active]:bg-[#8b5cf6] data-[state=active]:text-white flex gap-2">
-            <LayoutGrid className="h-4 w-4" /> Advanced Analytics
-          </TabsTrigger>
-          <TabsTrigger value="learning" className="data-[state=active]:bg-[#8b5cf6] data-[state=active]:text-white flex gap-2">
-            <RotateCw className="h-4 w-4" /> Continuous Learning
-          </TabsTrigger>
-          <TabsTrigger value="recommendations" className="data-[state=active]:bg-[#8b5cf6] data-[state=active]:text-white flex gap-2">
-            <ShieldCheck className="h-4 w-4" /> Recommendations
-          </TabsTrigger>
+          {SHOW_PREVIEW_TABS && (
+            <>
+              <TabsTrigger value="advanced" className="data-[state=active]:bg-[#8b5cf6] data-[state=active]:text-white flex gap-2">
+                <LayoutGrid className="h-4 w-4" /> Advanced Analytics
+              </TabsTrigger>
+              <TabsTrigger value="learning" className="data-[state=active]:bg-[#8b5cf6] data-[state=active]:text-white flex gap-2">
+                <RotateCw className="h-4 w-4" /> Continuous Learning
+              </TabsTrigger>
+              <TabsTrigger value="recommendations" className="data-[state=active]:bg-[#8b5cf6] data-[state=active]:text-white flex gap-2">
+                <ShieldCheck className="h-4 w-4" /> Recommendations
+              </TabsTrigger>
+            </>
+          )}
           <TabsTrigger value="analytics" className="data-[state=active]:bg-[#8b5cf6] data-[state=active]:text-white flex gap-2">
             <Activity className="h-4 w-4" /> Basic Metrics
           </TabsTrigger>
@@ -133,17 +143,21 @@ export default function PredictiveInsightsDashboard({ isEmbedded = false }) {
           />
         </TabsContent>
 
-        <TabsContent value="advanced" className="min-h-[800px]">
-          <AdvancedDashboard />
-        </TabsContent>
+        {SHOW_PREVIEW_TABS && (
+          <>
+            <TabsContent value="advanced" className="min-h-[800px]">
+              <AdvancedDashboard />
+            </TabsContent>
 
-        <TabsContent value="learning" className="min-h-[800px]">
-          <ContinuousLearningDashboard />
-        </TabsContent>
+            <TabsContent value="learning" className="min-h-[800px]">
+              <ContinuousLearningDashboard />
+            </TabsContent>
 
-        <TabsContent value="recommendations">
-          <RecommendationDashboard />
-        </TabsContent>
+            <TabsContent value="recommendations">
+              <RecommendationDashboard />
+            </TabsContent>
+          </>
+        )}
 
         <TabsContent value="analytics" className="space-y-8">
           {/* KPI Cards */}
