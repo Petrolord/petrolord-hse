@@ -1,3 +1,9 @@
+// PETROLORD HSE CONTEXT MIGRATION v1 (2026-05-06)
+// PETROLORD HSE CONTEXT MIGRATION v2 (2026-05-06): decouple PostgREST joins
+// PETROLORD HSE CONTEXT MIGRATION v3 (2026-05-07): expose userData alias
+// Migrated from organization_users to organization_members + organization_apps.
+// Access derivation moved off hseQueries.checkHSEAccess (legacy) to a direct
+// organization_apps lookup. See SQL migration 2026-05-06_unify_signup_trigger_v2.
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/lib/customSupabaseClient';
 import { hseQueries } from '@/lib/supabase';
@@ -120,10 +126,18 @@ export function HSEProvider({ children }) {
         if(activeModule.id === 'hse') setActiveModule({ id: 'dashboard', label: 'Dashboard', color: '#FFC107' });
 
         try {
-          const { data: memberships } = await supabase
-            .from('organization_users')
-            .select(`*, organization:organizations(*)`)
+          const { data: rawMems } = await supabase
+            .from('organization_members')
+            .select('*')
             .eq('user_id', userId);
+          const _orgIds = (rawMems || []).map(m => m.organization_id);
+          const { data: orgsList } = _orgIds.length
+            ? await supabase.from('organizations').select('*').in('id', _orgIds)
+            : { data: [] };
+          const memberships = (rawMems || []).map(m => ({
+            ...m,
+            organization: (orgsList || []).find(o => o.id === m.organization_id) || null
+          }));
             
           if (memberships && memberships.length > 0) {
             setAllOrgMemberships(memberships);
@@ -138,12 +152,21 @@ export function HSEProvider({ children }) {
         } catch (err) { console.warn("Super Admin fetch error:", err); }
 
       } else {
-        const { data: memberships, error: memError } = await supabase
-            .from('organization_users')
-            .select(`*, organization:organizations(*)`)
+        const { data: rawMems2, error: memError } = await supabase
+            .from('organization_members')
+            .select('*')
             .eq('user_id', userId);
 
         if (memError) throw memError;
+
+        const _orgIds2 = (rawMems2 || []).map(m => m.organization_id);
+        const { data: orgsList2 } = _orgIds2.length
+          ? await supabase.from('organizations').select('*').in('id', _orgIds2)
+          : { data: [] };
+        const memberships = (rawMems2 || []).map(m => ({
+          ...m,
+          organization: (orgsList2 || []).find(o => o.id === m.organization_id) || null
+        }));
 
         setAllOrgMemberships(memberships || []);
         const userOrgs = memberships?.map(m => m.organization).filter(Boolean) || [];
@@ -159,8 +182,11 @@ export function HSEProvider({ children }) {
         }
 
         if (activeMembership) {
-            setRealRole(activeMembership.user_role || 'staff_admin');
-            setUserModules(activeMembership.modules || []);
+            // organization_members has 'role' (not 'user_role'); 'owner' becomes org_admin semantically
+            const _r = activeMembership.role;
+            const mappedRole = _r === 'owner' ? 'org_admin' : (_r || 'staff_admin');
+            setRealRole(mappedRole);
+            // userModules now derived from organization_apps in the access check below
             
             // Only update if organization truly changed
             if (!currentOrganization || currentOrganization.id !== activeMembership.organization.id) {
@@ -179,20 +205,38 @@ export function HSEProvider({ children }) {
         }
       }
 
-      // Access Check
-      try {
-          const { data: accessData } = await hseQueries.checkHSEAccess(userId);
-          if (accessData?.has_hse_access) {
-             setAccessLevel(accessData.access_level);
-             setLimits({
-               email_limit: accessData.email_limit,
-               image_limit: accessData.image_limit,
-               video_limit: accessData.video_limit
-             });
-          } else {
-             setAccessLevel('none');
-          }
-      } catch (e) { console.log("Access check warning", e); }
+      // Access Check — derived from organization_apps (post-unification 2026-05-06).
+      // Super admins keep their pre-set 'premium'; everyone else is evaluated here.
+      if (!isSuperAdminEmail) {
+        try {
+            const { data: m2 } = await supabase
+              .from('organization_members')
+              .select('organization_id')
+              .eq('user_id', userId)
+              .limit(1);
+            const userOrgId = m2?.[0]?.organization_id;
+
+            if (userOrgId) {
+              const { data: orgApps } = await supabase
+                .from('organization_apps')
+                .select('app_id, module_id, status')
+                .eq('organization_id', userOrgId)
+                .eq('status', 'ACTIVE');
+
+              const hseApp = (orgApps || []).find(a => a.app_id === 'hse');
+              if (hseApp) {
+                const isPremium = hseApp.module_id !== 'hse_free';
+                setAccessLevel(isPremium ? 'premium' : 'basic');
+                setUserModules((orgApps || []).map(a => a.app_id));
+              } else {
+                setAccessLevel('none');
+                setUserModules([]);
+              }
+            } else {
+              setAccessLevel('none');
+            }
+        } catch (e) { console.log("Access check warning", e); }
+      }
 
     } catch (err) {
       console.error('Context refresh error:', err);
@@ -208,8 +252,9 @@ export function HSEProvider({ children }) {
       // Removed immediate fetchSidebarCounts here, useEffect will handle it
       
       if (realRole !== 'super_admin') {
-         setRealRole(membership?.user_role || 'staff_admin');
-         setUserModules(membership?.modules || []);
+         const _r2 = membership?.role;
+         setRealRole(_r2 === 'owner' ? 'org_admin' : (_r2 || 'staff_admin'));
+         // userModules will refresh via refreshContext on next access check
       }
       setSubscription({
         tier: org.subscription_tier || 'free',
@@ -247,7 +292,9 @@ export function HSEProvider({ children }) {
     refreshContext();
     const { data: { subscription: authListener } } = supabase.auth.onAuthStateChange(
       (event) => {
-        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') refreshContext();
+        // Note: TOKEN_REFRESHED fires on every tab visibility change in some browsers,
+        // which causes navigation/state bounce mid-action. Only refresh on actual sign-in.
+        if (event === 'SIGNED_IN') refreshContext();
         if (event === 'SIGNED_OUT') {
           setIsAuthenticated(false);
           setCurrentUser(null);
@@ -266,7 +313,7 @@ export function HSEProvider({ children }) {
     if (!role) return false;
     if (role === 'super_admin') return true;
     const hierarchy = {
-      'super_admin': 100, 'org_admin': 90, 'manager': 80, 'supervisor': 50,
+      'super_admin': 100, 'owner': 95, 'org_admin': 90, 'manager': 80, 'supervisor': 50,
       'staff_admin': 40, 'consultant': 30, 'contractor': 20, 'intern': 10,
       'auditor': 35, 'viewer': 5, 'hse_coordinator': 85, 'hse_officer': 70, 'department_manager': 75, 'employee': 15
     };
@@ -295,9 +342,18 @@ export function HSEProvider({ children }) {
       if (data) setUsageMetrics(data);
     }
   };
+  // userData: backwards-compat alias used by older components.
+  // Combines auth user fields with current org_id so legacy code doing
+  // userData.organization_id works without rewriting every component.
+  const userData = currentUser ? {
+    ...currentUser,
+    organization_id: currentOrganization?.id || null
+  } : null;
+
 
   // FIXED: Memoize the context value to prevent re-renders of consumers
   const value = useMemo(() => ({
+    userData,
     isAuthenticated, isLoading, currentUser, currentOrganization, organizations,
     role, realRole, simulatedRole, setSimulatedRole,
     userModules, subscription, accessLevel, limits, usageMetrics,
