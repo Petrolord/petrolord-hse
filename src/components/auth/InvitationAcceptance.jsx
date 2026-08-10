@@ -91,7 +91,10 @@ export default function InvitationAcceptance() {
         options: {
           data: {
             full_name: invite.first_name ? `${invite.first_name} ${invite.last_name || ''}`.trim() : null,
-            organization_id: invite.org_id
+            organization_id: invite.org_id,
+            // handle_new_user defaults role to 'owner' when absent, which would
+            // make every invitee an org admin. Always pass the invited role.
+            role: invite.role || 'member'
           }
         }
       });

@@ -115,7 +115,7 @@ export default function InviteTeamMember() {
         invited_by: user.id
       };
 
-      const { data, error } = await supabase.functions.invoke('invite-user', {
+      const { data, error } = await supabase.functions.invoke('hse-invite-user', {
         body: payload
       });
 
@@ -123,14 +123,14 @@ export default function InviteTeamMember() {
         handleInviteError(error);
         return; // Stop execution to prevent success toast
       }
-      
+
       // Handle explicit error or warning in response data
       if (data) {
         if (data.error) {
           handleInviteError(new Error(data.error));
           return;
         }
-        
+
         if (data.warning) {
           toast({
             title: "Invitation Warning",
@@ -143,11 +143,15 @@ export default function InviteTeamMember() {
         }
 
         if (data.success) {
-          toast({
-            title: "Invitation Sent",
-            description: `Invite sent to ${email}`,
-            className: "bg-green-600 text-white border-none"
-          });
+          if (data.emailSent === false && data.inviteLink) {
+            await offerLinkFallback(email, data.inviteLink);
+          } else {
+            toast({
+              title: "Invitation Sent",
+              description: `Invite sent to ${email}`,
+              className: "bg-green-600 text-white border-none"
+            });
+          }
           setEmail("");
           loadInvitations();
           return;
@@ -160,9 +164,9 @@ export default function InviteTeamMember() {
         description: `Invite sent to ${email}`,
         className: "bg-green-600 text-white border-none"
       });
-      
+
       setEmail("");
-      loadInvitations(); 
+      loadInvitations();
     } catch (err) {
       handleInviteError(err);
     } finally {
@@ -203,13 +207,13 @@ export default function InviteTeamMember() {
         invited_by: user.id
       };
 
-      const { data, error } = await supabase.functions.invoke('invite-user', {
+      const { data, error } = await supabase.functions.invoke('hse-invite-user', {
         body: payload
       });
 
       if (error) {
         // We wrap this in a promise rejection to use the common error handler
-        // but we need to await the error body parsing first usually. 
+        // but we need to await the error body parsing first usually.
         // handleInviteError handles raw error objects or Error instances.
         await handleInviteError(error);
         return;
@@ -226,9 +230,11 @@ export default function InviteTeamMember() {
             description: data.warning,
             className: "bg-yellow-600 text-white border-none"
           });
+        } else if (data.emailSent === false && data.inviteLink) {
+          await offerLinkFallback(invite.email, data.inviteLink);
         } else {
-          toast({ 
-            title: "Invitation Resent", 
+          toast({
+            title: "Invitation Resent",
             description: `Email sent to ${invite.email}`,
             className: "bg-blue-600 text-white border-none"
           });
@@ -252,6 +258,24 @@ export default function InviteTeamMember() {
         return next;
       });
     }
+  };
+
+  // Email delivery failed but the invitation exists: put the accept link on
+  // the clipboard so the admin can share it directly (WhatsApp, chat, etc.).
+  const offerLinkFallback = async (recipient, inviteLink) => {
+    let copied = false;
+    try {
+      await navigator.clipboard.writeText(inviteLink);
+      copied = true;
+    } catch (e) { /* clipboard unavailable; show the link instead */ }
+    toast({
+      title: "Invite created. Email could not be sent.",
+      description: copied
+        ? `The invite link for ${recipient} was copied to your clipboard. Share it with them directly.`
+        : `Share this link with ${recipient}: ${inviteLink}`,
+      className: "bg-yellow-600 text-white border-none",
+      duration: 15000
+    });
   };
 
   const handleInviteError = async (error) => {

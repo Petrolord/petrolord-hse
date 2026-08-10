@@ -18,6 +18,18 @@ const SUPER_ADMIN_EMAILS = [
   'support@petrolord.com'
 ];
 
+// organization_members.role vocabulary is wider than the UI's canonical set
+// (LeftNav gates on super_admin/org_admin/manager/supervisor/staff plus the
+// specialist roles). Aliases map stored roles onto that set so invited
+// members don't land on an empty sidebar.
+const ROLE_ALIASES = {
+  owner: 'org_admin',
+  admin: 'org_admin',
+  member: 'staff',
+  employee: 'staff'
+};
+const normalizeRole = (r) => ROLE_ALIASES[r] || r || 'staff';
+
 export function HSEProvider({ children }) {
   const { toast } = useToast();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -119,6 +131,8 @@ export function HSEProvider({ children }) {
         role: isSuperAdminEmail ? 'super_admin' : 'staff_admin'
       });
 
+      let activeOrgId = null; // org the entitlement check below must evaluate
+
       if (isSuperAdminEmail) {
         setRealRole('super_admin');
         setAccessLevel('premium');
@@ -182,9 +196,8 @@ export function HSEProvider({ children }) {
         }
 
         if (activeMembership) {
-            // organization_members has 'role' (not 'user_role'); 'owner' becomes org_admin semantically
-            const _r = activeMembership.role;
-            const mappedRole = _r === 'owner' ? 'org_admin' : (_r || 'staff_admin');
+            activeOrgId = activeMembership.organization_id;
+            const mappedRole = normalizeRole(activeMembership.role);
             setRealRole(mappedRole);
             // userModules now derived from organization_apps in the access check below
             
@@ -209,12 +222,9 @@ export function HSEProvider({ children }) {
       // Super admins keep their pre-set 'premium'; everyone else is evaluated here.
       if (!isSuperAdminEmail) {
         try {
-            const { data: m2 } = await supabase
-              .from('organization_members')
-              .select('organization_id')
-              .eq('user_id', userId)
-              .limit(1);
-            const userOrgId = m2?.[0]?.organization_id;
+            // Evaluate entitlement for the ACTIVE org, not an arbitrary
+            // membership row (multi-org users got a random org's access before).
+            const userOrgId = activeOrgId;
 
             if (userOrgId) {
               const { data: orgApps } = await supabase
@@ -252,8 +262,7 @@ export function HSEProvider({ children }) {
       // Removed immediate fetchSidebarCounts here, useEffect will handle it
       
       if (realRole !== 'super_admin') {
-         const _r2 = membership?.role;
-         setRealRole(_r2 === 'owner' ? 'org_admin' : (_r2 || 'staff_admin'));
+         setRealRole(normalizeRole(membership?.role));
          // userModules will refresh via refreshContext on next access check
       }
       setSubscription({
@@ -315,7 +324,8 @@ export function HSEProvider({ children }) {
     const hierarchy = {
       'super_admin': 100, 'owner': 95, 'org_admin': 90, 'manager': 80, 'supervisor': 50,
       'staff_admin': 40, 'consultant': 30, 'contractor': 20, 'intern': 10,
-      'auditor': 35, 'viewer': 5, 'hse_coordinator': 85, 'hse_officer': 70, 'department_manager': 75, 'employee': 15
+      'auditor': 35, 'viewer': 5, 'hse_coordinator': 85, 'hse_officer': 70, 'department_manager': 75, 'employee': 15,
+      'staff': 20, 'admin': 90, 'member': 20
     };
     return (hierarchy[role] || 0) >= (hierarchy[requiredRole] || 0);
   };
