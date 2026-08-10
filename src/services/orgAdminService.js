@@ -307,14 +307,15 @@ export const orgAdminService = {
     }
   },
 
-  // Send an invitation. Reuses the existing invite-user edge function which
-  // creates the invitations row AND sends the email.
+  // Send an invitation. hse-invite-user creates/refreshes the invitations
+  // row, attempts the email, and always returns the invite link so the UI
+  // can offer a copy/share fallback when email delivery fails.
   inviteMember: async (organizationId, payload) => {
     if (!organizationId || !payload?.email) {
       return { data: null, error: new Error('organization_id and email are required') };
     }
     try {
-      const { data, error } = await supabase.functions.invoke('invite-user', {
+      const { data, error } = await supabase.functions.invoke('hse-invite-user', {
         body: {
           org_id: organizationId,
           email: payload.email,
