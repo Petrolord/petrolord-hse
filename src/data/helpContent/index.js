@@ -11,6 +11,8 @@ import { trainingGuide } from './trainingGuide';
 import { safetyAuditsGuide } from './safetyAuditsGuide';
 import { actionTrackerGuide } from './actionTrackerGuide';
 import { teamManagementGuide } from './teamManagementGuide';
+import { qrObservationsGuide } from './qrObservationsGuide';
+import { orgSetupGuide } from './orgSetupGuide';
 import { safetyMomentsGuide } from './safetyMomentsGuide';
 import { reportingGuide } from './reportingGuide';
 import { troubleshootingGuide } from './troubleshootingGuide';
@@ -30,6 +32,8 @@ export const allGuides = {
   audit: safetyAuditsGuide,
   actions: actionTrackerGuide,
   team: teamManagementGuide,
+  'qr-observations': qrObservationsGuide,
+  'org-setup': orgSetupGuide,
   'safety-moments': safetyMomentsGuide,
   reporting: reportingGuide,
   troubleshooting: troubleshootingGuide,
