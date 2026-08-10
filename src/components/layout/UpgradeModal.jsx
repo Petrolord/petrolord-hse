@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Check, Star, Zap, Shield, BarChart3, Users } from 'lucide-react'
+import { professionalPricing } from '@/components/pricing/data'
 
 const features = [
   {
@@ -70,10 +71,11 @@ export function UpgradeModal({ open, onOpenChange }) {
              </div>
              <div className="text-right">
                <div className="flex items-baseline gap-1 justify-end">
-                 <span className="text-2xl font-bold text-white">$499</span>
+                 <span className="text-xs text-gray-400">from</span>
+                 <span className="text-2xl font-bold text-white">${professionalPricing[0].annual}</span>
                  <span className="text-xs text-gray-400">/mo</span>
                </div>
-               <p className="text-[10px] text-emerald-400">Billed annually</p>
+               <p className="text-[10px] text-emerald-400">Billed annually. Priced by team size.</p>
              </div>
           </div>
           

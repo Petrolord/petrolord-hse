@@ -1,5 +1,5 @@
 import React from 'react';
-import { Facebook, Twitter, Linkedin, Instagram, Mail, Phone } from 'lucide-react';
+import { Mail, Globe } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 export default function PublicFooter() {
@@ -28,12 +28,6 @@ export default function PublicFooter() {
               Petrolord HSE
             </div>
             <p className="text-sm text-[#7a7a9a] max-w-sm">The HSE component of the digital operating system for the modern energy enterprise. Ensuring safety, compliance, and efficiency across all operations.</p>
-            <div className="flex space-x-4">
-              <a href="#" className="text-[#7a7a9a] hover:text-[#FFC107] transition-colors"><Linkedin className="h-5 w-5" /></a>
-              <a href="#" className="text-[#7a7a9a] hover:text-[#FFC107] transition-colors"><Twitter className="h-5 w-5" /></a>
-              <a href="#" className="text-[#7a7a9a] hover:text-[#FFC107] transition-colors"><Facebook className="h-5 w-5" /></a>
-              <a href="#" className="text-[#7a7a9a] hover:text-[#FFC107] transition-colors"><Instagram className="h-5 w-5" /></a>
-            </div>
           </div>
 
           {/* Links Column 1: Product */}
@@ -93,16 +87,18 @@ export default function PublicFooter() {
           <div>
             <h3 className="text-white font-semibold mb-4">Contact</h3>
             <ul className="space-y-2 text-sm">
-              <li className="flex items-center gap-2">
-                <Phone className="h-4 w-4 text-[#FFC107]" /> 
-                1-540-PETROLORD
+              <li>
+                <a href="mailto:support@petrolord.com" className="flex items-center gap-2 hover:text-[#FFC107] transition-colors">
+                  <Mail className="h-4 w-4 text-[#FFC107]" />
+                  support@petrolord.com
+                </a>
               </li>
-              <li className="flex items-center gap-2">
-                <Mail className="h-4 w-4 text-[#FFC107]" /> 
-                support@petrolord.com
+              <li>
+                <a href="https://petrolord.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-[#FFC107] transition-colors">
+                  <Globe className="h-4 w-4 text-[#FFC107]" />
+                  petrolord.com
+                </a>
               </li>
-              <li className="text-[#7a7a9a]"><span className="text-white font-medium">UK:</span><br />128 City Road,<br />London, EC1V 2NX</li>
-              <li className="text-[#7a7a9a]"><span className="text-white font-medium">Nigeria:</span><br />8 The Providence Street,<br />Lekki Phase 1, Lagos</li>
             </ul>
           </div>
         </div>
