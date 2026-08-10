@@ -21,10 +21,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+// PETROLORD SUPERVISOR ACTIONS v1 (2026-05-07): wire up View/Assign/Resolve
+// PETROLORD SUPERVISOR ACTIONS v2 (2026-05-09): audit trail in View Details
+// PETROLORD SUPERVISOR ACTIONS v3 (2026-05-09): 5 Whys investigation in View Details
 import { useHSE } from '@/context/HSEContext';
 import { quickReportService } from '@/services/quickReportService';
 import { useToast } from "@/components/ui/use-toast";
 import { format } from 'date-fns';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 
 const SupervisorDashboardModule = () => {
   const { userData } = useHSE();
@@ -34,6 +38,136 @@ const SupervisorDashboardModule = () => {
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterSeverity, setFilterSeverity] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+
+  // Action handlers state (v1 — supervisor actions)
+  const [viewingReport, setViewingReport] = useState(null);
+  const [assigningReport, setAssigningReport] = useState(null);
+  const [resolvingReport, setResolvingReport] = useState(null);
+  const [orgMembers, setOrgMembers] = useState([]);
+  const [selectedAssignee, setSelectedAssignee] = useState('');
+  const [actionLoading, setActionLoading] = useState(false);
+  const [auditLog, setAuditLog] = useState([]);
+  const [auditLoading, setAuditLoading] = useState(false);
+
+  // Investigation state (v3)
+  const [investigating, setInvestigating] = useState(false);
+  const [investigationSaving, setInvestigationSaving] = useState(false);
+  const [investigationData, setInvestigationData] = useState({
+    whys: [
+      { why: 1, question: 'Why did this happen?', answer: '' },
+      { why: 2, question: 'Why?', answer: '' },
+      { why: 3, question: 'Why?', answer: '' },
+      { why: 4, question: 'Why?', answer: '' },
+      { why: 5, question: 'Why?', answer: '' }
+    ],
+    root_cause: '',
+    corrective_actions: '',
+    preventive_actions: '',
+    lessons_learned: ''
+  });
+
+  // When opening a report that already has an investigation, prefill the form
+  useEffect(() => {
+    if (viewingReport) {
+      const existingWhys = Array.isArray(viewingReport.investigation_whys) && viewingReport.investigation_whys.length === 5
+        ? viewingReport.investigation_whys
+        : [
+            { why: 1, question: 'Why did this happen?', answer: '' },
+            { why: 2, question: 'Why?', answer: '' },
+            { why: 3, question: 'Why?', answer: '' },
+            { why: 4, question: 'Why?', answer: '' },
+            { why: 5, question: 'Why?', answer: '' }
+          ];
+      setInvestigationData({
+        whys: existingWhys,
+        root_cause: viewingReport.root_cause || '',
+        corrective_actions: viewingReport.corrective_actions || '',
+        preventive_actions: viewingReport.preventive_actions || '',
+        lessons_learned: viewingReport.lessons_learned || ''
+      });
+      setInvestigating(!!viewingReport.investigation_completed_at);
+    }
+  }, [viewingReport?.id]);
+
+  const updateWhyAnswer = (index, value) => {
+    setInvestigationData(prev => ({
+      ...prev,
+      whys: prev.whys.map((w, i) => i === index ? { ...w, answer: value } : w)
+    }));
+  };
+
+  const handleSaveInvestigation = async () => {
+    if (!viewingReport?.id) return;
+    setInvestigationSaving(true);
+    const { error } = await quickReportService.saveInvestigation(viewingReport.id, investigationData);
+    setInvestigationSaving(false);
+    if (error) {
+      toast({ title: 'Could not save investigation', description: error.message || 'Try again.', variant: 'destructive' });
+      return;
+    }
+    toast({ title: 'Investigation saved' });
+    // Reload audit log to show the new event
+    const { data: logData } = await quickReportService.getReportAuditLog(viewingReport.id);
+    setAuditLog(logData || []);
+    await refreshReports();
+  };
+
+  // Lazy-load audit trail when View Details opens
+  useEffect(() => {
+    if (viewingReport?.id) {
+      setAuditLoading(true);
+      setAuditLog([]);
+      quickReportService.getReportAuditLog(viewingReport.id).then(({ data }) => {
+        setAuditLog(data || []);
+        setAuditLoading(false);
+      });
+    }
+  }, [viewingReport?.id]);
+
+  // Refresh helper to re-fetch reports after a mutation
+  const refreshReports = async () => {
+    if (!userData?.organization_id) return;
+    const { data } = await quickReportService.getSupervisorReports(userData.organization_id);
+    setReports(data || []);
+  };
+
+  // Lazy-load org members when assign dialog opens
+  useEffect(() => {
+    if (assigningReport && userData?.organization_id && orgMembers.length === 0) {
+      quickReportService.getOrgMembers(userData.organization_id).then(({ data }) => {
+        setOrgMembers(data || []);
+      });
+    }
+  }, [assigningReport, userData?.organization_id]);
+
+  const handleAssign = async () => {
+    if (!selectedAssignee || !assigningReport) return;
+    setActionLoading(true);
+    const { error } = await quickReportService.assignReport(assigningReport.id, selectedAssignee);
+    setActionLoading(false);
+    if (error) {
+      toast({ title: 'Assignment failed', description: error.message || 'Try again.', variant: 'destructive' });
+      return;
+    }
+    toast({ title: 'Report assigned', description: 'The user will see this in their queue.' });
+    setAssigningReport(null);
+    setSelectedAssignee('');
+    await refreshReports();
+  };
+
+  const handleResolve = async () => {
+    if (!resolvingReport) return;
+    setActionLoading(true);
+    const { error } = await quickReportService.updateReportStatus(resolvingReport.id, 'resolved');
+    setActionLoading(false);
+    if (error) {
+      toast({ title: 'Could not mark resolved', description: error.message || 'Try again.', variant: 'destructive' });
+      return;
+    }
+    toast({ title: 'Report resolved', description: 'Status updated and closed.' });
+    setResolvingReport(null);
+    await refreshReports();
+  };
 
   // Fetch reports on mount
   useEffect(() => {
@@ -296,13 +430,22 @@ const SupervisorDashboardModule = () => {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="bg-[#1e1e2d] border-[#2d2d4a] text-gray-200">
-                          <DropdownMenuItem className="hover:bg-[#2d2d4a] cursor-pointer">
+                          <DropdownMenuItem
+                            className="hover:bg-[#2d2d4a] cursor-pointer"
+                            onClick={() => setViewingReport(report)}
+                          >
                             View Details
                           </DropdownMenuItem>
-                          <DropdownMenuItem className="hover:bg-[#2d2d4a] cursor-pointer">
+                          <DropdownMenuItem
+                            className="hover:bg-[#2d2d4a] cursor-pointer"
+                            onClick={() => setAssigningReport(report)}
+                          >
                             Assign User
                           </DropdownMenuItem>
-                          <DropdownMenuItem className="hover:bg-[#2d2d4a] cursor-pointer text-green-400">
+                          <DropdownMenuItem
+                            className="hover:bg-[#2d2d4a] cursor-pointer text-green-400"
+                            onClick={() => setResolvingReport(report)}
+                          >
                             Mark Resolved
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -322,6 +465,236 @@ const SupervisorDashboardModule = () => {
           </div>
         </div>
       </div>
+    
+      {/* === ACTION DIALOGS (v1 supervisor actions) === */}
+      {viewingReport && (
+        <Dialog open={true} onOpenChange={() => setViewingReport(null)}>
+          <DialogContent className="bg-[#1a1a2e] text-white border-[#2d2d4a] max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>{viewingReport.title || 'Quick Report'}</DialogTitle>
+              <DialogDescription className="text-slate-400">
+                Reported by {viewingReport.reporter_name || 'Unknown'} on{' '}
+                {viewingReport.created_at && format(new Date(viewingReport.created_at), 'PPp')}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 mt-4">
+              {viewingReport.description && (
+                <div>
+                  <div className="text-xs uppercase text-slate-500 mb-1">Description</div>
+                  <p className="text-sm text-slate-200 whitespace-pre-wrap">{viewingReport.description}</p>
+                </div>
+              )}
+              {viewingReport.transcription && viewingReport.transcription !== viewingReport.description && (
+                <div>
+                  <div className="text-xs uppercase text-slate-500 mb-1">Voice Transcription</div>
+                  <p className="text-sm text-slate-300 italic whitespace-pre-wrap">"{viewingReport.transcription}"</p>
+                </div>
+              )}
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div><span className="text-slate-500">Severity:</span> <span className="text-slate-200 capitalize">{viewingReport.severity || 'unspecified'}</span></div>
+                <div><span className="text-slate-500">Status:</span> <span className="text-slate-200 capitalize">{viewingReport.status || 'submitted'}</span></div>
+                <div><span className="text-slate-500">Category:</span> <span className="text-slate-200">{viewingReport.category || 'N/A'}</span></div>
+                <div><span className="text-slate-500">Location:</span> <span className="text-slate-200">{viewingReport.location || 'N/A'}</span></div>
+              </div>
+
+              {/* Investigation section (v3) */}
+              <div className="mt-6 pt-4 border-t border-[#2d2d4a]">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="text-xs uppercase text-slate-500">5 Whys Investigation</div>
+                  {viewingReport.investigation_completed_at && (
+                    <div className="text-[10px] text-green-400">
+                      Completed {format(new Date(viewingReport.investigation_completed_at), 'PP')}
+                    </div>
+                  )}
+                </div>
+                {!investigating && !viewingReport.investigation_completed_at ? (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setInvestigating(true)}
+                    className="text-xs"
+                  >
+                    Start Investigation
+                  </Button>
+                ) : (
+                  <div className="space-y-3">
+                    {investigationData.whys.map((w, idx) => (
+                      <div key={idx}>
+                        <div className="text-[11px] text-slate-500 mb-1">
+                          Why #{w.why}: {w.question}
+                        </div>
+                        <textarea
+                          value={w.answer}
+                          onChange={(e) => updateWhyAnswer(idx, e.target.value)}
+                          placeholder={idx === 0 ? 'Describe the immediate cause...' : 'Drill deeper...'}
+                          rows={2}
+                          className="w-full bg-[#252541] border border-[#3a3a5a] rounded-md p-2 text-xs text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        />
+                      </div>
+                    ))}
+                    <div>
+                      <div className="text-[11px] text-slate-500 mb-1">Root Cause</div>
+                      <textarea
+                        value={investigationData.root_cause}
+                        onChange={(e) => setInvestigationData(p => ({ ...p, root_cause: e.target.value }))}
+                        rows={2}
+                        className="w-full bg-[#252541] border border-[#3a3a5a] rounded-md p-2 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <div className="text-[11px] text-slate-500 mb-1">Corrective Actions (immediate)</div>
+                      <textarea
+                        value={investigationData.corrective_actions}
+                        onChange={(e) => setInvestigationData(p => ({ ...p, corrective_actions: e.target.value }))}
+                        rows={2}
+                        className="w-full bg-[#252541] border border-[#3a3a5a] rounded-md p-2 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <div className="text-[11px] text-slate-500 mb-1">Preventive Actions (long-term)</div>
+                      <textarea
+                        value={investigationData.preventive_actions}
+                        onChange={(e) => setInvestigationData(p => ({ ...p, preventive_actions: e.target.value }))}
+                        rows={2}
+                        className="w-full bg-[#252541] border border-[#3a3a5a] rounded-md p-2 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <div className="text-[11px] text-slate-500 mb-1">Lessons Learned</div>
+                      <textarea
+                        value={investigationData.lessons_learned}
+                        onChange={(e) => setInvestigationData(p => ({ ...p, lessons_learned: e.target.value }))}
+                        rows={2}
+                        className="w-full bg-[#252541] border border-[#3a3a5a] rounded-md p-2 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div className="flex gap-2 pt-2">
+                      <Button
+                        size="sm"
+                        onClick={handleSaveInvestigation}
+                        disabled={investigationSaving}
+                        className="bg-blue-600 hover:bg-blue-700 text-xs"
+                      >
+                        {investigationSaving ? 'Saving...' : (viewingReport.investigation_completed_at ? 'Update Investigation' : 'Save Investigation')}
+                      </Button>
+                      {!viewingReport.investigation_completed_at && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setInvestigating(false)}
+                          className="text-xs"
+                        >
+                          Cancel
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Audit Trail section */}
+              <div className="mt-6 pt-4 border-t border-[#2d2d4a]">
+                <div className="text-xs uppercase text-slate-500 mb-3 flex items-center gap-2">
+                  <span>Audit Trail</span>
+                  {auditLoading && <span className="text-[10px] text-slate-600">loading...</span>}
+                </div>
+                {!auditLoading && auditLog.length === 0 && (
+                  <div className="text-xs text-slate-500 italic">No events recorded.</div>
+                )}
+                <ol className="space-y-2">
+                  {auditLog.map((e, idx) => (
+                    <li key={e.id} className="flex gap-3 text-xs">
+                      <div className="flex flex-col items-center">
+                        <div className={`w-2 h-2 rounded-full mt-1.5 ${
+                          e.action === 'quick_report.resolved' ? 'bg-green-500' :
+                          e.action === 'quick_report.closed' ? 'bg-gray-500' :
+                          e.action === 'quick_report.assigned' ? 'bg-blue-500' :
+                          'bg-slate-500'
+                        }`} />
+                        {idx < auditLog.length - 1 && <div className="w-px flex-1 bg-[#2d2d4a] my-1" />}
+                      </div>
+                      <div className="flex-1 pb-2">
+                        <div className="text-slate-200">{e.label}</div>
+                        <div className="text-slate-500 text-[11px]">
+                          by {e.actor_name} on {format(new Date(e.created_at), 'PPp')}
+                        </div>
+                        {e.action === 'quick_report.assigned' && e.details?.assigned_to && (
+                          <div className="text-slate-500 text-[11px] mt-0.5">
+                            Assigned user id: {String(e.details.assigned_to).substring(0, 8)}...
+                          </div>
+                        )}
+                        {e.action === 'quick_report.status_changed' && e.details?.from && (
+                          <div className="text-slate-500 text-[11px] mt-0.5">
+                            {e.details.from} → {e.details.to}
+                          </div>
+                        )}
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setViewingReport(null)}>Close</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {assigningReport && (
+        <Dialog open={true} onOpenChange={() => { setAssigningReport(null); setSelectedAssignee(''); }}>
+          <DialogContent className="bg-[#1a1a2e] text-white border-[#2d2d4a]">
+            <DialogHeader>
+              <DialogTitle>Assign Report</DialogTitle>
+              <DialogDescription className="text-slate-400">
+                Choose a team member to take ownership of this report.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-4">
+              {orgMembers.length === 0 ? (
+                <p className="text-sm text-slate-400">Loading team members...</p>
+              ) : (
+                <Select value={selectedAssignee} onValueChange={setSelectedAssignee}>
+                  <SelectTrigger className="bg-[#252542] border-[#2d2d4a] text-white">
+                    <SelectValue placeholder="Select a team member" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#1a1a2e] text-white border-[#2d2d4a]">
+                    {orgMembers.map(m => (
+                      <SelectItem key={m.id} value={m.id}>{m.name} ({m.email})</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => { setAssigningReport(null); setSelectedAssignee(''); }}>Cancel</Button>
+              <Button onClick={handleAssign} disabled={!selectedAssignee || actionLoading}>
+                {actionLoading ? 'Assigning...' : 'Assign'}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {resolvingReport && (
+        <Dialog open={true} onOpenChange={() => setResolvingReport(null)}>
+          <DialogContent className="bg-[#1a1a2e] text-white border-[#2d2d4a]">
+            <DialogHeader>
+              <DialogTitle>Mark as Resolved?</DialogTitle>
+              <DialogDescription className="text-slate-400">
+                This will set the report status to resolved and close it. You can reopen it later if needed.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setResolvingReport(null)}>Cancel</Button>
+              <Button className="bg-green-600 hover:bg-green-700" onClick={handleResolve} disabled={actionLoading}>
+                {actionLoading ? 'Resolving...' : 'Mark Resolved'}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+
     </div>
   );
 };

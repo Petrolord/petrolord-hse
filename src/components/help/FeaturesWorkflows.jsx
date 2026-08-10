@@ -6,14 +6,14 @@ import { Check, AlertCircle } from 'lucide-react';
 const workflows = [
   {
     id: "incident-reporting",
-    title: "Incident Reporting Workflow",
+    title: "Reporting a Hazard or Incident (Quick Report)",
     steps: [
-      "Navigate to Health or Safety Module dashboard.",
-      "Click 'Report Incident' in the top action bar.",
-      "Fill in the initial notification form (Date, Time, Location, Type).",
-      "Add immediate actions taken to secure the scene.",
-      "Attach photos or witness statements.",
-      "Submit for review. The Incident Manager will be notified automatically."
+      "Open Quick Report from the app.",
+      "Capture a photo of the hazard and/or record a short voice note.",
+      "Let the AI analyse it — it suggests a category, severity, description and recommended actions.",
+      "Review and edit the suggested details (title, description, category, severity, location).",
+      "Submit — you receive a reference ID and the report is routed for review.",
+      "Track progress under My Reports; supervisors action it from the Supervisor View."
     ]
   },
   {

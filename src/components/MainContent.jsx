@@ -16,6 +16,11 @@ import EnvironmentModule from './petrolord/EnvironmentModule';
 import RiskManagementModule from './petrolord/RiskManagementModule';
 import SafetyMomentsBankModule from './hse/safety-moments/SafetyMomentsBankModule';
 import OrgAdminSettings from './admin/OrgAdminSettings';
+// PETROLORD ORG SETUP MAINCONTENT v1 (2026-05-09)
+// PETROLORD ORG SETUP MAINCONTENT v2 (2026-05-09): wire Sites + Departments admin
+import OrgSetupHub from './hse/admin/OrgSetupHub';
+import SitesAdmin from './hse/admin/SitesAdmin';
+import DepartmentsAdmin from './hse/admin/DepartmentsAdmin';
 import HealthModule from './petrolord/health/HealthModule';
 import HelpCenter from './help/HelpCenter'; 
 
@@ -42,6 +47,9 @@ export default function MainContent() {
       case 'audit': return <SafetyAuditModule />;
       case 'training': return <TrainingCompetencyModule />;
       case 'team': return <TeamManagementModule />;
+      case 'admin-setup-hub': return <OrgSetupHub />;
+      case 'admin-sites': return <SitesAdmin />;
+      case 'admin-departments': return <DepartmentsAdmin />;
       
       // HSSE Pillars - Consolidated
       case 'health': return <HealthModule />; 

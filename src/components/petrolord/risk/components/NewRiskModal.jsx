@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -10,19 +10,31 @@ import { riskService } from '@/services/riskService';
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2 } from 'lucide-react';
 
-export default function NewRiskModal({ isOpen, onClose, onSuccess }) {
+const EMPTY = { title: '', description: '', category: '', likelihood: '1', impact: '1', root_cause: '', consequences: '' };
+
+export default function NewRiskModal({ isOpen, onClose, onSuccess, record }) {
   const { currentOrganization, currentUser } = useHSE();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    category: '',
-    likelihood: '1',
-    impact: '1',
-    root_cause: '',
-    consequences: ''
-  });
+  const [formData, setFormData] = useState(EMPTY);
+  const isEdit = !!record;
+
+  useEffect(() => {
+    if (!isOpen) return;
+    if (record) {
+      setFormData({
+        title: record.title || '',
+        description: record.description || '',
+        category: record.category || '',
+        likelihood: String(record.likelihood ?? '1'),
+        impact: String(record.impact ?? '1'),
+        root_cause: record.root_cause || '',
+        consequences: record.consequences || '',
+      });
+    } else {
+      setFormData(EMPTY);
+    }
+  }, [record, isOpen]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -30,9 +42,7 @@ export default function NewRiskModal({ isOpen, onClose, onSuccess }) {
     setLoading(true);
 
     try {
-      await riskService.createRisk({
-        org_id: currentOrganization.id,
-        risk_id: `RISK-${new Date().getFullYear()}-${Math.floor(Math.random() * 10000)}`,
+      const fields = {
         title: formData.title,
         description: formData.description,
         category: formData.category,
@@ -40,18 +50,27 @@ export default function NewRiskModal({ isOpen, onClose, onSuccess }) {
         impact: parseInt(formData.impact),
         root_cause: formData.root_cause,
         consequences: formData.consequences,
-        owner_id: currentUser.id, // Assign to self initially
-        created_by: currentUser.id,
-        status: 'Open'
-      });
+      };
+      if (isEdit) {
+        await riskService.updateRisk(record.id, fields);
+      } else {
+        await riskService.createRisk({
+          org_id: currentOrganization.id,
+          risk_id: `RISK-${new Date().getFullYear()}-${Math.floor(Math.random() * 10000)}`,
+          ...fields,
+          owner_id: currentUser.id, // Assign to self initially
+          created_by: currentUser.id,
+          status: 'Open'
+        });
+      }
 
-      toast({ title: "Success", description: "Risk registered successfully." });
+      toast({ title: "Success", description: isEdit ? "Risk updated." : "Risk registered successfully." });
       onSuccess();
       onClose();
-      setFormData({ title: '', description: '', category: '', likelihood: '1', impact: '1', root_cause: '', consequences: '' });
+      setFormData(EMPTY);
     } catch (error) {
       console.error(error);
-      toast({ title: "Error", description: "Failed to create risk.", variant: "destructive" });
+      toast({ title: "Error", description: `Failed to ${isEdit ? 'update' : 'create'} risk.`, variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -61,7 +80,7 @@ export default function NewRiskModal({ isOpen, onClose, onSuccess }) {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[700px] bg-[#1e1e30] border-[#3a3a5a] text-white">
         <DialogHeader>
-          <DialogTitle>Register New Risk</DialogTitle>
+          <DialogTitle>{isEdit ? 'Edit Risk' : 'Register New Risk'}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-2">
           <div className="grid grid-cols-2 gap-4">
@@ -169,7 +188,7 @@ export default function NewRiskModal({ isOpen, onClose, onSuccess }) {
           <DialogFooter className="mt-4">
             <Button type="button" variant="ghost" onClick={onClose} className="text-gray-400 hover:text-white">Cancel</Button>
             <Button type="submit" disabled={loading} className="bg-amber-600 hover:bg-amber-700">
-              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Submit Risk
+              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} {isEdit ? 'Save Changes' : 'Submit Risk'}
             </Button>
           </DialogFooter>
         </form>

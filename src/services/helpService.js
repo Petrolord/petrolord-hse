@@ -69,13 +69,14 @@ export const helpService = {
     return data;
   },
 
-  async createTicket(ticketData) {
+  async createTicket(ticketData, orgId) {
     const user = (await supabase.auth.getUser()).data.user;
     const { data, error } = await supabase
       .from('support_tickets')
       .insert({
         ...ticketData,
-        user_id: user.id
+        user_id: user.id,
+        organization_id: orgId || null, // attribute the ticket to the active org
       })
       .select()
       .single();

@@ -8,9 +8,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Mail, Phone, MessageSquare, Clock } from 'lucide-react';
 import { useToast } from "@/components/ui/use-toast";
 import { helpService } from '@/services/helpService';
+import { useHSE } from '@/context/HSEContext';
 
 export default function SupportContact() {
   const { toast } = useToast();
+  const { currentOrganization } = useHSE();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [ticket, setTicket] = useState({
     subject: '',
@@ -23,7 +25,7 @@ export default function SupportContact() {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      await helpService.createTicket(ticket);
+      await helpService.createTicket(ticket, currentOrganization?.id);
       toast({
         title: "Ticket Submitted",
         description: "We've received your request and will respond shortly.",

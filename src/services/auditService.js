@@ -87,5 +87,25 @@ export const auditService = {
       .single();
     if (error) throw error;
     return data;
+  },
+
+  // --- Dashboard Stats ---
+  async getDashboardStats(orgId) {
+    try {
+      const [findings, schedule] = await Promise.all([
+        supabase.schema('hse').from('audit_findings').select('status').eq('org_id', orgId),
+        supabase.schema('hse').from('audit_schedule').select('status').eq('org_id', orgId),
+      ]);
+
+      const findingRows = findings.data || [];
+      const scheduleRows = schedule.data || [];
+      const openFindings = findingRows.filter(f => f.status !== 'Closed' && f.status !== 'Resolved').length;
+      const upcomingAudits = scheduleRows.filter(s => s.status !== 'Completed' && s.status !== 'Cancelled').length;
+
+      return { totalFindings: findingRows.length, openFindings, upcomingAudits };
+    } catch (e) {
+      console.error('Error getting audit stats:', e);
+      return { totalFindings: 0, openFindings: 0, upcomingAudits: 0 };
+    }
   }
 };

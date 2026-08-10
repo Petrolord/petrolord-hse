@@ -1,6 +1,6 @@
 export const documentationMetadata = {
-  lastUpdated: '2026-01-01',
-  version: '2.5.0',
+  lastUpdated: '2026-06-08',
+  version: '2.6.0',
   contributors: ['Petrolord HSE Team'],
   categories: ['Modules', 'Workflows', 'Administration', 'Support']
 };

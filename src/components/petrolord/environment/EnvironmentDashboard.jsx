@@ -5,21 +5,64 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle, Droplets, Flame, Trash2, FileCheck, Calendar, Activity, Zap } from 'lucide-react';
 import ComplianceScoreGauge from '../common/ComplianceScoreGauge';
 import StatCard from '../common/StatCard';
-import { envDashboardService } from '@/services/env/envDashboardService';
+import { environmentService } from '@/services/environmentService';
 import { useHSE } from '@/context/HSEContext';
+import { exportToCsv } from '@/utils/exportCsv';
+import { useToast } from "@/components/ui/use-toast";
 
-export default function EnvironmentDashboard() {
+export default function EnvironmentDashboard({ onLogSpill, onSubmitMonitoring }) {
   const { currentOrganization } = useHSE();
+  const { toast } = useToast();
   const [stats, setStats] = useState({
-    complianceScore: 0, expiringPermits: 0, overdueActions: 0,
+    complianceScore: null, expiringPermits: 0, overdueActions: 0,
     totalFlaring: 0, totalWaste: 0, spillCount: 0
   });
 
   useEffect(() => {
     if (currentOrganization) {
-      envDashboardService.getStats(currentOrganization.id).then(setStats);
+      environmentService.getDashboardStats(currentOrganization.id).then(s => setStats({
+        complianceScore: s.complianceScore ?? null,
+        expiringPermits: s.permitsDueSoon ?? 0,
+        overdueActions: s.empOverdue ?? 0,
+        totalFlaring: s.totalFlaring ?? 0,
+        totalWaste: s.totalWaste ?? 0,
+        spillCount: s.totalSpills ?? 0,
+      }));
     }
   }, [currentOrganization]);
+
+  // Compliance pack: export the permit register with a derived compliance flag.
+  const handleGeneratePack = async () => {
+    if (!currentOrganization) return;
+    try {
+      const permits = await environmentService.getPermits(currentOrganization.id);
+      if (!permits.length) {
+        toast({ title: "Nothing to export", description: "No permits on record to include in the pack.", variant: "destructive" });
+        return;
+      }
+      const soon = Date.now() + 90 * 24 * 60 * 60 * 1000;
+      const rows = permits.map(p => {
+        const exp = p.expiry_date ? new Date(p.expiry_date) : null;
+        let compliance = 'Valid';
+        if (exp && exp.getTime() < Date.now()) compliance = 'Expired';
+        else if (exp && exp.getTime() <= soon) compliance = 'Expiring Soon';
+        return {
+          'Permit #': p.permit_number,
+          Type: p.type,
+          Authority: p.issuing_authority || '',
+          'Issue Date': p.issue_date ? new Date(p.issue_date).toLocaleDateString() : '',
+          'Expiry Date': exp ? exp.toLocaleDateString() : '',
+          Status: p.status,
+          Compliance: compliance,
+        };
+      });
+      exportToCsv(`environment-compliance-pack-${new Date().toISOString().slice(0, 10)}.csv`, rows);
+      toast({ title: "Compliance pack generated", description: `${rows.length} permits exported.` });
+    } catch (e) {
+      console.error(e);
+      toast({ title: "Error", description: "Failed to generate compliance pack.", variant: "destructive" });
+    }
+  };
 
   return (
     <div className="space-y-6 pb-10 animate-in fade-in duration-500">
@@ -72,9 +115,9 @@ export default function EnvironmentDashboard() {
         <Card className="bg-[#1e1e30] border-[#2a2a40]">
           <CardHeader><CardTitle className="text-white">Quick Actions</CardTitle></CardHeader>
           <CardContent className="space-y-3">
-            <Button className="w-full bg-red-600 hover:bg-red-700 text-white justify-start"><Droplets className="mr-2 h-4 w-4" /> Log New Spill</Button>
-            <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white justify-start"><Activity className="mr-2 h-4 w-4" /> Submit Monitoring Data</Button>
-            <Button className="w-full bg-[#2a2a40] hover:bg-[#3a3a5a] text-white border border-[#3a3a5a] justify-start"><FileCheck className="mr-2 h-4 w-4" /> Generate Compliance Pack</Button>
+            <Button className="w-full bg-red-600 hover:bg-red-700 text-white justify-start" onClick={onLogSpill}><Droplets className="mr-2 h-4 w-4" /> Log New Spill</Button>
+            <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white justify-start" onClick={onSubmitMonitoring}><Activity className="mr-2 h-4 w-4" /> Submit Monitoring Data</Button>
+            <Button className="w-full bg-[#2a2a40] hover:bg-[#3a3a5a] text-white border border-[#3a3a5a] justify-start" onClick={handleGeneratePack}><FileCheck className="mr-2 h-4 w-4" /> Generate Compliance Pack</Button>
           </CardContent>
         </Card>
       </div>

@@ -17,12 +17,32 @@ export const environmentService = {
       const totalFlaring = flaring.data?.reduce((acc, curr) => acc + (curr.volume_m3 || 0), 0) || 0;
       const totalWaste = waste.data?.reduce((acc, curr) => acc + (curr.quantity || 0), 0) || 0;
 
+      // Computed compliance figure (replaces the old literal 85). Two equally
+      // weighted factors — share of permits still valid and share of EMP actions
+      // on-track — each open spill subtracts 5 points. Null when there is no
+      // permit or EMP data to base it on, so the dashboard shows '--'.
+      const totalPermits = permits.data?.length || 0;
+      const validPermits = permits.data?.filter(p => p.expiry_date && new Date(p.expiry_date) > new Date()).length || 0;
+      const totalEmp = emp.data?.length || 0;
+      const empOnTrack = totalEmp - empOverdue;
+      const totalSpills = spills.data?.length || 0;
+
+      const factors = [];
+      if (totalPermits > 0) factors.push(validPermits / totalPermits);
+      if (totalEmp > 0) factors.push(empOnTrack / totalEmp);
+
+      let complianceScore = null;
+      if (factors.length > 0) {
+        const base = (factors.reduce((a, b) => a + b, 0) / factors.length) * 100;
+        complianceScore = Math.max(0, Math.min(100, Math.round(base - totalSpills * 5)));
+      }
+
       return {
-        complianceScore: 85, // Mock calc
+        complianceScore,
         permitsDueSoon,
         empOverdue,
         totalFlaring,
-        totalSpills: spills.data?.length || 0,
+        totalSpills,
         totalWaste
       };
     } catch (e) {
@@ -37,14 +57,29 @@ export const environmentService = {
     return data || [];
   },
 
+  // --- Studies (EIA / EER cyclical studies) ---
+  async getStudies(orgId) {
+    const { data } = await supabase.from('environment_studies').select('*').eq('org_id', orgId).order('next_due_date', { ascending: true });
+    return data || [];
+  },
+
   // --- Permits ---
   async getPermits(orgId) {
     const { data } = await supabase.from('environment_permits').select('*').eq('org_id', orgId).order('expiry_date', { ascending: true });
     return data || [];
   },
   async createPermit(payload) {
+    if (!payload?.org_id) throw new Error('createPermit requires org_id');
     const { data, error } = await supabase.from('environment_permits').insert(payload).select().single();
     if (error) throw error; return data;
+  },
+  async updatePermit(id, patch) {
+    const { data, error } = await supabase.from('environment_permits').update(patch).eq('id', id).select().single();
+    if (error) throw error; return data;
+  },
+  async deletePermit(id) {
+    const { error } = await supabase.from('environment_permits').delete().eq('id', id);
+    if (error) throw error; return true;
   },
 
   // --- EMP ---
@@ -59,8 +94,17 @@ export const environmentService = {
     return data || [];
   },
   async logMonitoringData(payload) {
+    if (!payload?.org_id) throw new Error('logMonitoringData requires org_id');
     const { data, error } = await supabase.from('environment_monitoring_results').insert(payload).select().single();
     if (error) throw error; return data;
+  },
+  async updateMonitoringData(id, patch) {
+    const { data, error } = await supabase.from('environment_monitoring_results').update(patch).eq('id', id).select().single();
+    if (error) throw error; return data;
+  },
+  async deleteMonitoringData(id) {
+    const { error } = await supabase.from('environment_monitoring_results').delete().eq('id', id);
+    if (error) throw error; return true;
   },
 
   // --- Emissions ---
@@ -74,6 +118,19 @@ export const environmentService = {
     const { data } = await supabase.from('environment_waste_manifests').select('*').eq('org_id', orgId).order('created_at', { ascending: false });
     return data || [];
   },
+  async createWasteManifest(payload) {
+    if (!payload?.org_id) throw new Error('createWasteManifest requires org_id');
+    const { data, error } = await supabase.from('environment_waste_manifests').insert(payload).select().single();
+    if (error) throw error; return data;
+  },
+  async updateWasteManifest(id, patch) {
+    const { data, error } = await supabase.from('environment_waste_manifests').update(patch).eq('id', id).select().single();
+    if (error) throw error; return data;
+  },
+  async deleteWasteManifest(id) {
+    const { error } = await supabase.from('environment_waste_manifests').delete().eq('id', id);
+    if (error) throw error; return true;
+  },
 
   // --- Spills ---
   async getSpills(orgId) {
@@ -81,8 +138,17 @@ export const environmentService = {
     return data || [];
   },
   async createSpillReport(payload) {
+    if (!payload?.org_id) throw new Error('createSpillReport requires org_id');
     const { data, error } = await supabase.from('environment_spill_reports').insert(payload).select().single();
     if (error) throw error; return data;
+  },
+  async updateSpillReport(id, patch) {
+    const { data, error } = await supabase.from('environment_spill_reports').update(patch).eq('id', id).select().single();
+    if (error) throw error; return data;
+  },
+  async deleteSpillReport(id) {
+    const { error } = await supabase.from('environment_spill_reports').delete().eq('id', id);
+    if (error) throw error; return true;
   }
 };
 
@@ -90,6 +156,7 @@ export const fetchEnvironmentData = async (orgId) => {
   const stats = await environmentService.getDashboardStats(orgId);
   return {
     ...stats,
-    environmental_score: stats.complianceScore || 0
+    // Preserve null (no data) so the dashboard can show '--' rather than a fake 0%.
+    environmental_score: stats.complianceScore ?? null
   };
 };

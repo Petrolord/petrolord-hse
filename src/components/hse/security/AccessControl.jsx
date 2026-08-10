@@ -10,11 +10,13 @@ export default function AccessControl() {
   const { currentOrganization, currentUser } = useHSE();
   const [logs, setLogs] = useState([]);
   const [credentials, setCredentials] = useState([]);
+  const [summary, setSummary] = useState({ currentLevel: null, mfaEnabled: false, failedAttempts: 0 });
 
   useEffect(() => {
     if (currentOrganization && currentUser) {
       accessControlService.getAccessLogs(currentOrganization.id).then(setLogs);
       accessControlService.getCredentials(currentUser.id).then(setCredentials);
+      accessControlService.getAccessSummary(currentUser.id, currentOrganization.id).then(setSummary);
     }
   }, [currentOrganization, currentUser]);
 
@@ -26,7 +28,7 @@ export default function AccessControl() {
             <div className="p-3 rounded-full bg-blue-500/20"><UserCheck className="h-6 w-6 text-blue-400"/></div>
             <div>
               <p className="text-gray-400 text-xs uppercase">Current Level</p>
-              <h3 className="text-xl font-bold text-white">Level 3 (Senior)</h3>
+              <h3 className="text-xl font-bold text-white">{summary.currentLevel || '--'}</h3>
             </div>
           </CardContent>
         </Card>
@@ -35,7 +37,7 @@ export default function AccessControl() {
             <div className="p-3 rounded-full bg-green-500/20"><ShieldCheck className="h-6 w-6 text-green-400"/></div>
             <div>
               <p className="text-gray-400 text-xs uppercase">MFA Status</p>
-              <h3 className="text-xl font-bold text-green-400">Enabled</h3>
+              <h3 className={`text-xl font-bold ${summary.mfaEnabled ? 'text-green-400' : 'text-gray-400'}`}>{summary.mfaEnabled ? 'Enabled' : 'Not Enabled'}</h3>
             </div>
           </CardContent>
         </Card>
@@ -44,7 +46,7 @@ export default function AccessControl() {
             <div className="p-3 rounded-full bg-red-500/20"><AlertOctagon className="h-6 w-6 text-red-400"/></div>
             <div>
               <p className="text-gray-400 text-xs uppercase">Failed Attempts</p>
-              <h3 className="text-xl font-bold text-white">0 (Last 7 Days)</h3>
+              <h3 className="text-xl font-bold text-white">{summary.failedAttempts} (Last 7 Days)</h3>
             </div>
           </CardContent>
         </Card>

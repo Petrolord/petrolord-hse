@@ -1,6 +1,5 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { CheckCircle2, PlayCircle, ArrowRight, UserCheck, ShieldCheck } from 'lucide-react';
 
 export default function GettingStarted() {
@@ -14,14 +13,6 @@ export default function GettingStarted() {
             Petrolord HSE is your comprehensive platform for managing health, safety, and environmental compliance. 
             Designed for the modern energy enterprise, it unifies risk management, incident reporting, and analytics into a single, intuitive interface.
           </p>
-          <div className="flex gap-4">
-            <Button className="bg-[#FFC107] text-black hover:bg-[#e0a800]">
-              <PlayCircle className="mr-2 h-4 w-4" /> Watch Tour
-            </Button>
-            <Button variant="outline" className="border-[#3a3a5a] text-white hover:bg-[#252541]">
-              Download User Manual
-            </Button>
-          </div>
         </div>
         <div className="bg-[#252541] rounded-xl border border-[#3a3a5a] p-2">
           {/* Placeholder for Video/Image */}

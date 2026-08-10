@@ -1,26 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import { useHSE } from '@/context/HSEContext';
 import { predictiveAnalyticsService } from '@/services/predictiveAnalyticsService';
-import { recommendationEngine } from '@/services/recommendationEngine';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Brain, TrendingUp, AlertTriangle, Activity, ShieldCheck, BarChart3, CloudRain, LayoutGrid, RotateCw } from 'lucide-react';
-import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid, BarChart, Bar, Legend } from 'recharts';
+import { useToast } from "@/components/ui/use-toast";
+import { Brain, TrendingUp, AlertTriangle, Activity, ShieldCheck, BarChart3, LayoutGrid, RotateCw, Sparkles } from 'lucide-react';
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid, Legend } from 'recharts';
 import RecommendationDashboard from './RecommendationDashboard';
 import AdvancedDashboard from './AdvancedDashboard';
-import ContinuousLearningDashboard from './ContinuousLearningDashboard'; // New Import
+import ContinuousLearningDashboard from './ContinuousLearningDashboard';
+import ForecastView from './ForecastView';
 
 export default function PredictiveInsightsDashboard({ isEmbedded = false }) {
   const { currentOrganization } = useHSE();
+  const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
+
+  // AI forecast state
+  const [forecast, setForecast] = useState(null);
+  const [accuracy, setAccuracy] = useState(null);
+  const [generating, setGenerating] = useState(false);
 
   useEffect(() => {
     if (currentOrganization?.id) {
       loadData();
-      recommendationEngine.initializeDemoData(currentOrganization.id);
+      loadForecast();
     }
   }, [currentOrganization]);
 
@@ -33,6 +40,36 @@ export default function PredictiveInsightsDashboard({ isEmbedded = false }) {
       console.error("Analytics Error:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadForecast = async () => {
+    try {
+      const [latest, acc] = await Promise.all([
+        predictiveAnalyticsService.getLatestForecast(currentOrganization.id),
+        predictiveAnalyticsService.getForecastAccuracy(currentOrganization.id),
+      ]);
+      setForecast(latest);
+      setAccuracy(acc);
+    } catch (e) {
+      console.error("Forecast load error:", e);
+    }
+  };
+
+  const handleGenerateForecast = async () => {
+    if (!currentOrganization?.id) return;
+    setGenerating(true);
+    try {
+      const result = await predictiveAnalyticsService.generateForecast(currentOrganization.id);
+      setForecast(result);
+      const acc = await predictiveAnalyticsService.getForecastAccuracy(currentOrganization.id);
+      setAccuracy(acc);
+      toast({ title: "Forecast generated", description: "AI safety forecast updated from your latest reports." });
+    } catch (e) {
+      console.error(e);
+      toast({ title: "Could not generate forecast", description: e.message || "The AI service is unavailable.", variant: "destructive" });
+    } finally {
+      setGenerating(false);
     }
   };
 
@@ -68,8 +105,11 @@ export default function PredictiveInsightsDashboard({ isEmbedded = false }) {
         </div>
       )}
 
-      <Tabs defaultValue={isEmbedded ? "analytics" : "advanced"} className="space-y-6">
+      <Tabs defaultValue="forecast" className="space-y-6">
         <TabsList className="bg-[#1a1a2e] border border-[#3a3a5a]">
+          <TabsTrigger value="forecast" className="data-[state=active]:bg-[#8b5cf6] data-[state=active]:text-white flex gap-2">
+            <Sparkles className="h-4 w-4" /> AI Forecast
+          </TabsTrigger>
           <TabsTrigger value="advanced" className="data-[state=active]:bg-[#8b5cf6] data-[state=active]:text-white flex gap-2">
             <LayoutGrid className="h-4 w-4" /> Advanced Analytics
           </TabsTrigger>
@@ -83,6 +123,15 @@ export default function PredictiveInsightsDashboard({ isEmbedded = false }) {
             <Activity className="h-4 w-4" /> Basic Metrics
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="forecast" className="space-y-6">
+          <ForecastView
+            forecast={forecast}
+            accuracy={accuracy}
+            generating={generating}
+            onGenerate={handleGenerateForecast}
+          />
+        </TabsContent>
 
         <TabsContent value="advanced" className="min-h-[800px]">
           <AdvancedDashboard />

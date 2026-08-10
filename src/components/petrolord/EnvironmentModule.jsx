@@ -5,9 +5,21 @@ import EnvironmentDashboard from './environment/EnvironmentDashboard';
 import ObligationsPermits from './environment/ObligationsPermits';
 import EmissionsFlaring from './environment/EmissionsFlaring';
 import Monitoring from './environment/Monitoring';
+import SpillsRemediation from './environment/SpillsRemediation';
+import WasteChemicals from './environment/WasteChemicals';
+import StudiesEMP from './environment/StudiesEMP';
+import Decommissioning from './environment/Decommissioning';
+import Reporting from './environment/Reporting';
 
 export default function EnvironmentModule() {
   const [activeTab, setActiveTab] = useState('dashboard');
+  // Incrementing signals let a dashboard Quick Action both switch tabs and tell
+  // the target tab to auto-open its create modal.
+  const [spillSignal, setSpillSignal] = useState(0);
+  const [monitorSignal, setMonitorSignal] = useState(0);
+
+  const handleLogSpill = () => { setActiveTab('spills'); setSpillSignal(s => s + 1); };
+  const handleSubmitMonitoring = () => { setActiveTab('monitoring'); setMonitorSignal(s => s + 1); };
 
   return (
     <div className="flex flex-col h-full bg-[#141423] text-white">
@@ -40,16 +52,15 @@ export default function EnvironmentModule() {
           </div>
 
           <div className="flex-1 overflow-y-auto p-6 bg-[#141423]">
-            <TabsContent value="dashboard" className="m-0 h-full"><EnvironmentDashboard /></TabsContent>
+            <TabsContent value="dashboard" className="m-0 h-full"><EnvironmentDashboard onLogSpill={handleLogSpill} onSubmitMonitoring={handleSubmitMonitoring} /></TabsContent>
             <TabsContent value="obligations" className="m-0 h-full"><ObligationsPermits /></TabsContent>
             <TabsContent value="emissions" className="m-0 h-full"><EmissionsFlaring /></TabsContent>
-            <TabsContent value="monitoring" className="m-0 h-full"><Monitoring /></TabsContent>
-            {/* Placeholders for other tabs to prevent crash if clicked, can be expanded later */}
-            <TabsContent value="studies" className="m-0 h-full text-gray-500 flex items-center justify-center">Studies & EMP Module Loading...</TabsContent>
-            <TabsContent value="waste" className="m-0 h-full text-gray-500 flex items-center justify-center">Waste Management Module Loading...</TabsContent>
-            <TabsContent value="spills" className="m-0 h-full text-gray-500 flex items-center justify-center">Spill Management Module Loading...</TabsContent>
-            <TabsContent value="decom" className="m-0 h-full text-gray-500 flex items-center justify-center">Decommissioning Module Loading...</TabsContent>
-            <TabsContent value="reporting" className="m-0 h-full text-gray-500 flex items-center justify-center">Reporting Module Loading...</TabsContent>
+            <TabsContent value="monitoring" className="m-0 h-full"><Monitoring openSignal={monitorSignal} /></TabsContent>
+            <TabsContent value="waste" className="m-0 h-full"><WasteChemicals /></TabsContent>
+            <TabsContent value="spills" className="m-0 h-full"><SpillsRemediation openSignal={spillSignal} /></TabsContent>
+            <TabsContent value="studies" className="m-0 h-full"><StudiesEMP /></TabsContent>
+            <TabsContent value="decom" className="m-0 h-full"><Decommissioning /></TabsContent>
+            <TabsContent value="reporting" className="m-0 h-full"><Reporting /></TabsContent>
           </div>
         </Tabs>
       </div>

@@ -3,17 +3,32 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Search, Plus, Filter, Download, MoreHorizontal, ArrowUpDown } from 'lucide-react';
+import { Search, Plus, Filter, Download, ArrowUpDown } from 'lucide-react';
 import { riskService } from '@/services/riskService';
 import { useHSE } from '@/context/HSEContext';
+import { exportToCsv } from '@/utils/exportCsv';
+import { useToast } from "@/components/ui/use-toast";
 import NewRiskModal from './components/NewRiskModal';
+import RowActions from '../common/RowActions';
+
+const PAGE_SIZE = 10;
+
+const ratingOf = (score) => {
+  if (score >= 15) return 'Critical';
+  if (score >= 10) return 'High';
+  if (score >= 5) return 'Medium';
+  return 'Low';
+};
 
 export default function RiskRegister() {
   const { currentOrganization } = useHSE();
+  const { toast } = useToast();
   const [risks, setRisks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editRecord, setEditRecord] = useState(null);
 
   useEffect(() => {
     if (currentOrganization) loadRisks();
@@ -24,11 +39,46 @@ export default function RiskRegister() {
     try {
       const data = await riskService.getRisks(currentOrganization.id, { search });
       setRisks(data);
+      setPage(1);
     } catch (e) {
       console.error(e);
     } finally {
       setLoading(false);
     }
+  };
+
+  const totalPages = Math.max(1, Math.ceil(risks.length / PAGE_SIZE));
+  const pageRisks = risks.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  const openAdd = () => { setEditRecord(null); setIsModalOpen(true); };
+  const openEdit = (risk) => { setEditRecord(risk); setIsModalOpen(true); };
+
+  const handleDelete = async (risk) => {
+    try {
+      await riskService.deleteRisk(risk.id);
+      toast({ title: "Deleted", description: `Risk ${risk.risk_id} removed from the register.` });
+      loadRisks();
+    } catch (e) {
+      toast({ title: "Error", description: "Failed to delete risk.", variant: "destructive" });
+    }
+  };
+
+  const handleExport = () => {
+    const rows = risks.map(r => ({
+      'Risk ID': r.risk_id,
+      Title: r.title,
+      Description: r.description,
+      Category: r.category,
+      Likelihood: r.likelihood,
+      Impact: r.impact,
+      Score: r.risk_score,
+      Rating: r.rating || ratingOf(r.risk_score),
+      Status: r.status,
+      Owner: r.owner?.raw_user_meta_data?.full_name || r.owner?.email || 'Unassigned',
+      Updated: r.updated_at ? new Date(r.updated_at).toLocaleDateString() : '',
+    }));
+    const ok = exportToCsv(`risk-register-${new Date().toISOString().slice(0, 10)}.csv`, rows);
+    if (!ok) toast({ title: "Nothing to export", description: "There are no risks to export.", variant: "destructive" });
   };
 
   const getScoreBadge = (score) => {
@@ -56,10 +106,10 @@ export default function RiskRegister() {
           <Button variant="outline" className="border-[#3a3a5a] bg-[#252541] text-gray-300 hover:text-white">
             <Filter className="mr-2 h-4 w-4" /> Filter
           </Button>
-          <Button variant="outline" className="border-[#3a3a5a] bg-[#252541] text-gray-300 hover:text-white">
+          <Button variant="outline" className="border-[#3a3a5a] bg-[#252541] text-gray-300 hover:text-white" onClick={handleExport}>
             <Download className="mr-2 h-4 w-4" /> Export
           </Button>
-          <Button className="bg-amber-600 hover:bg-amber-700 text-white" onClick={() => setIsModalOpen(true)}>
+          <Button className="bg-amber-600 hover:bg-amber-700 text-white" onClick={openAdd}>
             <Plus className="mr-2 h-4 w-4" /> Add Risk
           </Button>
         </div>
@@ -87,7 +137,7 @@ export default function RiskRegister() {
               ) : risks.length === 0 ? (
                 <tr><td colSpan="8" className="p-10 text-center text-gray-500">No risks found matching your criteria.</td></tr>
               ) : (
-                risks.map((risk) => (
+                pageRisks.map((risk) => (
                   <tr key={risk.id} className="hover:bg-[#252541] transition-colors group">
                     <td className="px-6 py-4 font-mono text-gray-500 text-xs">{risk.risk_id}</td>
                     <td className="px-6 py-4 max-w-md">
@@ -114,9 +164,12 @@ export default function RiskRegister() {
                       {new Date(risk.updated_at).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-500 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
+                      <RowActions
+                        onEdit={() => openEdit(risk)}
+                        onDelete={() => handleDelete(risk)}
+                        deleteTitle="Delete risk?"
+                        deleteDescription={`Risk ${risk.risk_id} and its register entry will be permanently removed.`}
+                      />
                     </td>
                   </tr>
                 ))
@@ -125,15 +178,19 @@ export default function RiskRegister() {
           </table>
         </div>
         <div className="p-4 border-t border-[#2a2a40] bg-[#1e1e30] text-xs text-gray-500 flex justify-between items-center">
-          <span>Showing {risks.length} records</span>
+          <span>
+            {risks.length === 0
+              ? 'Showing 0 records'
+              : `Showing ${(page - 1) * PAGE_SIZE + 1}–${Math.min(page * PAGE_SIZE, risks.length)} of ${risks.length} · Page ${page} of ${totalPages}`}
+          </span>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" className="h-7 text-xs border-[#3a3a5a] bg-transparent" disabled>Previous</Button>
-            <Button variant="outline" size="sm" className="h-7 text-xs border-[#3a3a5a] bg-transparent" disabled>Next</Button>
+            <Button variant="outline" size="sm" className="h-7 text-xs border-[#3a3a5a] bg-transparent" disabled={page <= 1} onClick={() => setPage(p => Math.max(1, p - 1))}>Previous</Button>
+            <Button variant="outline" size="sm" className="h-7 text-xs border-[#3a3a5a] bg-transparent" disabled={page >= totalPages} onClick={() => setPage(p => Math.min(totalPages, p + 1))}>Next</Button>
           </div>
         </div>
       </Card>
 
-      <NewRiskModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSuccess={loadRisks} />
+      <NewRiskModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSuccess={loadRisks} record={editRecord} />
     </div>
   );
 }

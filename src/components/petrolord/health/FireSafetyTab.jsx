@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Flame, Shield, Activity, Calendar, AlertTriangle, Plus, FileText, CheckCircle, Search } from 'lucide-react';
+import { AlertTriangle, Plus, FileText, CheckCircle } from 'lucide-react';
 import FireRiskGauge from './FireRiskGauge';
 import FireEquipmentCard from './FireEquipmentCard';
 import { fireSafetyService } from '@/services/fireSafetyService';
@@ -16,6 +16,7 @@ export default function FireSafetyTab() {
   const [equipment, setEquipment] = useState([]);
   const [incidents, setIncidents] = useState([]);
   const [risks, setRisks] = useState([]);
+  const [compliance, setCompliance] = useState([]);
 
   useEffect(() => {
     if (currentOrganization) {
@@ -25,21 +26,24 @@ export default function FireSafetyTab() {
 
   const loadData = async () => {
     try {
-      const dashboardStats = await fireSafetyService.getDashboardStats(currentOrganization.id);
+      const [dashboardStats, eqData, incData, riskData, compData] = await Promise.all([
+        fireSafetyService.getDashboardStats(currentOrganization.id),
+        fireSafetyService.getEquipment(currentOrganization.id),
+        fireSafetyService.getIncidents(currentOrganization.id),
+        fireSafetyService.getRisks(currentOrganization.id),
+        fireSafetyService.getCompliance(currentOrganization.id),
+      ]);
       setStats(dashboardStats);
-      
-      const eqData = await fireSafetyService.getEquipment(currentOrganization.id);
       setEquipment(eqData);
-
-      const incData = await fireSafetyService.getIncidents(currentOrganization.id);
       setIncidents(incData);
-
-      const riskData = await fireSafetyService.getRisks(currentOrganization.id);
       setRisks(riskData);
+      setCompliance(compData);
     } catch (error) {
       console.error("Failed to load fire safety data", error);
     }
   };
+
+  const riskColor = (score) => (score >= 15 ? 'text-red-400' : score >= 8 ? 'text-orange-400' : 'text-green-400');
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
@@ -167,13 +171,64 @@ export default function FireSafetyTab() {
         </Card>
       )}
 
-      {/* Placeholder for other sections */}
-      {(activeSection === 'risk' || activeSection === 'compliance') && (
-        <div className="p-12 text-center border-2 border-dashed border-[#3a3a5a] rounded-xl text-gray-500">
-          <Activity className="h-12 w-12 mx-auto mb-4 opacity-50" />
-          <h3 className="text-lg font-medium text-white">Module Ready</h3>
-          <p>This section is fully integrated and ready for data entry.</p>
-        </div>
+      {/* RISK ASSESSMENT VIEW */}
+      {activeSection === 'risk' && (
+        <Card className="bg-[#1e1e30] border-[#2a2a40]">
+          <CardHeader><CardTitle className="text-white">Fire Risk Assessment Register</CardTitle></CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {risks.map(r => (
+                <div key={r.id} className="p-4 bg-[#252541] rounded border border-[#3a3a5a]">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h4 className="text-white font-bold">{r.hazard_id}</h4>
+                      <p className="text-sm text-gray-400 mt-1">{r.description}</p>
+                      {r.location && <p className="text-xs text-gray-500 mt-1">Location: {r.location}</p>}
+                    </div>
+                    <div className="text-right shrink-0 ml-4">
+                      <span className={`text-2xl font-bold ${riskColor(r.risk_score)}`}>{r.risk_score}</span>
+                      <p className="text-xs text-gray-500">L{r.likelihood} × C{r.consequence}</p>
+                    </div>
+                  </div>
+                  {r.mitigation_measures && (
+                    <p className="text-xs text-gray-400 mt-2 pt-2 border-t border-[#3a3a5a]">
+                      <span className="text-gray-500">Mitigation:</span> {r.mitigation_measures}
+                    </p>
+                  )}
+                </div>
+              ))}
+              {risks.length === 0 && <div className="text-center py-12 text-gray-500">No fire risks assessed.</div>}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* COMPLIANCE VIEW */}
+      {activeSection === 'compliance' && (
+        <Card className="bg-[#1e1e30] border-[#2a2a40]">
+          <CardHeader><CardTitle className="text-white">Fire Safety Compliance Checklist</CardTitle></CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {compliance.map(c => (
+                <div key={c.id} className="p-4 bg-[#252541] rounded border border-[#3a3a5a] flex justify-between items-center gap-4">
+                  <div>
+                    <h4 className="text-white font-medium">{c.checklist_item}</h4>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {c.standard_ref ? `${c.standard_ref} • ` : ''}
+                      {c.last_checked_date ? `Last checked: ${new Date(c.last_checked_date).toLocaleDateString()}` : 'Not yet checked'}
+                    </p>
+                    {c.remarks && <p className="text-xs text-gray-400 mt-1">{c.remarks}</p>}
+                  </div>
+                  <div className={`px-3 py-1 rounded text-xs font-bold whitespace-nowrap flex items-center gap-1 ${c.is_compliant ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+                    {c.is_compliant ? <CheckCircle className="h-3 w-3" /> : <AlertTriangle className="h-3 w-3" />}
+                    {c.is_compliant ? 'Compliant' : 'Non-Compliant'}
+                  </div>
+                </div>
+              ))}
+              {compliance.length === 0 && <div className="text-center py-12 text-gray-500">No compliance items recorded.</div>}
+            </div>
+          </CardContent>
+        </Card>
       )}
     </div>
   );

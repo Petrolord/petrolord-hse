@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { quickReportService } from '@/services/quickReportService'; // Updated import
 import { HSEContext } from '@/context/HSEContext';
@@ -19,6 +19,14 @@ export default function QuickReport({ isOpen, onClose }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [analysisProgress, setAnalysisProgress] = useState('');
+  const [aiUsage, setAiUsage] = useState(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    quickReportService.getAiUsage(currentOrganization?.id).then(usage => {
+      if (usage) setAiUsage(usage);
+    });
+  }, [isOpen, currentOrganization?.id]);
 
   const handleCapture = async (photo, audio) => {
     setPhotoData(photo);
@@ -32,7 +40,18 @@ export default function QuickReport({ isOpen, onClose }) {
       // 1. Run Analysis using the service
       setAnalysisProgress('AI analyzing scene & risks...');
       const result = await quickReportService.analyzeReport(photo, audio);
-      
+
+      if (result.usage) setAiUsage(result.usage);
+      if (result.quota_exceeded) {
+        toast({
+          title: 'AI limit reached',
+          description: result.usage
+            ? `Your organization used ${result.usage.used} of ${result.usage.quota} AI analyses this month. You can still complete the report manually.`
+            : 'Monthly AI analysis limit reached. You can still complete the report manually.',
+          variant: 'destructive',
+        });
+      }
+
       // 2. Map result to local state for Preview
       const report = {
         ...result,
@@ -105,7 +124,14 @@ export default function QuickReport({ isOpen, onClose }) {
             <h1 className="text-xl font-bold flex items-center gap-2">
               ⚡ Quick Report
             </h1>
-            <p className="text-black/80 text-xs font-medium">AI-Powered Safety Assistant</p>
+            <p className="text-black/80 text-xs font-medium">
+              AI-Powered Safety Assistant
+              {aiUsage && (
+                <span className="ml-2 inline-block bg-black/10 rounded-full px-2 py-0.5">
+                  AI analyses this month: {aiUsage.used}/{aiUsage.quota}
+                </span>
+              )}
+            </p>
           </div>
           <button onClick={onClose} className="p-1 hover:bg-black/10 rounded-full transition-colors">
             <X className="w-5 h-5" />

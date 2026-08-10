@@ -36,6 +36,7 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import PWAInstallPrompt from '@/components/common/PWAInstallPrompt';
 import BackgroundSync from '@/components/common/BackgroundSync';
 import { TooltipProvider } from "@/components/ui/tooltip";
+import PublicObservation from '@/components/public/PublicObservation';
 
 function App() {
   return (
@@ -57,6 +58,7 @@ function App() {
                     <RealtimeProvider>
                       <AIAnalyticsProvider>
                         <TooltipProvider>
+                          {/* PETROLORD PUBLIC OBSERVATION ROUTE v1 (2026-05-09) */}
                           <OfflineIndicator />
                           <PWAInstallPrompt />
                           <BackgroundSync />
@@ -81,6 +83,7 @@ function App() {
                             <Route path="/auth/registration-confirmation" element={<RegistrationConfirmation />} />
                             <Route path="/auth/callback" element={<AuthCallback />} />
                             <Route path="/accept-invite/:token" element={<InvitationAcceptance />} />
+                            <Route path="/observe/:token" element={<PublicObservation />} />
                             
                             {/* Set/Update Password Route - Protected by magic link session or auth state */}
                             {/* FIXED: Path updated to match what edge functions redirect to */}

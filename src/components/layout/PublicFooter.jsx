@@ -101,13 +101,14 @@ export default function PublicFooter() {
                 <Mail className="h-4 w-4 text-[#FFC107]" /> 
                 support@petrolord.com
               </li>
-              <li className="text-[#7a7a9a]">8 The Providence Street,<br />Lekki Phase 1, Lagos,<br />Nigeria</li>
+              <li className="text-[#7a7a9a]"><span className="text-white font-medium">UK:</span><br />128 City Road,<br />London, EC1V 2NX</li>
+              <li className="text-[#7a7a9a]"><span className="text-white font-medium">Nigeria:</span><br />8 The Providence Street,<br />Lekki Phase 1, Lagos</li>
             </ul>
           </div>
         </div>
 
         <div className="border-t border-[#3a3a5a] mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-[#7a7a9a]">
-          <p>© 2025 Lordsway Energy. All Rights Reserved.</p>
+          <p>© 2026 Lordsway Energy. All Rights Reserved.</p>
           <div className="flex gap-6">
             <Link to="/privacy-policy" className="hover:text-white transition-colors">Privacy</Link>
             <Link to="/terms-of-service" className="hover:text-white transition-colors">Terms</Link>

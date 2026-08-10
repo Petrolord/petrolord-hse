@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { guideList } from '@/data/helpContent/index';
 import GuideViewer from './GuideViewer';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -6,9 +6,15 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, BookOpen, Search } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 
-export default function ModuleGuides() {
-  const [selectedGuideId, setSelectedGuideId] = useState(null);
+export default function ModuleGuides({ openGuideId = null, openToken = 0 }) {
+  const [selectedGuideId, setSelectedGuideId] = useState(openGuideId);
   const [filter, setFilter] = useState('');
+
+  // Open a specific guide when requested from outside (e.g. global search).
+  // Keyed on openToken so re-requesting the same guide re-opens it.
+  useEffect(() => {
+    if (openGuideId) setSelectedGuideId(openGuideId);
+  }, [openToken]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const selectedGuide = guideList.find(g => g.id === selectedGuideId);
 
