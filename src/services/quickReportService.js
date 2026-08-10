@@ -211,11 +211,21 @@ export const quickReportService = {
         );
       }
 
-      const enriched = (data || []).map(r => ({
-        ...r,
-        reporter_name: nameMap[r.created_by_user_id] || 'Unknown',
-        assignee_name: r.assigned_to ? (nameMap[r.assigned_to] || 'Unknown') : null
-      }));
+      const enriched = (data || []).map(r => {
+        // QR walk-up submissions have no account; surface their self-provided
+        // contact details instead of 'Unknown'.
+        const isPublic = r.report_data?.submission_source === 'qr_public';
+        const publicName = r.report_data?.reporter_name;
+        return {
+          ...r,
+          is_public_submission: isPublic,
+          reporter_name: isPublic
+            ? (publicName || 'Anonymous (QR)')
+            : (nameMap[r.created_by_user_id] || 'Unknown'),
+          reporter_phone: isPublic ? (r.report_data?.reporter_phone || null) : null,
+          assignee_name: r.assigned_to ? (nameMap[r.assigned_to] || 'Unknown') : null
+        };
+      });
 
       return { data: enriched, error: null };
     } catch (err) {

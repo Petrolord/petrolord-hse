@@ -22,7 +22,8 @@ import OrgSetupHub from './hse/admin/OrgSetupHub';
 import SitesAdmin from './hse/admin/SitesAdmin';
 import DepartmentsAdmin from './hse/admin/DepartmentsAdmin';
 import HealthModule from './petrolord/health/HealthModule';
-import HelpCenter from './help/HelpCenter'; 
+import HelpCenter from './help/HelpCenter';
+import PredictiveInsightsDashboard from './analytics/PredictiveInsightsDashboard';
 
 export default function MainContent() {
   const { activeModule } = useHSE();
@@ -34,6 +35,7 @@ export default function MainContent() {
     switch (currentModuleId) {
       case 'dashboard': return <HSEDashboard />;
       case 'analytics': return <AnalyticsDashboardModule />;
+      case 'ai-analytics': return <PredictiveInsightsDashboard />;
       case 'leaderboard': return <LeaderboardModule />;
       
       // Reporting

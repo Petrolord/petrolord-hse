@@ -285,9 +285,9 @@ const SupervisorDashboardModule = () => {
           bg="bg-blue-400/10" 
           border="border-blue-400/20"
         />
-        <StatsCard 
-          title="Closed This Week" 
-          value={stats.closed} 
+        <StatsCard
+          title="Total Closed"
+          value={stats.closed}
           icon={CheckCircle} 
           color="text-green-400" 
           bg="bg-green-400/10" 
@@ -397,6 +397,11 @@ const SupervisorDashboardModule = () => {
                         <span className="text-white truncate max-w-[120px]" title={report.reporter_name}>
                           {report.reporter_name || 'Unknown'}
                         </span>
+                        {report.is_public_submission && (
+                          <span className="ml-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-yellow-400/15 text-yellow-300 border border-yellow-400/30 flex-shrink-0" title="Submitted via site QR code, no login">
+                            QR
+                          </span>
+                        )}
                       </div>
                     </td>
                     <td className="px-6 py-4">
@@ -473,7 +478,12 @@ const SupervisorDashboardModule = () => {
             <DialogHeader>
               <DialogTitle>{viewingReport.title || 'Quick Report'}</DialogTitle>
               <DialogDescription className="text-slate-400">
-                Reported by {viewingReport.reporter_name || 'Unknown'} on{' '}
+                Reported by {viewingReport.reporter_name || 'Unknown'}
+                {viewingReport.is_public_submission && (
+                  <span className="ml-2 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-yellow-400/15 text-yellow-300 border border-yellow-400/30">
+                    Public QR submission{viewingReport.reporter_phone ? ` · ${viewingReport.reporter_phone}` : ''}
+                  </span>
+                )}{' '}on{' '}
                 {viewingReport.created_at && format(new Date(viewingReport.created_at), 'PPp')}
               </DialogDescription>
             </DialogHeader>
