@@ -16,18 +16,18 @@ export default function PricingCTA() {
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
           <Link to="/signup">
             <Button className="h-14 px-10 text-lg bg-[#FFC107] hover:bg-[#FFD54F] text-[#1a1a2e] font-bold rounded-full shadow-[0_0_20px_rgba(255,193,7,0.3)]">
-              Start Free Trial
+              Start Free
             </Button>
           </Link>
-          <Link to="/contact">
+          <a href="mailto:support@petrolord.com?subject=Petrolord%20HSE%20Sales%20Enquiry">
             <Button variant="outline" className="h-14 px-10 text-lg border-[#3a3a5a] text-white hover:bg-[#3a3a5a] rounded-full">
               Contact Sales
             </Button>
-          </Link>
+          </a>
         </div>
         
         <p className="mt-6 text-sm text-[#7a7a9a]">
-          Have questions? <a href="mailto:support@petrolord.com" className="text-[#FFC107] hover:underline">Chat with our team</a>.
+          Have questions? <a href="mailto:support@petrolord.com" className="text-[#FFC107] hover:underline">Email our team</a>.
         </p>
       </div>
     </div>

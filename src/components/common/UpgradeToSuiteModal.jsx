@@ -1,22 +1,16 @@
-import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import React from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Check, Sparkles, X, ArrowRight, Loader2 } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
+import { Check, Sparkles, ArrowRight } from 'lucide-react';
 
 export default function UpgradeToSuiteModal({ isOpen, onClose, featureName }) {
-  const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
-
-  const handleRequestQuote = async () => {
-    setLoading(true);
-    // Simulate API call to send quote request
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setLoading(false);
-    toast({
-      title: "Quote Request Sent",
-      description: "A Petrolord specialist will contact you shortly to unlock premium features.",
-    });
+  const handleRequestQuote = () => {
+    const subject = encodeURIComponent('Petrolord HSE Premium Quote Request');
+    const body = encodeURIComponent(
+      `Hello Petrolord team,\n\nWe would like a quote for Petrolord HSE Premium.` +
+      (featureName ? `\n\nFeature of interest: ${featureName.replace(/_/g, ' ')}` : '')
+    );
+    window.location.href = `mailto:support@petrolord.com?subject=${subject}&body=${body}`;
     onClose();
   };
 
@@ -75,12 +69,10 @@ export default function UpgradeToSuiteModal({ isOpen, onClose, featureName }) {
             >
               Learn More
             </Button>
-            <Button 
+            <Button
               className="petrolord-button flex-1 sm:flex-none bg-[#FFC107] hover:bg-[#FFD54F] text-black font-semibold"
               onClick={handleRequestQuote}
-              disabled={loading}
             >
-              {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
               Request Quote <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
           </div>

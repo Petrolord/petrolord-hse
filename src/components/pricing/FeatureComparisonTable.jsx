@@ -33,7 +33,8 @@ export default function FeatureComparisonTable() {
       </div>
 
       <div className="rounded-xl border border-[#3a3a5a] bg-[#1f1f35] overflow-hidden shadow-2xl">
-        <Table>
+        <p className="md:hidden text-center text-xs text-[#7a7a9a] py-2 border-b border-[#3a3a5a]">Swipe sideways to compare plans</p>
+        <Table className="min-w-[640px]">
           <TableHeader className="bg-[#151525] sticky top-0 z-30">
             <TableRow className="border-[#3a3a5a] hover:bg-transparent">
               <TableHead className="w-[300px] py-6 pl-6 text-[#b0b0c0] font-bold uppercase tracking-wider">Features</TableHead>

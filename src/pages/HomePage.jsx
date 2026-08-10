@@ -109,13 +109,13 @@ const benefits = [
 
 const faqs = [{
   q: "Is the Free tier really free?",
-  a: "Yes! Our Free tier allows unlimited users to access core safety features. It's designed for broad adoption across your organization with usage caps on reports and no email capabilities."
+  a: "Yes. The Free tier is free forever, with unlimited users and the core safety modules: Incident Management, Observations, Risk Assessments and a basic dashboard. It has monthly usage caps on reports and incidents, and it does not send emails."
 }, {
-  q: "What features are included in the free tier?",
-  a: "The Free Tier includes all essential modules: Incident Management, Observations, Risk Assessments, basic Analytics, and unlimited users."
+  q: "How does paid pricing work?",
+  a: "The Professional plan is priced by team size band, from 1-10 users up to 2,501-5,000 users. Pick your band on the pricing card and the price updates instantly. Above 5,000 users, talk to us about Enterprise."
 }, {
   q: "How do I get started?",
-  a: "Simply click 'Start Free', create your organization account, and invite your team. It takes less than 2 minutes."
+  a: "Click 'Get Started Free', create your organization account, and invite your team. It takes less than 2 minutes and no credit card is needed."
 }, {
   q: "Is my data secure?",
   a: "Absolutely. We use enterprise-grade encryption and security protocols to ensure your data is safe and compliant."
@@ -124,7 +124,7 @@ const faqs = [{
   a: "Yes, you own your data. You can export reports and datasets in various formats (PDF, CSV, Excel) at any time."
 }, {
   q: "Is there a limit on users?",
-  a: "No. The Free Tier allows for unlimited users so your entire team can be part of the safety culture."
+  a: "No. Every plan, including Free, lets your entire workforce join so everyone can be part of the safety culture. Paid plans are priced by team size band rather than a hard user cap."
 }];
 
 export default function HomePage() {
@@ -242,7 +242,7 @@ export default function HomePage() {
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">Why Choose Petrolord HSE?</h2>
             <p className="text-[#b0b0c0] max-w-2xl mx-auto text-lg">
-              10 reasons why leading energy organizations trust us to protect their workforce and operations.
+              10 reasons to run your safety program on a platform built for the energy industry.
             </p>
           </div>
 
@@ -330,7 +330,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Flexible Plans for Every Safety Culture</h2>
-            <p className="text-[#b0b0c0]">Start for free with unlimited users. Upgrade for advanced compliance and automation.</p>
+            <p className="text-[#b0b0c0]">Start for free with unlimited users. Upgrade for advanced compliance and automation. Prices are in USD and scale with your team size.</p>
           </div>
 
           <PricingToggle isAnnual={isAnnual} setIsAnnual={setIsAnnual} />
@@ -393,7 +393,7 @@ export default function HomePage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">Ready to Transform Your HSSE Management?</h2>
           <p className="text-xl text-[#b0b0c0] mb-10">
-            Join thousands of safety professionals using Petrolord HSE to build a safer workplace.
+            Join the safety professionals using Petrolord HSE to build a safer workplace. Free to start, ready in minutes.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/signup">

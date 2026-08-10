@@ -30,6 +30,7 @@ export const pricingTiers = [
     description: 'For organizations needing compliance, emails & insights.',
     // Prices handled dynamically in component
     features: [
+      'Everything in Free',
       'Unlimited Reports & Incidents',
       'Unlimited Sites & Locations',
       '1,000 Emails / Month',
@@ -57,19 +58,19 @@ export const pricingTiers = [
     ],
     highlight: false,
     cta: 'Contact Sales',
-    href: '/contact'
+    href: 'mailto:support@petrolord.com?subject=Petrolord%20HSE%20Enterprise%20Enquiry'
   }
 ];
 
 export const professionalPricing = [
-  { label: "1-10", monthly: 110, annual: 99, savings: "10%" },
-  { label: "11-50", monthly: 275, annual: 249, savings: "10%" },
-  { label: "51-100", monthly: 555, annual: 499, savings: "10%" },
-  { label: "101-250", monthly: 999, annual: 899, savings: "10%" },
-  { label: "251-500", monthly: 1665, annual: 1499, savings: "10%" },
-  { label: "501-1,000", monthly: 2775, annual: 2499, savings: "10%" },
-  { label: "1,001-2,500", monthly: 4999, annual: 4499, savings: "10%" },
-  { label: "2,501-5,000", monthly: 8330, annual: 7499, savings: "10%" }
+  { label: "1-10", maxUsers: 10, monthly: 110, annual: 99, savings: "10%" },
+  { label: "11-50", maxUsers: 50, monthly: 275, annual: 249, savings: "10%" },
+  { label: "51-100", maxUsers: 100, monthly: 555, annual: 499, savings: "10%" },
+  { label: "101-250", maxUsers: 250, monthly: 999, annual: 899, savings: "10%" },
+  { label: "251-500", maxUsers: 500, monthly: 1665, annual: 1499, savings: "10%" },
+  { label: "501-1,000", maxUsers: 1000, monthly: 2775, annual: 2499, savings: "10%" },
+  { label: "1,001-2,500", maxUsers: 2500, monthly: 4999, annual: 4499, savings: "10%" },
+  { label: "2,501-5,000", maxUsers: 5000, monthly: 8330, annual: 7499, savings: "10%" }
 ];
 
 export const featureCategories = [
@@ -231,11 +232,11 @@ export const faqs = [
   },
   {
     question: "How does the user count for Professional pricing work?",
-    answer: "The Professional tier is priced in bands (e.g., 1-10 users, 11-50 users). You select the band that fits your team size. If you exceed the band, you'll simply move to the next one."
+    answer: "The Professional tier is priced in team size bands: 1-10, 11-50, 51-100, 101-250, 251-500, 501-1,000, 1,001-2,500 and 2,501-5,000 users. Pick the band that fits your team on the pricing card and the price updates. If your team outgrows a band, you simply move to the next one. Above 5,000 users, choose Enterprise."
   },
   {
     question: "What payment methods do you accept?",
-    answer: "We accept all major credit cards (Visa, Mastercard, Amex) for Professional plans. Enterprise plans can be paid via invoice/wire transfer."
+    answer: "Professional plans are paid by card or bank transfer through our secure payment partners, Paystack and Stripe. Enterprise plans can be paid via invoice or wire transfer."
   },
   {
     question: "Do you offer discounts for non-profits?",
