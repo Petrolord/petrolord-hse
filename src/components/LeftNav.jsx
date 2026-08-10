@@ -22,7 +22,9 @@ import {
   ChevronLeft,
   ChevronRight,
   PanelLeftClose,
-  PanelLeftOpen
+  PanelLeftOpen,
+  MapPin,
+  Building2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useHSE } from '@/context/HSEContext';
@@ -61,6 +63,16 @@ export default function LeftNav({ onClose }) {
         { id: 'leaderboard', label: 'Leaderboard', icon: Trophy, roles: ['super_admin', 'org_admin', 'manager', 'supervisor', 'staff'] },
       ]
     },
+    // PETROLORD ORG SETUP NAV v1 (2026-05-09)
+    {
+      category: "Organization Setup",
+      items: [
+        { id: 'admin-setup-hub', label: 'Setup Hub', icon: Home, roles: ['super_admin', 'org_admin'] },
+        { id: 'admin-sites', label: 'Sites', icon: MapPin, roles: ['super_admin', 'org_admin'] },
+        { id: 'admin-departments', label: 'Departments', icon: Building2, roles: ['super_admin', 'org_admin'] },
+        { id: 'team', label: 'Members', icon: Users, roles: ['super_admin', 'org_admin', 'manager'] },
+      ]
+    },
     {
       category: "Reporting",
       items: [
@@ -76,7 +88,6 @@ export default function LeftNav({ onClose }) {
         { id: 'contractor', label: 'Contractor Safety', icon: HardHat, roles: ['super_admin', 'org_admin', 'manager'] },
         { id: 'audit', label: 'Safety Audits', icon: ClipboardList, roles: ['super_admin', 'org_admin', 'manager', 'auditor'] },
         { id: 'training', label: 'Training', icon: GraduationCap, roles: ['super_admin', 'org_admin', 'manager', 'supervisor', 'staff'] },
-        { id: 'team', label: 'Team Mgmt', icon: Users, roles: ['super_admin', 'org_admin', 'manager'] },
       ]
     },
     {

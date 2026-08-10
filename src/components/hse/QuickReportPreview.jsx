@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +25,8 @@ import {
 import { format } from 'date-fns';
 import { PETROLORD_BRANDING } from '@/components/branding/BrandingGuide';
 import { useOrganizationData } from '@/hooks/useOrganizationData';
+// PETROLORD QUICK REPORT PREVIEW v1 (2026-05-09): empty-state hints to admin pages
+import { useHSE } from '@/context/HSEContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const HAZARD_CATEGORIES = [
@@ -52,6 +55,7 @@ export default function QuickReportPreview({ reportData, onEdit, onSubmit, onCan
   const [isEditing, setIsEditing] = useState(false);
   const [editedData, setEditedData] = useState(reportData);
   const { getDepartments, getSites } = useOrganizationData();
+  const { setActiveModule } = useHSE();
   
   const [departments, setDepartments] = useState([]);
   const [sites, setSites] = useState([]);
@@ -212,7 +216,7 @@ export default function QuickReportPreview({ reportData, onEdit, onSubmit, onCan
               <Label className="text-xs text-slate-500">Assign Department</Label>
               <Select value={selectedDept} onValueChange={setSelectedDept}>
                 <SelectTrigger className="bg-white border-slate-300 text-slate-900"><SelectValue placeholder="Select Department" /></SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white border-slate-300 text-slate-900">
                   {departments.length > 0 ? (
                     departments.map(d => <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>)
                   ) : (
@@ -220,12 +224,21 @@ export default function QuickReportPreview({ reportData, onEdit, onSubmit, onCan
                   )}
                 </SelectContent>
               </Select>
+              {departments.length === 0 && (
+                <button
+                  type="button"
+                  onClick={() => setActiveModule({ id: 'admin-departments', label: 'Departments' })}
+                  className="text-xs text-blue-600 hover:text-blue-700 hover:underline mt-1"
+                >
+                  Set up departments first &rarr;
+                </button>
+              )}
            </div>
            <div className="space-y-1">
               <Label className="text-xs text-slate-500">Assign Site</Label>
               <Select value={selectedSite} onValueChange={setSelectedSite}>
                 <SelectTrigger className="bg-white border-slate-300 text-slate-900"><SelectValue placeholder="Select Site" /></SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white border-slate-300 text-slate-900">
                   {sites.length > 0 ? (
                     sites.map(s => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)
                   ) : (
@@ -233,6 +246,15 @@ export default function QuickReportPreview({ reportData, onEdit, onSubmit, onCan
                   )}
                 </SelectContent>
               </Select>
+              {sites.length === 0 && (
+                <button
+                  type="button"
+                  onClick={() => setActiveModule({ id: 'admin-sites', label: 'Sites' })}
+                  className="text-xs text-blue-600 hover:text-blue-700 hover:underline mt-1"
+                >
+                  Set up sites first &rarr;
+                </button>
+              )}
            </div>
         </div>
       </div>
