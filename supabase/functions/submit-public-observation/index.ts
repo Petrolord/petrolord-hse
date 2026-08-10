@@ -134,7 +134,9 @@ Deno.serve(async (req) => {
       try {
         const { data: aiData, error: aiErr } = await supabase.functions.invoke(
           'analyze-quick-report',
-          { body: { imageBase64, imageMimeType, audioBase64, audioMimeType } }
+          // metering_org_id lets the quota check meter this service-role call
+          // against the site's organization (public reporters have no JWT).
+          { body: { imageBase64, imageMimeType, audioBase64, audioMimeType, metering_org_id: site.organization_id } }
         );
         if (!aiErr && aiData && !aiData.error) {
           aiResult = aiData;

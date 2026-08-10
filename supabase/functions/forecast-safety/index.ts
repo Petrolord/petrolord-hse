@@ -25,7 +25,11 @@
 //     ai_meta: { model, duration_ms }
 //   }
 
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
+
 const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? '';
+const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
 const MODEL = 'gpt-5.4-mini';
 
 const corsHeaders = {
@@ -63,6 +67,55 @@ Respond ONLY with valid JSON in EXACTLY this shape:
 
 Return 1-5 predicted_incidents, ordered by likelihood (highest first). If the data shows essentially no risk signal, return an empty predicted_incidents array, overall_risk_level "low", and say so in the summary.`;
 
+// Same monthly metering as analyze-quick-report, under its own feature key so
+// forecasts and quick-report analyses share the hse_ai_usage ledger but keep
+// separate counters. Fail-open on metering infrastructure errors; explicit
+// deny on no-auth / no-org / over-quota.
+async function checkQuota(req: Request): Promise<{ allowed: boolean; code?: string; usage?: any }> {
+  const authHeader = req.headers.get('Authorization') || '';
+  const jwt = authHeader.replace(/^Bearer\s+/i, '');
+  if (!jwt) return { allowed: false, code: 'AUTH_REQUIRED' };
+
+  try {
+    const admin = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
+      auth: { persistSession: false },
+    });
+
+    const { data: userData, error: userErr } = await admin.auth.getUser(jwt);
+    const userId = userData?.user?.id;
+    if (userErr || !userId) return { allowed: false, code: 'AUTH_REQUIRED' };
+
+    const { data: memberRows, error: memErr } = await admin
+      .from('organization_members')
+      .select('organization_id')
+      .eq('user_id', userId)
+      .limit(1);
+    if (memErr) {
+      console.error('quota: membership lookup failed, allowing:', memErr);
+      return { allowed: true };
+    }
+    const orgId = memberRows?.[0]?.organization_id;
+    if (!orgId) return { allowed: false, code: 'NO_ORGANIZATION' };
+
+    const { data: usage, error: rpcErr } = await admin.rpc('hse_check_and_increment_ai_usage', {
+      p_organization_id: orgId,
+      p_user_id: userId,
+      p_feature: 'safety_forecast',
+    });
+    if (rpcErr) {
+      console.error('quota: rpc failed, allowing:', rpcErr);
+      return { allowed: true };
+    }
+    if (usage && usage.allowed === false) {
+      return { allowed: false, code: 'QUOTA_EXCEEDED', usage };
+    }
+    return { allowed: true, usage };
+  } catch (err) {
+    console.error('quota: unexpected error, allowing:', err);
+    return { allowed: true };
+  }
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -84,6 +137,25 @@ Deno.serve(async (req: Request) => {
     if (!summary) {
       return new Response(
         JSON.stringify({ error: 'No summary provided.' }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Enforce the monthly AI quota after input validation so a bad request
+    // never consumes a forecast.
+    const quota = await checkQuota(req);
+    if (!quota.allowed) {
+      const messages: Record<string, string> = {
+        AUTH_REQUIRED: 'Sign in to generate a forecast.',
+        NO_ORGANIZATION: 'Your account has no organization.',
+        QUOTA_EXCEEDED: 'Your organization has reached its monthly AI usage limit for forecasts.',
+      };
+      return new Response(
+        JSON.stringify({
+          error: messages[quota.code || ''] || 'Forecast unavailable.',
+          code: quota.code,
+          usage: quota.usage,
+        }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
