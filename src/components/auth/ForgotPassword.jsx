@@ -41,7 +41,7 @@ function ForgotPassword() {
   return (
     <div className="min-h-screen bg-[#1a1a2e] flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        <div className="petrolord-card p-8 shadow-xl bg-[#252541]/90">
+        <div className="bg-[#252541]/90 border border-[#3a3a5a] rounded-lg p-8 shadow-xl">
           <Link 
             to="/login" 
             className="inline-flex items-center text-sm text-[#7a7a9a] hover:text-[#e0e0e0] mb-6 transition-colors"
@@ -68,7 +68,7 @@ function ForgotPassword() {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 rounded-lg petrolord-input text-sm focus:ring-[#FFC107] focus:border-[#FFC107]"
+                    className="w-full pl-10 pr-4 py-3 rounded-lg bg-white border-0 text-black placeholder:text-[#7a7a9a] text-sm focus:outline-none focus:ring-2 focus:ring-[#FFC107]"
                     placeholder="name@company.com"
                   />
                 </div>
@@ -77,7 +77,7 @@ function ForgotPassword() {
               <Button 
                 type="submit" 
                 disabled={loading}
-                className="w-full petrolord-button py-6 text-base font-semibold"
+                className="w-full bg-[#FFC107] hover:bg-[#ffb300] text-[#1a1a2e] py-6 text-base font-semibold"
               >
                 {loading ? (
                   <>
