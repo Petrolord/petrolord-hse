@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { AlertCircle, Eye, EyeOff, Mail, Lock, Loader2 } from 'lucide-react';
 import { supabase } from '@/lib/customSupabaseClient';
 import { useToast } from '@/components/ui/use-toast';
+import { PETROLORD_BRANDING } from '@/components/branding/BrandingGuide';
 
 const SignIn = () => {
   const navigate = useNavigate();
@@ -63,11 +64,11 @@ const SignIn = () => {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-[#FFC107]/10 border border-[#FFC107]/30 rounded-lg mb-4">
-            <div className="w-8 h-8 bg-[#FFC107] rounded-full flex items-center justify-center">
-              <span className="text-[#1a1a2e] font-bold text-lg">⚡</span>
-            </div>
-          </div>
+          <img
+            src={PETROLORD_BRANDING.logoUrl}
+            alt={PETROLORD_BRANDING.companyName}
+            className="h-14 w-auto mx-auto mb-4 object-contain"
+          />
           <h1 className="text-3xl font-bold text-white mb-2">Welcome Back</h1>
           <p className="text-[#b0b0c0]">Sign in to your unified Petrolord account</p>
         </div>

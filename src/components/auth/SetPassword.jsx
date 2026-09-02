@@ -2,15 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Lock, Loader2 } from 'lucide-react';
+import { Lock, Loader2, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '@/lib/customSupabaseClient';
 import { useToast } from '@/components/ui/use-toast';
+import { PETROLORD_BRANDING } from '@/components/branding/BrandingGuide';
 
 export default function SetPassword() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [cooldown, setCooldown] = useState(0);
 
@@ -81,6 +84,11 @@ export default function SetPassword() {
     <div className="min-h-screen bg-[#1a1a2e] flex items-center justify-center p-4">
       <div className="w-full max-w-md bg-[#252541] border border-[#3a3a5a] rounded-lg p-8 shadow-xl">
         <div className="text-center mb-8">
+          <img
+            src={PETROLORD_BRANDING.logoUrl}
+            alt={PETROLORD_BRANDING.companyName}
+            className="h-14 w-auto mx-auto mb-4 object-contain"
+          />
           <h2 className="text-2xl font-bold text-white">Set Your Password</h2>
           <p className="text-gray-400 mt-2">Secure your account to continue</p>
         </div>
@@ -91,12 +99,21 @@ export default function SetPassword() {
             <div className="relative">
               <Lock className="absolute left-3 top-3 w-5 h-5 text-gray-500" />
               <Input
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="pl-10 bg-[#1a1a2e] border-[#3a3a5a] text-white"
+                placeholder="••••••••"
+                className="pl-10 pr-10 bg-white border-0 text-black focus:ring-2 focus:ring-[#FFC107]"
                 required
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                className="absolute right-3 top-3 text-[#7a7a9a] hover:text-[#505068]"
+              >
+                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
             </div>
           </div>
           
@@ -105,12 +122,21 @@ export default function SetPassword() {
             <div className="relative">
               <Lock className="absolute left-3 top-3 w-5 h-5 text-gray-500" />
               <Input
-                type="password"
+                type={showConfirm ? 'text' : 'password'}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="pl-10 bg-[#1a1a2e] border-[#3a3a5a] text-white"
+                placeholder="••••••••"
+                className="pl-10 pr-10 bg-white border-0 text-black focus:ring-2 focus:ring-[#FFC107]"
                 required
               />
+              <button
+                type="button"
+                onClick={() => setShowConfirm(!showConfirm)}
+                aria-label={showConfirm ? 'Hide password' : 'Show password'}
+                className="absolute right-3 top-3 text-[#7a7a9a] hover:text-[#505068]"
+              >
+                {showConfirm ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
             </div>
           </div>
 

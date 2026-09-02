@@ -16,6 +16,29 @@
     --accent-foreground: #000000;
     
     --radius: 0.5rem;
+
+    /* UI-kit tokens (shadcn). tailwind.config.js wraps these in hsl(), so they
+       MUST stay bare HSL triplets. Brand amber lives in --accent above as hex
+       and is intentionally separate from the subtle --accent-ui hover surface. */
+    --background: 210 17% 98%;
+    --foreground: 221 39% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 221 39% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 221 39% 11%;
+    --primary: 45 100% 51%;
+    --primary-foreground: 221 39% 11%;
+    --secondary: 210 17% 95%;
+    --secondary-foreground: 221 39% 11%;
+    --muted: 210 17% 95%;
+    --muted-foreground: 215 14% 34%;
+    --accent-ui: 210 17% 95%;
+    --accent-ui-foreground: 221 39% 11%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 45 100% 51%;
   }
 
   .dark {
@@ -29,6 +52,38 @@
     --accent: #FFC107;
     --accent-hover: #ffcd38;
     --accent-foreground: #000000;
+
+    --background: 217 51% 12%;
+    --foreground: 210 20% 98%;
+    --card: 240 28% 14%;
+    --card-foreground: 210 20% 98%;
+    --popover: 240 28% 14%;
+    --popover-foreground: 210 20% 98%;
+    --primary: 45 100% 51%;
+    --primary-foreground: 240 28% 14%;
+    --secondary: 240 27% 20%;
+    --secondary-foreground: 210 20% 98%;
+    --muted: 240 27% 20%;
+    --muted-foreground: 218 11% 65%;
+    --accent-ui: 240 27% 20%;
+    --accent-ui-foreground: 210 20% 98%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 22% 29%;
+    --input: 240 22% 29%;
+    --ring: 45 100% 51%;
+  }
+}
+
+/* Shared Petrolord component classes. Referenced across dashboards, admin
+   forms and auth pages; they were never defined, so cards and buttons rendered
+   transparent. Utilities on the same element still override these. */
+@layer components {
+  .petrolord-card {
+    @apply rounded-lg border border-[var(--border-color)] bg-[var(--bg-card)] text-[var(--text-primary)] shadow-sm;
+  }
+  .petrolord-button {
+    @apply inline-flex items-center justify-center gap-2 rounded-md bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--accent-foreground)] transition-colors hover:bg-[var(--accent-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] disabled:pointer-events-none disabled:opacity-50;
   }
 }
 
