@@ -39,8 +39,10 @@ module.exports = {
 					foreground: 'hsl(var(--muted-foreground))',
 				},
 				accent: {
-					DEFAULT: 'hsl(var(--accent))',
-					foreground: 'hsl(var(--accent-foreground))',
+					// --accent itself is the brand amber hex used directly via
+					// var(--accent); the UI-kit hover surface is a separate token.
+					DEFAULT: 'hsl(var(--accent-ui))',
+					foreground: 'hsl(var(--accent-ui-foreground))',
 				},
 				popover: {
 					DEFAULT: 'hsl(var(--popover))',

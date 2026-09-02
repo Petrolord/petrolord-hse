@@ -60,15 +60,56 @@ export const GlobalThemeProvider = ({ children }) => {
     }
   };
 
+  // tailwind.config.js consumes --primary / --secondary / --background /
+  // --foreground as hsl(var(--x)), so they must be bare "H S% L%" triplets.
+  // Branding colours arrive as hex; anything unparseable is skipped rather
+  // than written (a hex written into these tokens makes them invalid and
+  // every element using them renders transparent).
+  const hexToHslTriplet = (hex) => {
+    if (typeof hex !== 'string') return null;
+    const m = hex.trim().match(/^#?([0-9a-f]{3}|[0-9a-f]{6})$/i);
+    if (!m) return null;
+    let h = m[1];
+    if (h.length === 3) h = h.split('').map((c) => c + c).join('');
+    const r = parseInt(h.slice(0, 2), 16) / 255;
+    const g = parseInt(h.slice(2, 4), 16) / 255;
+    const b = parseInt(h.slice(4, 6), 16) / 255;
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    const l = (max + min) / 2;
+    let hue = 0;
+    let sat = 0;
+    if (max !== min) {
+      const d = max - min;
+      sat = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      if (max === r) hue = (g - b) / d + (g < b ? 6 : 0);
+      else if (max === g) hue = (b - r) / d + 2;
+      else hue = (r - g) / d + 4;
+      hue /= 6;
+    }
+    return `${Math.round(hue * 360)} ${Math.round(sat * 100)}% ${Math.round(l * 100)}%`;
+  };
+
+  const setHslToken = (root, name, hex) => {
+    const triplet = hexToHslTriplet(hex);
+    if (triplet) root.style.setProperty(name, triplet);
+  };
+
   const applyGlobalStyles = (settings) => {
     const root = document.documentElement;
     
     // Apply new table columns to CSS vars
-    if (settings.primary_color) root.style.setProperty('--primary', settings.primary_color);
-    if (settings.secondary_color) root.style.setProperty('--secondary', settings.secondary_color);
+    if (settings.primary_color) setHslToken(root, '--primary', settings.primary_color);
+    if (settings.secondary_color) setHslToken(root, '--secondary', settings.secondary_color);
     if (settings.accent_color) root.style.setProperty('--accent', settings.accent_color);
-    if (settings.text_color) root.style.setProperty('--text-primary', settings.text_color);
-    if (settings.background_color) root.style.setProperty('--bg-app', settings.background_color);
+    if (settings.text_color) {
+      root.style.setProperty('--text-primary', settings.text_color);
+      setHslToken(root, '--foreground', settings.text_color);
+    }
+    if (settings.background_color) {
+      root.style.setProperty('--bg-app', settings.background_color);
+      setHslToken(root, '--background', settings.background_color);
+    }
     
     if (settings.font_family) root.style.setProperty('--font-body', settings.font_family);
     if (settings.font_family) root.style.setProperty('--font-heading', settings.font_family);
@@ -95,7 +136,9 @@ export const GlobalThemeProvider = ({ children }) => {
     root.style.removeProperty('--secondary');
     root.style.removeProperty('--accent');
     root.style.removeProperty('--text-primary');
+    root.style.removeProperty('--foreground');
     root.style.removeProperty('--bg-app');
+    root.style.removeProperty('--background');
     root.style.removeProperty('--font-body');
     root.style.removeProperty('--font-heading');
     root.style.removeProperty('--font-size-base');
