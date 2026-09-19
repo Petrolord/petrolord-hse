@@ -12,6 +12,7 @@ import { fileURLToPath } from 'node:url';
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const REPO = path.resolve(HERE, '..', '..');
 const ENGINE = 'packages/engines/engines/hse/safetyStats.js';
+const EXPOSURE = 'packages/engines/engines/hse/exposure.js';
 
 const git = (cwd, ...a) => execFileSync('git', ['-C', cwd, ...a], { encoding: 'utf8' });
 
@@ -46,7 +47,7 @@ describe('vendored engine guard', () => {
   test('the committed subset is clean and the guard says how much it compared', () => {
     const r = guard();
     expect(r.code).toBe(0);
-    expect(r.out).toMatch(/5 path\(s\) compared byte for byte/);
+    expect(r.out).toMatch(/10 path\(s\) compared byte for byte/);
   });
 
   test('an unstaged hand edit to the engine is caught (hashed from disk)', () => {
@@ -55,6 +56,22 @@ describe('vendored engine guard', () => {
     expect(r.code).toBe(1);
     expect(r.out).toMatch(/DIFFERING/);
     expect(r.out).toContain('engines/hse/safetyStats.js');
+  });
+
+  test('a hand edit to the H2 exposure engine is caught, by name', () => {
+    fs.writeFileSync(path.join(dir, EXPOSURE), fs.readFileSync(path.join(dir, EXPOSURE), 'utf8').replace('twaCoefficientDb: 16.61', 'twaCoefficientDb: 16.6'));
+    const r = guard();
+    expect(r.code).toBe(1);
+    expect(r.out).toMatch(/DIFFERING/);
+    expect(r.out).toContain('engines/hse/exposure.js');
+  });
+
+  test('the exposure golden deleted from the vendored tree is caught', () => {
+    fs.rmSync(path.join(dir, 'packages', 'engines', 'test-data', 'hse', 'goldens', 'exposure_cases.json'));
+    const r = guard();
+    expect(r.code).toBe(1);
+    expect(r.out).toMatch(/MISSING/);
+    expect(r.out).toContain('exposure_cases.json');
   });
 
   test('a file added to packages/engines outside the subset is caught', () => {
