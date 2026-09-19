@@ -195,7 +195,11 @@ export const OrganizationInfo = ({ organization, onUpdate }) => {
             <CardTitle className="text-sm font-medium text-white">Safety Score</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold text-green-500">{organization?.safety_score || 0}%</p>
+            {organization?.safety_score != null ? (
+              <p className="text-3xl font-bold text-green-500">{organization.safety_score}%</p>
+            ) : (
+              <p className="text-xl font-semibold text-gray-400">No data yet</p>
+            )}
             <p className="text-xs text-gray-400 mt-2">Overall safety rating</p>
           </CardContent>
         </Card>

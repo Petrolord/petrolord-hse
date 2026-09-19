@@ -29,7 +29,8 @@ export const fetchOrganization = async (organizationId) => {
       ...org,
       member_count: memberCount || 0,
       asset_count: assetCount || 0,
-      safety_score: 92 // Mock score or calculate from assets/incidents
+      // No safety-score calculation exists yet; null renders as "No data yet".
+      safety_score: null
     };
   } catch (error) {
     console.error('Error fetching organization:', error);
@@ -225,7 +226,7 @@ export const fetchAssetSafetyData = async (organizationId) => {
   try {
     const { data, error } = await supabase
       .from('organization_assets')
-      .select('safety_status')
+      .select('id, name, safety_status, safety_notes, updated_at')
       .eq('organization_id', organizationId);
 
     if (error) throw error;
@@ -237,9 +238,16 @@ export const fetchAssetSafetyData = async (organizationId) => {
       critical: data?.filter(a => a.safety_status === 'critical').length || 0,
     };
 
+    // Share of assets marked safe; null (shown as "No data yet") when there are no assets.
     safetyData.score = safetyData.total > 0 
       ? Math.round(((safetyData.safe / safetyData.total) * 100))
-      : 0;
+      : null;
+
+    // Assets currently flagged warning or critical, most recently updated first.
+    safetyData.flagged = (data || [])
+      .filter(a => a.safety_status === 'warning' || a.safety_status === 'critical')
+      .sort((a, b) => new Date(b.updated_at || 0) - new Date(a.updated_at || 0))
+      .slice(0, 10);
 
     return safetyData;
   } catch (error) {
