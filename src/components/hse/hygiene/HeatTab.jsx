@@ -3,7 +3,9 @@ import {
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine,
 } from 'recharts';
 import { heatInputs, heatRowFromForm, blankHeatForm } from '@/lib/hygiene/forms';
-import { evaluateHeat, isRefusal, WBGT_FORMS } from '@/lib/hygiene/evaluate';
+import {
+  evaluateHeat, isRefusal, WBGT_FORMS, HEAT_EQUATION_NOTE,
+} from '@/lib/hygiene/evaluate';
 import { hygieneService } from '@/services/hygieneService';
 import { ChartCard, CHART } from '../safety-stats/common';
 import {
@@ -29,11 +31,7 @@ const WBGT_COLUMNS = {
   ],
 };
 
-/** The caveat the brief and FINDINGS-exposure.md require, shown wherever a heat limit is. */
-export const HEAT_EQUATION_NOTE = 'The RAL and REL here are the published NIOSH 2016-106 equations (section 8.1): RAL = 59.9 - 14.1 log10 M and '
-  + 'REL = 56.7 - 11.5 log10 M, with M the 1-hour time-weighted metabolic rate in watts and the limit in degrees C WBGT. They were checked '
-  + 'against the document by transcription only: no printed value reproduces them independently. NIOSH\'s own worked example (section 1.1.3) '
-  + 'reads its figures off the plotted curves and gets 27.8 C (REL) and 25 C (RAL) at 348.9 W, where the equations give 27.5 C and 24.1 C.';
+export { HEAT_EQUATION_NOTE };
 
 export default function HeatTab({ orgId, form, setForm, sites, canSave, saveBlockReason, onSaved }) {
   const setField = (k) => (v) => setForm((f) => ({ ...f, [k]: v }));

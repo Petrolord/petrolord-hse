@@ -189,6 +189,17 @@ export const evaluateMixture = (agents, evaluations) => {
   };
 };
 
+/**
+ * The caveat FINDINGS-exposure.md requires wherever a heat limit is shown:
+ * the equations and WBGT weights are transcription-checked only, and the
+ * NIOSH worked example reads its figures off the plotted curves (the
+ * niosh-heat-example errata in the vendored golden).
+ */
+export const HEAT_EQUATION_NOTE = 'The RAL and REL here are the published NIOSH 2016-106 equations (section 8.1): RAL = 59.9 - 14.1 log10 M and '
+  + 'REL = 56.7 - 11.5 log10 M, with M the 1-hour time-weighted metabolic rate in watts and the limit in degrees C WBGT. They were checked '
+  + 'against the document by transcription only: no printed value reproduces them independently. NIOSH\'s own worked example (section 1.1.3) '
+  + 'reads its figures off the plotted curves and gets 27.8 C (REL) and 25 C (RAL) at 348.9 W, where the equations give 27.5 C and 24.1 C.';
+
 /* ------------------------------------------------------------------ */
 /* Heat                                                                */
 /* ------------------------------------------------------------------ */
