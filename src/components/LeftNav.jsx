@@ -24,7 +24,8 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   MapPin,
-  Building2
+  Building2,
+  Gauge
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useHSE } from '@/context/HSEContext';
@@ -60,6 +61,7 @@ export default function LeftNav({ onClose }) {
       items: [
         { id: 'dashboard', label: 'Dashboard', icon: Home, roles: ['super_admin', 'org_admin', 'manager', 'supervisor', 'staff'] },
         { id: 'analytics', label: 'Analytics', icon: BarChart2, roles: ['super_admin', 'org_admin', 'manager'] },
+        { id: 'safety-statistics', label: 'Safety Statistics', icon: Gauge, roles: ['super_admin', 'org_admin', 'manager', 'supervisor'] },
         { id: 'leaderboard', label: 'Leaderboard', icon: Trophy, roles: ['super_admin', 'org_admin', 'manager', 'supervisor', 'staff'] },
       ]
     },

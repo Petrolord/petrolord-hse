@@ -380,7 +380,8 @@ export const quickReportService = {
         'quick_report.status_changed': 'Status changed',
         'quick_report.resolved': 'Resolved',
         'quick_report.closed': 'Closed',
-        'quick_report.investigation_completed': 'Investigation completed'
+        'quick_report.investigation_completed': 'Investigation completed',
+        'quick_report.classified': 'Classified for safety statistics'
       };
 
       const events = [];
@@ -455,6 +456,46 @@ export const quickReportService = {
             has_root_cause: !!payload.root_cause
           }
         );
+      }
+      return { data, error };
+    } catch (err) {
+      return { data: null, error: err };
+    }
+  },
+
+  // HS1: classify a report for safety statistics. Scoped by organization as
+  // well as id. The database guard (hse_quick_reports_classification_guard)
+  // refuses anyone below supervisor and stamps classified_by / classified_at
+  // itself, so those are never sent from here.
+  saveClassification: async (reportId, organizationId, payload) => {
+    if (!reportId || !organizationId) {
+      return { data: null, error: new Error('reportId and organizationId are required') };
+    }
+    try {
+      const update = {
+        injury_classification: payload.injury_classification || null,
+        days_away: payload.injury_classification === 'lost_time' && Number.isInteger(payload.days_away) ? payload.days_away : null,
+        days_restricted: ['lost_time', 'restricted'].includes(payload.injury_classification) && Number.isInteger(payload.days_restricted)
+          ? payload.days_restricted : null,
+        pse_classification: payload.pse_classification || null,
+        workforce: payload.workforce || null,
+        occurred_on: payload.occurred_on || null,
+        updated_at: new Date().toISOString()
+      };
+      const { data, error } = await supabase
+        .from('quick_reports')
+        .update(update)
+        .eq('id', reportId)
+        .eq('organization_id', organizationId)
+        .select()
+        .single();
+
+      if (!error && data) {
+        await safeAuditLog(organizationId, 'quick_report.classified', reportId, {
+          report_title: data.title,
+          injury_classification: update.injury_classification,
+          pse_classification: update.pse_classification
+        });
       }
       return { data, error };
     } catch (err) {
