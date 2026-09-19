@@ -1,0 +1,20 @@
+ERROR:  duplicate key value violates unique constraint "hse_exposure_hours_period_key"
+ERROR:  new row for relation "hse_exposure_hours" violates check constraint "hse_exposure_hours_calendar_month"
+ERROR:  new row for relation "hse_exposure_hours" violates check constraint "hse_exposure_hours_calendar_month"
+ERROR:  new row for relation "hse_exposure_hours" violates check constraint "hse_exposure_hours_hours_check"
+ERROR:  new row for relation "hse_exposure_hours" violates check constraint "hse_exposure_hours_hours_check"
+ERROR:  new row violates row-level security policy for table "hse_exposure_hours"
+ERROR:  new row violates row-level security policy for table "hse_exposure_hours"
+ERROR:  new row violates row-level security policy for table "hse_exposure_hours"
+ERROR:  new row violates row-level security policy for table "hse_exposure_hours"
+ERROR:  new row violates row-level security policy for table "hse_exposure_hours"
+ERROR:  Only a supervisor, manager or admin of this organization can classify a report for safety statistics
+CONTEXT:  PL/pgSQL function hse_quick_reports_classification_guard() line 18 at RAISE
+ERROR:  Only a supervisor, manager or admin of this organization can classify a report for safety statistics
+CONTEXT:  PL/pgSQL function hse_quick_reports_classification_guard() line 18 at RAISE
+ERROR:  new row for relation "quick_reports" violates check constraint "quick_reports_days_away_check"
+ERROR:  new row for relation "quick_reports" violates check constraint "quick_reports_pse_classification_check"
+ERROR:  new row for relation "quick_reports" violates check constraint "quick_reports_workforce_check"
+ERROR:  update or delete on table "organization_sites" violates foreign key constraint "hse_exposure_hours_site_id_fkey" on table "hse_exposure_hours"
+DETAIL:  Key (id)=(20000000-0000-0000-0000-000000000001) is still referenced from table "hse_exposure_hours".
+ERROR:  permission denied for table hse_exposure_hours
