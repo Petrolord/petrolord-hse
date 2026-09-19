@@ -20,11 +20,13 @@ insert into public.hse_noise_samples(organization_id, subject_label, sample_date
 insert into public.hse_noise_samples(organization_id, subject_label, sample_date, periods) values (:O1, 'x', '2026-09-01', '[{"levelDbA":90,"durationH":-1}]');
 insert into public.hse_noise_samples(organization_id, subject_label, sample_date, periods) values (:O1, 'x', '2026-09-01', '[{"levelDbA":90,"durationH":20},{"levelDbA":85,"durationH":5}]');
 insert into public.hse_noise_samples(organization_id, subject_label, sample_date, periods, criterion) values (:O1, 'x', '2026-09-01', '[{"levelDbA":90,"durationH":8}]', 'ACGIH');
--- N3 protector consistency (expect 3 check violations): NRR without method, NIOSH without type,
--- OSHA field 50 on C-weighted data; then a complete NIOSH earmuff (expect OK)
+-- N3 protector consistency (expect 4 check violations): NRR without method, NIOSH without type,
+-- OSHA field 50 on C-weighted data, C weighting without the dBC level; then a complete
+-- NIOSH earmuff (expect OK)
 insert into public.hse_noise_samples(organization_id, subject_label, sample_date, periods, protector_nrr_db) values (:O1, 'x', '2026-09-01', '[{"levelDbA":90,"durationH":8}]', 25);
 insert into public.hse_noise_samples(organization_id, subject_label, sample_date, periods, protector_method, protector_nrr_db) values (:O1, 'x', '2026-09-01', '[{"levelDbA":90,"durationH":8}]', 'NIOSH_TYPE', 25);
 insert into public.hse_noise_samples(organization_id, subject_label, sample_date, periods, protector_method, protector_nrr_db, protector_weighting) values (:O1, 'x', '2026-09-01', '[{"levelDbA":90,"durationH":8}]', 'OSHA_FIELD_50', 25, 'C');
+insert into public.hse_noise_samples(organization_id, subject_label, sample_date, periods, protector_method, protector_nrr_db, protector_weighting) values (:O1, 'x', '2026-09-01', '[{"levelDbA":90,"durationH":8}]', 'OSHA_APPENDIX_B', 25, 'C');
 insert into public.hse_noise_samples(organization_id, subject_label, sample_date, periods, protector_method, protector_nrr_db, protector_type) values (:O1, 'Muff wearer', '2026-09-02', '[{"levelDbA":100,"durationH":8}]', 'NIOSH_TYPE', 30, 'earmuff');
 select 'N3 rows', count(*) from public.hse_noise_samples;
 -- C1 the 1910.1000(d)(2) mixture as one atomic three-row insert (expect OK, 3 rows, one group)

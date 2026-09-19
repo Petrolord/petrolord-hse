@@ -8,6 +8,7 @@ ERROR:  new row for relation "hse_noise_samples" violates check constraint "hse_
 ERROR:  new row for relation "hse_noise_samples" violates check constraint "hse_noise_samples_protector_complete_check"
 ERROR:  new row for relation "hse_noise_samples" violates check constraint "hse_noise_samples_protector_complete_check"
 ERROR:  new row for relation "hse_noise_samples" violates check constraint "hse_noise_samples_protector_complete_check"
+ERROR:  new row for relation "hse_noise_samples" violates check constraint "hse_noise_samples_protector_complete_check"
 ERROR:  new row for relation "hse_chemical_samples" violates check constraint "hse_chemical_samples_periods_check"
 ERROR:  new row for relation "hse_chemical_samples" violates check constraint "hse_chemical_samples_limit_source_check"
 ERROR:  new row for relation "hse_chemical_samples" violates check constraint "hse_chemical_samples_units_check"

@@ -146,7 +146,8 @@ grant execute on function public.hse_hygiene_periods_ok(jsonb, text[], text[], t
 -- 3. Noise samples. periods: [{ "levelDbA": 92, "durationH": 2 }, ...], each
 --    a steady A-weighted level held for that many hours, at most 24 h a day.
 --    criterion is the one the record is judged against; the app shows every
---    preset side by side regardless.
+--    preset side by side regardless. A hearing protector estimate on
+--    C-weighted data uses protector_c_weighted_db, measured separately.
 -- ---------------------------------------------------------------------------
 create table if not exists public.hse_noise_samples (
   id uuid primary key default gen_random_uuid(),
@@ -162,6 +163,7 @@ create table if not exists public.hse_noise_samples (
   protector_method text,
   protector_nrr_db numeric,
   protector_weighting text not null default 'A',
+  protector_c_weighted_db numeric,
   protector_type text,
   instrument text,
   notes text,
@@ -178,14 +180,18 @@ create table if not exists public.hse_noise_samples (
     protector_method is null or protector_method in ('OSHA_APPENDIX_B', 'OSHA_FIELD_50', 'OSHA_DUAL', 'NIOSH_TYPE')),
   constraint hse_noise_samples_protector_nrr_check check (protector_nrr_db is null or (protector_nrr_db >= 0 and protector_nrr_db < 100)),
   constraint hse_noise_samples_protector_weighting_check check (protector_weighting in ('A', 'C')),
+  constraint hse_noise_samples_protector_c_check check (
+    protector_c_weighted_db is null or (protector_c_weighted_db > 0 and protector_c_weighted_db < 200)),
   constraint hse_noise_samples_protector_type_check check (
     protector_type is null or protector_type in ('earmuff', 'formableEarplug', 'otherEarplug')),
   -- a method needs an NRR and an NRR needs a method; the NIOSH method needs a
-  -- protector type, and the OSHA 50 percent field derating is A-weighted only
+  -- protector type; the OSHA 50 percent field derating is A-weighted only; a
+  -- C-weighted estimate needs the C-weighted exposure (the periods are dBA)
   constraint hse_noise_samples_protector_complete_check check (
     (protector_method is null) = (protector_nrr_db is null)
     and (protector_method is distinct from 'NIOSH_TYPE' or protector_type is not null)
-    and (protector_method is distinct from 'OSHA_FIELD_50' or protector_weighting = 'A'))
+    and (protector_method is distinct from 'OSHA_FIELD_50' or protector_weighting = 'A')
+    and (protector_weighting = 'A' or protector_c_weighted_db is not null))
 );
 
 create index if not exists hse_noise_samples_org_date_idx on public.hse_noise_samples (organization_id, sample_date desc);
