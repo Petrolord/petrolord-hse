@@ -25,7 +25,8 @@ import {
   PanelLeftOpen,
   MapPin,
   Building2,
-  Gauge
+  Gauge,
+  Ear
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useHSE } from '@/context/HSEContext';
@@ -96,6 +97,7 @@ export default function LeftNav({ onClose }) {
       category: "HSSE Pillars",
       items: [
         { id: 'health', label: 'Health', icon: Activity, roles: ['super_admin', 'org_admin', 'manager', 'health_officer'] },
+        { id: 'occupational-hygiene', label: 'Occupational Hygiene', icon: Ear, roles: ['super_admin', 'org_admin', 'manager', 'supervisor', 'health_officer'] },
         { id: 'security', label: 'Security', icon: Lock, roles: ['super_admin', 'org_admin', 'manager', 'security_officer'] },
         { id: 'environment', label: 'Environment', icon: Leaf, roles: ['super_admin', 'org_admin', 'manager', 'env_officer'] },
         { id: 'risk', label: 'Risk Mgmt', icon: AlertTriangle, roles: ['super_admin', 'org_admin', 'manager', 'risk_officer'] },
