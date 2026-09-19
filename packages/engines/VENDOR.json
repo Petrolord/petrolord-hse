@@ -1,0 +1,38 @@
+{
+  "$comment": "Vendoring contract for packages/engines in Petrolord HSE. Checked by tools/check-vendored-engines.mjs (adapted from petrolord-suite tools/check-vendored-engines.mjs). Unlike the Suite, which vendors the WHOLE canonical tree, HSE vendors a SUBSET: only the engines the app imports, plus each one's test, golden, oracle and FINDINGS for provenance. The subset is listed below and the committed VENDOR.manifest carries the canonical blob hash of exactly those paths at the pinned commit. The check is against the PINNED commit, never against engines HEAD, so canonical moving on never blocks an HSE pull request; moving the pin is a deliberate, reviewed vendoring pass. knownDeviations is the same ledger the Suite uses (reason, group, burnDownWhen, and a vendoredSha pin for a differing or extra path); the expected state is an empty list.",
+  "canonical": {
+    "repo": "git@github.com:Petrolord/petrolord-engines.git",
+    "commit": "f123a575f06cb5fcef0fa9af2bbce951a3ac1305",
+    "manifest": "VENDOR.manifest"
+  },
+  "vendoring": {
+    "method": "file-by-file copy of the listed subset from a canonical clone at the pinned commit (git show <commit>:<path>), verified by blob hash with this guard, hashed from the files on disk rather than from the git index",
+    "$comment": "NEVER a whole-tree `git subtree pull`: in the Suite that silently deleted 24 downstream files on 2026-09-14, and here it would drag in hundreds of engines the app does not use. To move the pin: fetch the canonical clone, copy each subset path at the new commit, run `node tools/check-vendored-engines.mjs --write-manifest <clone>` to regenerate VENDOR.manifest, then `node tools/check-vendored-engines.mjs --canonical <clone>` and `npm test`.",
+    "lastVendored": "2026-09-19",
+    "lastVendoredRange": "first vendoring. Canonical f123a575f06cb5fcef0fa9af2bbce951a3ac1305 (engines PR #216, feat(hse): H1 safetyStats engine). 5 paths, all new."
+  },
+  "subset": [
+    "__tests__/hse.safetyStats.test.js",
+    "engines/hse/safetyStats.js",
+    "test-data/hse/goldens/safetyStats_cases.json",
+    "tools/validation/hse/FINDINGS-safetystats.md",
+    "tools/validation/hse/oracle_safetystats.py"
+  ],
+  "notVendored": {
+    "$comment": "Canonical files deliberately left out of the subset, with the reason.",
+    "tools/validation/hse/negcontrol_safetystats.sh": "a jest-based negative control that plants defects in the canonical tree and needs the engines repo's jest; it proves the canonical gate, which the pinned blob hash already ties this copy to"
+  },
+  "testing": {
+    "$comment": "The vendored engine test runs under the HSE repo's vitest (vitest.config.js includes packages/engines/__tests__/**/*.test.js and sets globals, so the jest-style describe/test/expect in the canonical file run unchanged). `npm test` runs it beside the app's own tests.",
+    "runner": "vitest (npm test)",
+    "knownTestFailures": {
+      "suites": []
+    }
+  },
+  "floors": {
+    "$comment": "manifestPaths is the size of the subset. vendoredPaths is 1 on purpose: a subset path missing from the tree is reported by name as MISSING, which says more than a floor would; the floor is only there so an EMPTY tree can never read clean.",
+    "manifestPaths": 5,
+    "vendoredPaths": 1
+  },
+  "knownDeviations": []
+}

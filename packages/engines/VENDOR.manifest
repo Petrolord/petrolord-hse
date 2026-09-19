@@ -1,0 +1,8 @@
+# Canonical petrolord-engines blobs for the SUBSET vendored here, at the commit pinned in VENDOR.json.
+# Generated, do not hand edit: node tools/check-vendored-engines.mjs --canonical <clone> verifies it.
+# commit f123a575f06cb5fcef0fa9af2bbce951a3ac1305
+e2e4f398b5c2da829a738c1038dccc93c7bdddb2 __tests__/hse.safetyStats.test.js
+3ecaa28e39abbf39846d8406f5fa4329f8b8c402 engines/hse/safetyStats.js
+392b810543c5d1138c96a0f9afaea8847359b9a5 test-data/hse/goldens/safetyStats_cases.json
+42d823d7fc4428e51df1a62fc2aeebee9ecc37bd tools/validation/hse/FINDINGS-safetystats.md
+3d7e213cf66a2c6b86858a0b5d858be379217764 tools/validation/hse/oracle_safetystats.py
