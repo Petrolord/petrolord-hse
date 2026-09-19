@@ -71,22 +71,26 @@ export default function FireSafetyTab() {
               <div>
                 <p className="text-gray-400 text-xs font-bold uppercase">Fire Risk Score</p>
                 <div className="mt-2 h-20 w-20">
-                   <FireRiskGauge score={stats.riskScore} />
+                   {stats.riskScore === null ? (
+                     <p className="text-sm font-semibold text-gray-400 pt-6">No data yet</p>
+                   ) : (
+                     <FireRiskGauge score={stats.riskScore} />
+                   )}
                 </div>
               </div>
             </Card>
             <Card className="bg-[#1e1e30] border-[#2a2a40] p-4">
               <p className="text-gray-400 text-xs font-bold uppercase">Compliance</p>
-              <h3 className="text-3xl font-bold text-white mt-2">{stats.complianceScore}%</h3>
+              <h3 className="text-3xl font-bold text-white mt-2">{stats.complianceScore === null ? <span className="text-xl text-gray-400">No data yet</span> : `${stats.complianceScore}%`}</h3>
               <p className="text-xs text-gray-500 mt-1">Audit readiness</p>
             </Card>
             <Card className="bg-[#1e1e30] border-[#2a2a40] p-4">
               <p className="text-gray-400 text-xs font-bold uppercase">Equipment Status</p>
-              <h3 className="text-3xl font-bold text-white mt-2">{stats.maintenanceScore}%</h3>
+              <h3 className="text-3xl font-bold text-white mt-2">{stats.maintenanceScore === null ? <span className="text-xl text-gray-400">No data yet</span> : `${stats.maintenanceScore}%`}</h3>
               <p className="text-xs text-gray-500 mt-1">Operational</p>
             </Card>
             <Card className="bg-[#1e1e30] border-[#2a2a40] p-4">
-              <p className="text-gray-400 text-xs font-bold uppercase">YTD Incidents</p>
+              <p className="text-gray-400 text-xs font-bold uppercase">Incidents (All Time)</p>
               <h3 className="text-3xl font-bold text-white mt-2">{stats.incidentsCount}</h3>
               <p className="text-xs text-gray-500 mt-1">{stats.drillsCount} Drills Completed</p>
             </Card>

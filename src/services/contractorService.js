@@ -103,11 +103,27 @@ export const contractorService = {
       this.getPermits(orgId)
     ]);
 
+    const yearStart = new Date(new Date().getFullYear(), 0, 1);
+    const incidentDate = (i) => new Date(i.date || i.created_at);
+    const incidentsYTD = incidents.filter(i => incidentDate(i) >= yearStart);
+
+    // Recent activity built from the records fetched above (newest first).
+    const recentActivity = [
+      ...contractors.map(c => ({ id: `c-${c.id}`, type: 'Contractor', message: `Contractor "${c.company_name}" added`, at: c.created_at })),
+      ...permits.map(p => ({ id: `p-${p.id}`, type: 'Permit', message: `Permit${p.permit_number ? ` ${p.permit_number}` : ''}${p.contractor?.company_name ? ` for ${p.contractor.company_name}` : ''}${p.status ? ` (${p.status})` : ''}`, at: p.created_at })),
+      ...incidents.map(i => ({ id: `i-${i.id}`, type: 'Incident', message: `${i.incident_type || 'Incident'} reported${i.contractor?.company_name ? ` for ${i.contractor.company_name}` : ''}`, at: i.date || i.created_at })),
+    ]
+      .filter(e => e.at)
+      .sort((x, y) => new Date(y.at) - new Date(x.at))
+      .slice(0, 4);
+
     return {
       totalContractors: contractors.length,
       activeContractors: contractors.filter(c => c.status === 'Active').length,
-      totalIncidents: incidents.length,
-      openPermits: permits.filter(p => p.status === 'Open' || p.status === 'Active').length
+      totalIncidents: incidentsYTD.length,
+      criticalIncidents: incidentsYTD.filter(i => (i.severity || '').toLowerCase() === 'critical').length,
+      openPermits: permits.filter(p => p.status === 'Open' || p.status === 'Active').length,
+      recentActivity,
     };
   }
 };
