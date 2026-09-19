@@ -22,12 +22,11 @@ export const securityService = {
       const today = now.toISOString().slice(0, 10);
       const nowIso = now.toISOString();
       const in30Days = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString();
-      const hse = supabase.schema('hse');
 
       const [incidents, pending, expiring] = await Promise.all([
         supabase.from('security_incidents').select('id', { count: 'exact', head: true }).eq('organization_id', orgId).gte('incident_date', yearStart),
-        hse.from('training_schedule').select('id', { count: 'exact', head: true }).eq('org_id', orgId).gte('scheduled_date', today),
-        hse.from('competency_records').select('id', { count: 'exact', head: true }).eq('org_id', orgId).not('expiry_date', 'is', null).gte('expiry_date', nowIso).lte('expiry_date', in30Days),
+        supabase.from('hse_training_schedule').select('id', { count: 'exact', head: true }).eq('org_id', orgId).gte('scheduled_date', today),
+        supabase.from('hse_competency_records').select('id', { count: 'exact', head: true }).eq('org_id', orgId).not('expiry_date', 'is', null).gte('expiry_date', nowIso).lte('expiry_date', in30Days),
       ]);
 
       return {

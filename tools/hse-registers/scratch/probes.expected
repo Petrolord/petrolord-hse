@@ -1,0 +1,64 @@
+SET
+SET
+INSERT 0 1
+INSERT 0 1
+SET
+INSERT 0 1
+   ?column?    |              created_by              
+---------------+--------------------------------------
+ R1 created_by | 00000000-0000-0000-0000-00000000000a
+(1 row)
+
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+      ?column?      | count 
+--------------------+-------
+ R8 A sees programs |     1
+(1 row)
+
+       ?column?        | count 
+-----------------------+-------
+ R8 A sees contractors |     1
+(1 row)
+
+UPDATE 1
+  ?column?  | safety_rating | ?column? 
+------------+---------------+----------
+ R11 rating |             4 | t
+(1 row)
+
+SET
+      ?column?       | count 
+---------------------+-------
+ R13 B sees programs |     1
+(1 row)
+
+UPDATE 0
+               ?column?                | count | count | count 
+---------------------------------------+-------+-------+-------
+ R13 B sees schedule/inductions/audits |     0 |     0 |     0
+(1 row)
+
+SET
+     ?column?     | count 
+------------------+-------
+ R14 invited sees |     0
+(1 row)
+
+SET
+       ?column?       | count 
+----------------------+-------
+ R15 super admin sees |     2
+(1 row)
+
+RESET
+SET
+RESET
+  ?column?  | count | count | count | count | count | count 
+------------+-------+-------+-------+-------+-------+-------
+ R17 totals |     2 |     1 |     2 |     1 |     1 |     1
+(1 row)
+

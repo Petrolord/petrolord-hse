@@ -1,10 +1,12 @@
 import { supabase } from '@/lib/customSupabaseClient';
 
-// All training/competency domain tables live in the `hse` schema and are scoped
-// by `org_id` (the gold-standard Work Permits pattern). Every read filters on the
-// caller's organization; every method degrades to an empty result on error rather
-// than throwing into the UI's swallowing try/catch.
-const hse = () => supabase.schema('hse');
+// The training/competency tables are public.hse_* (migration
+// 20260919150000_hse_public_registers.sql), scoped by `org_id` and by RLS.
+// They used to be read through supabase.schema('hse'), which PostgREST does
+// not expose on this project (PGRST106), so every call failed in production.
+// Every read filters on the caller's organization; every read degrades to an
+// empty result on error rather than throwing into the UI's swallowing
+// try/catch.
 
 export const trainingService = {
   /**
@@ -13,8 +15,8 @@ export const trainingService = {
    */
   async getPrograms(orgId, filters = {}) {
     if (!orgId) return [];
-    let query = hse()
-      .from('training_programs')
+    let query = supabase
+      .from('hse_training_programs')
       .select('*')
       .eq('org_id', orgId)
       .order('created_at', { ascending: false });
@@ -37,8 +39,8 @@ export const trainingService = {
    */
   async getSchedule(orgId) {
     if (!orgId) return [];
-    const { data, error } = await hse()
-      .from('training_schedule')
+    const { data, error } = await supabase
+      .from('hse_training_schedule')
       .select('*, program:program_id(program_name)')
       .eq('org_id', orgId)
       .order('scheduled_date', { ascending: true });
@@ -53,8 +55,8 @@ export const trainingService = {
    */
   async getRecords(orgId) {
     if (!orgId) return [];
-    const { data, error } = await hse()
-      .from('training_records')
+    const { data, error } = await supabase
+      .from('hse_training_records')
       .select('*, training_date:date')
       .eq('org_id', orgId)
       .order('date', { ascending: false });
@@ -68,8 +70,8 @@ export const trainingService = {
    */
   async getCompetencies(orgId) {
     if (!orgId) return [];
-    const { data, error } = await hse()
-      .from('competency_framework')
+    const { data, error } = await supabase
+      .from('hse_competency_framework')
       .select('*')
       .eq('org_id', orgId)
       .order('competency_name', { ascending: true });
@@ -83,8 +85,8 @@ export const trainingService = {
    */
   async getAssessments(orgId) {
     if (!orgId) return [];
-    const { data, error } = await hse()
-      .from('competency_assessments')
+    const { data, error } = await supabase
+      .from('hse_competency_assessments')
       .select('*, competency:competency_id(competency_name)')
       .eq('org_id', orgId)
       .order('assessment_date', { ascending: false });
@@ -103,11 +105,11 @@ export const trainingService = {
       const today = new Date().toISOString().slice(0, 10);
       const nowIso = new Date().toISOString();
       const [programs, schedule, records, competencies] = await Promise.all([
-        hse().from('training_programs').select('id', { count: 'exact', head: true }).eq('org_id', orgId).eq('status', 'Active'),
-        hse().from('training_schedule').select('id', { count: 'exact', head: true }).eq('org_id', orgId).gte('scheduled_date', today),
-        hse().from('training_records').select('id', { count: 'exact', head: true }).eq('org_id', orgId).eq('status', 'Completed'),
+        supabase.from('hse_training_programs').select('id', { count: 'exact', head: true }).eq('org_id', orgId).eq('status', 'Active'),
+        supabase.from('hse_training_schedule').select('id', { count: 'exact', head: true }).eq('org_id', orgId).gte('scheduled_date', today),
+        supabase.from('hse_training_records').select('id', { count: 'exact', head: true }).eq('org_id', orgId).eq('status', 'Completed'),
         // Personnel holding a competency that hasn't expired (null expiry = no expiry).
-        hse().from('competency_records').select('id', { count: 'exact', head: true }).eq('org_id', orgId).or(`expiry_date.is.null,expiry_date.gte.${nowIso}`),
+        supabase.from('hse_competency_records').select('id', { count: 'exact', head: true }).eq('org_id', orgId).or(`expiry_date.is.null,expiry_date.gte.${nowIso}`),
       ]);
       return {
         activePrograms: programs.count || 0,
@@ -134,8 +136,8 @@ export const trainingService = {
     if (!orgId) return empty;
     try {
       const [records, assessments] = await Promise.all([
-        hse().from('training_records').select('status, date').eq('org_id', orgId),
-        hse().from('competency_assessments').select('score, competency:competency_id(category)').eq('org_id', orgId),
+        supabase.from('hse_training_records').select('status, date').eq('org_id', orgId),
+        supabase.from('hse_competency_assessments').select('score, competency:competency_id(category)').eq('org_id', orgId),
       ]);
       const recs = records.data || [];
       const assess = assessments.data || [];
@@ -183,8 +185,8 @@ export const trainingService = {
    * already shaped to the table's columns.
    */
   async createProgram(payload) {
-    const { data, error } = await hse()
-      .from('training_programs')
+    const { data, error } = await supabase
+      .from('hse_training_programs')
       .insert([{
         org_id: payload.org_id,
         program_id: payload.program_id,
@@ -208,32 +210,33 @@ export const trainingService = {
    * competency records to measure.
    */
   async getDashboardStats(orgId) {
-    try {
-      const [training, competency] = await Promise.all([
-        hse().from('training_records').select('status').eq('org_id', orgId),
-        hse().from('competency_records').select('status, expiry_date').eq('org_id', orgId),
-      ]);
-
-      const trainingRows = training.data || [];
-      const competencyRows = competency.data || [];
-      const totalCompetencies = competencyRows.length;
-      const validCompetencies = competencyRows.filter(
-        c => !c.expiry_date || new Date(c.expiry_date) > new Date()
-      ).length;
-      const complianceRate = totalCompetencies > 0
-        ? Math.round((validCompetencies / totalCompetencies) * 100)
-        : null;
-
-      return {
-        trainingRecords: trainingRows.length,
-        totalCompetencies,
-        validCompetencies,
-        complianceRate,
-      };
-    } catch (e) {
-      console.error('Error getting training stats:', e);
-      return { trainingRecords: 0, totalCompetencies: 0, validCompetencies: 0, complianceRate: null };
+    // null (not zeros) when either read fails, so the dashboard tile shows
+    // its unavailable state instead of an invented "0 records".
+    const [training, competency] = await Promise.all([
+      supabase.from('hse_training_records').select('status').eq('org_id', orgId),
+      supabase.from('hse_competency_records').select('status, expiry_date').eq('org_id', orgId),
+    ]);
+    if (training.error || competency.error) {
+      console.error('Error getting training stats:', training.error || competency.error);
+      return null;
     }
+
+    const trainingRows = training.data || [];
+    const competencyRows = competency.data || [];
+    const totalCompetencies = competencyRows.length;
+    const validCompetencies = competencyRows.filter(
+      c => !c.expiry_date || new Date(c.expiry_date) > new Date()
+    ).length;
+    const complianceRate = totalCompetencies > 0
+      ? Math.round((validCompetencies / totalCompetencies) * 100)
+      : null;
+
+    return {
+      trainingRecords: trainingRows.length,
+      totalCompetencies,
+      validCompetencies,
+      complianceRate,
+    };
   },
 
   /**

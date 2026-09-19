@@ -1,0 +1,12 @@
+ERROR:  new row violates row-level security policy for table "hse_training_programs"
+ERROR:  new row violates row-level security policy for table "hse_training_programs"
+ERROR:  new row violates row-level security policy for table "hse_training_schedule"
+ERROR:  new row violates row-level security policy for table "hse_contractors"
+ERROR:  new row violates row-level security policy for table "hse_safety_inductions"
+ERROR:  new row violates row-level security policy for table "hse_audit_schedule"
+ERROR:  new row violates row-level security policy for table "hse_contractors"
+ERROR:  new row violates row-level security policy for table "hse_contractors"
+ERROR:  permission denied for table hse_training_programs
+ERROR:  new row violates row-level security policy for table "hse_training_programs"
+ERROR:  permission denied for table hse_training_programs
+ERROR:  permission denied for table hse_contractors
