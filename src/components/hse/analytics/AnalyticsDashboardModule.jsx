@@ -5,7 +5,7 @@ import {
 } from 'recharts';
 import { 
   TrendingUp, TrendingDown, Activity, AlertCircle, 
-  MapPin, Calendar, Download, RefreshCw, Zap
+  MapPin, Download, RefreshCw
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -27,14 +27,14 @@ const AnalyticsDashboardModule = () => {
   const [metrics, setMetrics] = useState({
     totalReports: 0,
     criticalCount: 0,
-    avgResolution: 0,
-    topLocation: 'N/A',
-    trend: 'stable'
+    topLocation: null,
+    topLocationCount: 0,
+    thisMonth: 0,
+    lastMonth: 0,
   });
   const [chartData, setChartData] = useState([]);
   const [severityData, setSeverityData] = useState([]);
   const [categoryData, setCategoryData] = useState([]);
-  const [predictions, setPredictions] = useState(null);
 
   useEffect(() => {
     if (currentOrganization?.id) {
@@ -52,24 +52,13 @@ const AnalyticsDashboardModule = () => {
       if (timeRange === '30days') startDate = subDays(endDate, 30);
       if (timeRange === '90days') startDate = subDays(endDate, 90);
 
-      // 2. Fetch Aggregated Insights
-      const { data: insights } = await analyticsService.getInsights(
-        currentOrganization.id, 
-        startDate.toISOString().split('T')[0], 
-        endDate.toISOString().split('T')[0]
-      );
-
-      // 3. Fetch Raw Data (Fallback/Enrichment)
+      // 2. Fetch the organization's reports
       const { data: rawReports } = await analyticsService.getRawReportData(currentOrganization.id);
-      
-      // 4. Process Data for Charts
-      if (rawReports) {
-        processRawData(rawReports);
-      }
 
-      // 5. Get AI Predictions
-      const pred = await analyticsService.getPredictiveInsights(currentOrganization.id);
-      setPredictions(pred);
+      // 3. Process Data for Charts (selected range) and month-on-month counts (all reports)
+      if (rawReports) {
+        processRawData(rawReports, startDate);
+      }
 
     } catch (error) {
       console.error("Analytics Error:", error);
@@ -83,21 +72,32 @@ const AnalyticsDashboardModule = () => {
     }
   };
 
-  const processRawData = (reports) => {
-    // Process Metrics
-    const total = reports.length;
-    const critical = reports.filter(r => r.severity === 'critical' || r.severity === 'high').length;
-    
-    // Process Trend (Simple Comparison)
-    const thisMonth = reports.filter(r => new Date(r.created_at) > startOfMonth(new Date())).length;
+  const processRawData = (allReports, startDate) => {
+    // Month-on-month counts use every report; everything else uses the selected range.
+    const thisMonth = allReports.filter(r => new Date(r.created_at) >= startOfMonth(new Date())).length;
     const lastMonthStart = startOfMonth(subMonths(new Date(), 1));
     const lastMonthEnd = endOfMonth(subMonths(new Date(), 1));
-    const lastMonth = reports.filter(r => {
+    const lastMonth = allReports.filter(r => {
       const d = new Date(r.created_at);
       return d >= lastMonthStart && d <= lastMonthEnd;
     }).length;
-    
-    const trendDirection = thisMonth >= lastMonth ? 'up' : 'down';
+
+    const reports = allReports.filter(r => new Date(r.created_at) >= startDate);
+
+    // Process Metrics
+    const total = reports.length;
+    const critical = reports.filter(r => r.severity === 'critical' || r.severity === 'high').length;
+
+    // Location with the most reports in range. Reports without a real location
+    // (empty, or the 'Unknown' / 'Detected: Site Location' placeholders the
+    // quick report flow writes) are skipped.
+    const PLACEHOLDER_LOCATIONS = new Set(['unknown', 'detected: site location']);
+    const locCounts = reports.reduce((acc, r) => {
+      const loc = (r.location || '').toString().trim();
+      if (loc && !PLACEHOLDER_LOCATIONS.has(loc.toLowerCase())) acc[loc] = (acc[loc] || 0) + 1;
+      return acc;
+    }, {});
+    const topLocEntry = Object.entries(locCounts).sort((a, b) => b[1] - a[1])[0];
 
     // Process Charts - Severity
     const sevCounts = reports.reduce((acc, r) => {
@@ -126,9 +126,10 @@ const AnalyticsDashboardModule = () => {
     setMetrics({
       totalReports: total,
       criticalCount: critical,
-      avgResolution: 24, // Mock for now
-      topLocation: 'Drill Site A', // Mock for now
-      trend: trendDirection
+      topLocation: topLocEntry ? topLocEntry[0] : null,
+      topLocationCount: topLocEntry ? topLocEntry[1] : 0,
+      thisMonth,
+      lastMonth,
     });
     setSeverityData(sevData);
     setCategoryData(catData);
@@ -144,10 +145,11 @@ const AnalyticsDashboardModule = () => {
       startY: 40,
       head: [['Metric', 'Value']],
       body: [
-        ['Total Reports', metrics.totalReports],
-        ['Critical Incidents', metrics.criticalCount],
-        ['Trend', metrics.trend.toUpperCase()],
-        ['AI Risk Prediction', predictions?.riskLevel || 'N/A']
+        ['Total Reports (selected range)', metrics.totalReports],
+        ['High or Critical Reports (selected range)', metrics.criticalCount],
+        ['Reports This Month', metrics.thisMonth],
+        ['Reports Last Month', metrics.lastMonth],
+        ['Top Location', metrics.topLocation || 'No data yet']
       ]
     });
 
@@ -175,7 +177,7 @@ const AnalyticsDashboardModule = () => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold text-white mb-1">Advanced Analytics</h1>
-          <p className="text-gray-400 text-sm">AI-driven insights and operational trends.</p>
+          <p className="text-gray-400 text-sm">Reporting trends from your organization's submitted reports.</p>
         </div>
         <div className="flex items-center gap-3">
           <Select value={timeRange} onValueChange={setTimeRange}>
@@ -199,32 +201,25 @@ const AnalyticsDashboardModule = () => {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <KpiCard 
           title="Total Reports" 
           value={metrics.totalReports} 
-          trend={metrics.trend === 'up' ? '+12%' : '-5%'} 
-          trendUp={metrics.trend === 'up'}
+          trend={`${metrics.thisMonth} this month, ${metrics.lastMonth} last month`}
+          trendUp={metrics.thisMonth === metrics.lastMonth ? undefined : metrics.thisMonth > metrics.lastMonth}
           icon={Activity}
         />
         <KpiCard 
-          title="Critical Incidents" 
+          title="High / Critical Reports" 
           value={metrics.criticalCount} 
-          trend="Stable" 
+          trend={metrics.totalReports ? `${Math.round((metrics.criticalCount / metrics.totalReports) * 100)}% of reports in range` : 'No data yet'}
           icon={AlertCircle}
           color="text-red-500"
         />
         <KpiCard 
-          title="AI Risk Forecast" 
-          value={predictions?.riskLevel || 'Analyzing...'} 
-          trend="Next 7 Days"
-          icon={Zap}
-          color="text-purple-500"
-        />
-        <KpiCard 
           title="Top Location" 
-          value={metrics.topLocation} 
-          trend="Most Reports" 
+          value={metrics.topLocation || 'No data yet'} 
+          trend={metrics.topLocation ? `${metrics.topLocationCount} reports in range` : 'No locations recorded'}
           icon={MapPin}
           color="text-blue-500"
         />
@@ -240,6 +235,7 @@ const AnalyticsDashboardModule = () => {
           </CardHeader>
           <CardContent>
             <div className="h-[300px]">
+              {chartData.length === 0 ? <EmptyChart /> : (
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={chartData}>
                   <defs>
@@ -257,6 +253,7 @@ const AnalyticsDashboardModule = () => {
                   <Area type="monotone" dataKey="count" stroke="#FFC107" fillOpacity={1} fill="url(#colorCount)" />
                 </AreaChart>
               </ResponsiveContainer>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -269,6 +266,7 @@ const AnalyticsDashboardModule = () => {
           </CardHeader>
           <CardContent>
             <div className="h-[300px]">
+              {severityData.length === 0 ? <EmptyChart /> : (
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
@@ -290,39 +288,21 @@ const AnalyticsDashboardModule = () => {
                   <Legend />
                 </PieChart>
               </ResponsiveContainer>
+              )}
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* AI Insights Section */}
-      <Card className="bg-[#1e1e2d] border-[#2d2d4a] border-l-4 border-l-purple-500">
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Zap className="h-5 w-5 text-purple-500" />
-            <CardTitle className="text-white">Predictive AI Insights</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="p-4 bg-[#252541] rounded-lg">
-              <span className="text-sm text-gray-400 block mb-1">Projected Incidents (Next 7 Days)</span>
-              <span className="text-2xl font-bold text-white">{predictions?.predictedIncidentsNextWeek || 0}</span>
-            </div>
-            <div className="p-4 bg-[#252541] rounded-lg">
-              <span className="text-sm text-gray-400 block mb-1">High Risk Location</span>
-              <span className="text-lg font-semibold text-orange-400">{predictions?.highRiskLocation || 'Calculating...'}</span>
-            </div>
-            <div className="p-4 bg-[#252541] rounded-lg">
-              <span className="text-sm text-gray-400 block mb-1">Recommended Action</span>
-              <span className="text-sm text-white">{predictions?.recommendedAction || 'No immediate action required.'}</span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 };
+
+const EmptyChart = () => (
+  <div className="h-full w-full flex items-center justify-center text-sm text-gray-500">
+    No data yet
+  </div>
+);
 
 const KpiCard = ({ title, value, trend, trendUp, icon: Icon, color = "text-[#FFC107]" }) => (
   <Card className="bg-[#1e1e2d] border-[#2d2d4a]">
@@ -339,13 +319,12 @@ const KpiCard = ({ title, value, trend, trendUp, icon: Icon, color = "text-[#FFC
       <div className="flex items-center text-xs">
         {trendUp !== undefined && (
           trendUp ? 
-            <TrendingUp className="h-3 w-3 text-green-500 mr-1" /> : 
-            <TrendingDown className="h-3 w-3 text-red-500 mr-1" />
+            <TrendingUp className="h-3 w-3 text-gray-400 mr-1" /> : 
+            <TrendingDown className="h-3 w-3 text-gray-400 mr-1" />
         )}
-        <span className={trendUp ? "text-green-500" : "text-gray-500"}>
+        <span className="text-gray-500">
           {trend}
         </span>
-        <span className="text-gray-500 ml-1">vs last period</span>
       </div>
     </CardContent>
   </Card>

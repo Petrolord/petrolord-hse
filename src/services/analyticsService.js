@@ -118,47 +118,5 @@ export const analyticsService = {
       console.error('Error fetching raw report data:', error);
       return { data: [], error };
     }
-  },
-
-  // Predict future trends (Mock AI implementation using heuristics)
-  getPredictiveInsights: async (orgId) => {
-    // In a real app, this would call an Edge Function with an ML model
-    // Here we use simple heuristics based on recent data
-    try {
-      const lastWeek = subDays(new Date(), 7).toISOString().split('T')[0];
-      const today = new Date().toISOString().split('T')[0];
-      
-      const { data: recentReports } = await analyticsService.getInsights(orgId, lastWeek, today);
-      
-      if (!recentReports || recentReports.length < 3) {
-        return {
-          riskLevel: 'Low',
-          predictedIncidentsNextWeek: 2,
-          highRiskLocation: 'Analysis pending...',
-          recommendedAction: 'Continue baseline monitoring.'
-        };
-      }
-
-      // Simple trend analysis
-      const trend = recentReports.map(r => r.total_reports_submitted);
-      const increasing = trend[trend.length - 1] > trend[0];
-      
-      return {
-        riskLevel: increasing ? 'Medium' : 'Low',
-        predictedIncidentsNextWeek: Math.round(trend.reduce((a,b)=>a+b,0) / trend.length * 1.2),
-        highRiskLocation: recentReports[recentReports.length - 1]?.top_location || 'General Site',
-        recommendedAction: increasing 
-          ? 'Increase supervision in high-activity zones.' 
-          : 'Maintain current safety protocols.'
-      };
-
-    } catch (error) {
-      return {
-        riskLevel: 'Unknown',
-        predictedIncidentsNextWeek: 0,
-        highRiskLocation: 'N/A',
-        recommendedAction: 'Unable to generate prediction.'
-      };
-    }
   }
 };

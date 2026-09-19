@@ -94,10 +94,9 @@ export default function PredictiveInsightsDashboard({ isEmbedded = false }) {
             <h1 className="text-3xl font-bold flex items-center gap-3">
               <Brain className="h-8 w-8 text-[#8b5cf6]" />
               Petrolord AI Safety Predictor
-              <Badge variant="outline" className="ml-2 border-[#8b5cf6] text-[#8b5cf6] bg-[#8b5cf6]/10">PHASE 5: OPTIMIZED</Badge>
             </h1>
             <p className="text-[#7a7a9a] mt-1">
-              Aggregated safety intelligence and continuous learning optimization.
+              AI safety forecast and metrics computed from your organization's reports.
             </p>
           </div>
           <div className="flex gap-2">
@@ -171,21 +170,21 @@ export default function PredictiveInsightsDashboard({ isEmbedded = false }) {
             />
             <KpiCard 
               title="Near-Miss Ratio" 
-              value={metrics?.nm_incident_ratio || "0:0"} 
+              value={metrics?.nm_incident_ratio != null ? `${metrics.nm_incident_ratio} : 1` : "Not enough data"} 
               trend="leading indicator"
               icon={Activity}
               color="text-yellow-400"
             />
             <KpiCard 
               title="Action Closure Rate" 
-              value={`${metrics?.action_closure_rate || 0}%`} 
+              value={metrics?.action_closure_rate != null ? `${metrics.action_closure_rate}%` : "No data yet"} 
               trend="operational efficiency"
               icon={ShieldCheck}
               color="text-green-400"
             />
             <KpiCard 
               title="Avg. Compliance" 
-              value={`${metrics?.avg_compliance_score || 0}%`} 
+              value={metrics?.avg_compliance_score != null ? `${metrics.avg_compliance_score}%` : "No data yet"} 
               trend="audit performance"
               icon={BarChart3}
               color="text-blue-400"
