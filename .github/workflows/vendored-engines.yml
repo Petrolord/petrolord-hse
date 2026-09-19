@@ -1,0 +1,49 @@
+# The vendored engines must match canonical, and CI is where that is proved.
+#
+# packages/engines holds a SUBSET of Petrolord/petrolord-engines (the engines
+# this app imports, with their tests, goldens, oracles and FINDINGS), pinned in
+# packages/engines/VENDOR.json. The guard joins every tracked path under
+# packages/engines against the blob hashes committed in VENDOR.manifest, so it
+# needs no engines-repo credentials, no clone and no install, and it takes
+# well under a second.
+#
+# The second job runs `npm test` (vitest): the vendored engine gates beside
+# the app's own tests.
+name: Vendored engines
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  vendored-engines-match-canonical:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # No `npm ci`: the guard uses only node builtins and git, so a broken
+      # install can never be the reason the drift check did not run.
+      - name: Vendored engines match canonical
+        run: node tools/check-vendored-engines.mjs
+
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - run: npm ci --no-audit --no-fund
+
+      - name: Tests (vitest)
+        run: npm test

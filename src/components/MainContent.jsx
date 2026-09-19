@@ -2,6 +2,7 @@ import React from 'react';
 import { useHSE } from '@/context/HSEContext';
 import HSEDashboard from './hse/HSEDashboard'; // UPDATED to use the main dashboard with heatmap
 import AnalyticsDashboardModule from './hse/analytics/AnalyticsDashboardModule';
+import SafetyStatisticsModule from './hse/safety-stats/SafetyStatisticsModule';
 import LeaderboardModule from './hse/LeaderboardModule';
 import MyReportsModule from './hse/MyReportsModule';
 import SupervisorDashboardModule from './hse/SupervisorDashboardModule';
@@ -35,6 +36,7 @@ export default function MainContent() {
     switch (currentModuleId) {
       case 'dashboard': return <HSEDashboard />;
       case 'analytics': return <AnalyticsDashboardModule />;
+      case 'safety-statistics': return <SafetyStatisticsModule />;
       case 'ai-analytics': return <PredictiveInsightsDashboard />;
       case 'leaderboard': return <LeaderboardModule />;
       

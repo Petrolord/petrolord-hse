@@ -29,6 +29,7 @@ import { quickReportService } from '@/services/quickReportService';
 import { useToast } from "@/components/ui/use-toast";
 import { format } from 'date-fns';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import ReportClassificationPanel from './safety-stats/ReportClassificationPanel';
 
 const SupervisorDashboardModule = () => {
   const { userData } = useHSE();
@@ -506,6 +507,18 @@ const SupervisorDashboardModule = () => {
                 <div><span className="text-slate-500">Category:</span> <span className="text-slate-200">{viewingReport.category || 'N/A'}</span></div>
                 <div><span className="text-slate-500">Location:</span> <span className="text-slate-200">{viewingReport.location || 'N/A'}</span></div>
               </div>
+
+              {/* Safety statistics classification (HS1) */}
+              <ReportClassificationPanel
+                report={viewingReport}
+                organizationId={viewingReport.organization_id || userData?.organization_id}
+                onSaved={async (saved) => {
+                  if (saved) setViewingReport((prev) => ({ ...prev, ...saved }));
+                  const { data: logData } = await quickReportService.getReportAuditLog(viewingReport.id);
+                  setAuditLog(logData || []);
+                  await refreshReports();
+                }}
+              />
 
               {/* Investigation section (v3) */}
               <div className="mt-6 pt-4 border-t border-[#2d2d4a]">

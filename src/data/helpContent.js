@@ -1,6 +1,6 @@
 import {
   Activity, Leaf, AlertTriangle, FileText,
-  BarChart2, Users, Lock, Camera
+  BarChart2, Users, Lock, Camera, Gauge
 } from 'lucide-react';
 
 export const helpCategories = [
@@ -18,6 +18,7 @@ export const moduleGuides = [
   { id: 'risk', title: 'Risk Management', icon: AlertTriangle, color: 'text-amber-500', description: 'Identify, assess, treat, monitor, and forecast operational risk.' },
   { id: 'security', title: 'Security Module', icon: Lock, color: 'text-blue-500', description: 'Access control, threats, and security incidents.' },
   { id: 'actions', title: 'Action Tracker', icon: FileText, color: 'text-purple-500', description: 'Centralized tracking for all corrective actions.' },
+  { id: 'safety-statistics', title: 'Safety Statistics', icon: Gauge, color: 'text-amber-500', description: 'TRIR, DART, LTIF, FAR, severity and PSE rates with their bases and 95% intervals.' },
   { id: 'analytics', title: 'AI Safety Predictor', icon: BarChart2, color: 'text-cyan-500', description: 'Forecast likely incidents from your submitted reports.' },
   { id: 'team', title: 'Team & Members', icon: Users, color: 'text-pink-500', description: 'Invite members, assign roles, and manage access.' }
 ];

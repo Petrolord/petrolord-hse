@@ -1,0 +1,55 @@
+SET
+SET
+INSERT 0 1
+INSERT 0 1
+ ?column? | count |                 max                  
+----------+-------+--------------------------------------
+ P1 rows  |     2 | 00000000-0000-0000-0000-00000000000a
+(1 row)
+
+SET
+   ?column?    | count 
+---------------+-------
+ P6 staff sees |     2
+(1 row)
+
+UPDATE 0
+          ?column?          |  sum   
+----------------------------+--------
+ P6 staff update left hours | 150000
+(1 row)
+
+SET
+SET
+     ?column?      | count 
+-------------------+-------
+ P8 other org sees |     0
+(1 row)
+
+SET
+SET
+UPDATE 1
+UPDATE 1
+ ?column? | title  | classified_by | classified_at 
+----------+--------+---------------+---------------
+ Q3       | edited |               | 
+(1 row)
+
+SET
+UPDATE 1
+ ?column? | injury_classification | days_away |            classified_by             | ?column? 
+----------+-----------------------+-----------+--------------------------------------+----------
+ Q5       | lost_time             |         3 | 00000000-0000-0000-0000-00000000000a | t
+(1 row)
+
+RESET
+SET
+SET
+INSERT 0 1
+ ?column? | title | injury_classification | classified_by | ?column? 
+----------+-------+-----------------------+---------------+----------
+ Q8       | svc   | near_miss             |               | t
+(1 row)
+
+RESET
+SET

@@ -13,6 +13,7 @@ import { actionTrackerGuide } from './actionTrackerGuide';
 import { teamManagementGuide } from './teamManagementGuide';
 import { qrObservationsGuide } from './qrObservationsGuide';
 import { orgSetupGuide } from './orgSetupGuide';
+import { safetyStatisticsGuide } from './safetyStatisticsGuide';
 import { safetyMomentsGuide } from './safetyMomentsGuide';
 import { reportingGuide } from './reportingGuide';
 import { troubleshootingGuide } from './troubleshootingGuide';
@@ -22,6 +23,7 @@ export const allGuides = {
   dashboard: dashboardGuide,
   'quick-report': quickReportGuide,
   analytics: aiAnalyticsGuide,
+  'safety-statistics': safetyStatisticsGuide,
   health: healthModuleGuide,
   security: securityModuleGuide,
   environment: environmentModuleGuide,

@@ -4,7 +4,7 @@ import importPlugin from 'eslint-plugin-import';
 import globals from 'globals';
 
 export default [
-	{ ignores: ['node_modules/**', 'dist/**', 'build/**', 'vite.config.js'] },
+	{ ignores: ['node_modules/**', 'dist/**', 'build/**', 'vite.config.js', 'packages/engines/**'] },
 	{
 		files: ['**/*.js', '**/*.jsx'],
 		plugins: { react, 'react-hooks': reactHooks, import: importPlugin },
@@ -49,5 +49,16 @@ export default [
 			'import/no-cycle': 'off', // AI rarely makes this error, and the rule is very slow to run
 		},
 	},
-	{ files: ['tools/**/*.js', 'tailwind.config.js'], languageOptions: { globals: globals.node } },
+	{ files: ['tools/**/*.js', 'tools/**/*.mjs', 'tailwind.config.js', 'vitest.config.js'], languageOptions: { globals: globals.node } },
+	// vitest runs with globals: true (vitest.config.js)
+	{
+		files: ['**/*.test.js', '**/*.test.jsx'],
+		languageOptions: {
+			globals: {
+				...globals.node,
+				describe: 'readonly', test: 'readonly', it: 'readonly', expect: 'readonly',
+				beforeEach: 'readonly', afterEach: 'readonly', beforeAll: 'readonly', afterAll: 'readonly', vi: 'readonly',
+			},
+		},
+	},
 ];
