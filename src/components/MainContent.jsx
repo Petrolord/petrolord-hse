@@ -23,6 +23,7 @@ import OrgSetupHub from './hse/admin/OrgSetupHub';
 import SitesAdmin from './hse/admin/SitesAdmin';
 import DepartmentsAdmin from './hse/admin/DepartmentsAdmin';
 import HealthModule from './petrolord/health/HealthModule';
+import OccupationalHygieneModule from './hse/hygiene/OccupationalHygieneModule';
 import HelpCenter from './help/HelpCenter';
 import PredictiveInsightsDashboard from './analytics/PredictiveInsightsDashboard';
 
@@ -57,6 +58,7 @@ export default function MainContent() {
       
       // HSSE Pillars - Consolidated
       case 'health': return <HealthModule />; 
+      case 'occupational-hygiene': return <OccupationalHygieneModule />;
       case 'security': return <SecurityModule />;
       case 'environment': return <EnvironmentModule />; 
       case 'risk': return <RiskManagementModule />;

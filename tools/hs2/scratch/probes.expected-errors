@@ -1,0 +1,33 @@
+ERROR:  new row for relation "hse_noise_samples" violates check constraint "hse_noise_samples_periods_check"
+ERROR:  new row for relation "hse_noise_samples" violates check constraint "hse_noise_samples_periods_check"
+ERROR:  new row for relation "hse_noise_samples" violates check constraint "hse_noise_samples_periods_check"
+ERROR:  new row for relation "hse_noise_samples" violates check constraint "hse_noise_samples_periods_check"
+ERROR:  new row for relation "hse_noise_samples" violates check constraint "hse_noise_samples_periods_check"
+ERROR:  new row for relation "hse_noise_samples" violates check constraint "hse_noise_samples_periods_check"
+ERROR:  new row for relation "hse_noise_samples" violates check constraint "hse_noise_samples_criterion_check"
+ERROR:  new row for relation "hse_noise_samples" violates check constraint "hse_noise_samples_protector_complete_check"
+ERROR:  new row for relation "hse_noise_samples" violates check constraint "hse_noise_samples_protector_complete_check"
+ERROR:  new row for relation "hse_noise_samples" violates check constraint "hse_noise_samples_protector_complete_check"
+ERROR:  new row for relation "hse_noise_samples" violates check constraint "hse_noise_samples_protector_complete_check"
+ERROR:  new row for relation "hse_chemical_samples" violates check constraint "hse_chemical_samples_periods_check"
+ERROR:  new row for relation "hse_chemical_samples" violates check constraint "hse_chemical_samples_limit_source_check"
+ERROR:  new row for relation "hse_chemical_samples" violates check constraint "hse_chemical_samples_units_check"
+ERROR:  new row for relation "hse_chemical_samples" violates check constraint "hse_chemical_samples_stel_periods_check"
+ERROR:  new row for relation "hse_heat_assessments" violates check constraint "hse_heat_assessments_wbgt_periods_check"
+ERROR:  new row for relation "hse_heat_assessments" violates check constraint "hse_heat_assessments_wbgt_periods_check"
+ERROR:  new row for relation "hse_heat_assessments" violates check constraint "hse_heat_assessments_metabolic_check"
+ERROR:  new row for relation "hse_heat_assessments" violates check constraint "hse_heat_assessments_form_check"
+ERROR:  new row violates row-level security policy for table "hse_noise_samples"
+ERROR:  new row violates row-level security policy for table "hse_noise_samples"
+ERROR:  new row violates row-level security policy for table "hse_noise_samples"
+ERROR:  new row violates row-level security policy for table "hse_noise_samples"
+ERROR:  new row violates row-level security policy for table "hse_noise_samples"
+ERROR:  new row violates row-level security policy for table "hse_noise_samples"
+ERROR:  new row violates row-level security policy for table "hse_noise_samples"
+ERROR:  A hygiene record cannot move to another organization
+CONTEXT:  PL/pgSQL function hse_hygiene_stamp() line 9 at RAISE
+ERROR:  update or delete on table "organization_sites" violates foreign key constraint "hse_noise_samples_site_id_fkey" on table "hse_noise_samples"
+DETAIL:  Key (id)=(20000000-0000-0000-0000-000000000001) is still referenced from table "hse_noise_samples".
+ERROR:  permission denied for table hse_noise_samples
+ERROR:  permission denied for table hse_chemical_samples
+ERROR:  permission denied for table hse_heat_assessments

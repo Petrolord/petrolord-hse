@@ -1,6 +1,6 @@
 import {
   Activity, Leaf, AlertTriangle, FileText,
-  BarChart2, Users, Lock, Camera, Gauge
+  BarChart2, Users, Lock, Camera, Gauge, Ear
 } from 'lucide-react';
 
 export const helpCategories = [
@@ -14,6 +14,7 @@ export const helpCategories = [
 export const moduleGuides = [
   { id: 'quick-report', title: 'Quick Report', icon: Camera, color: 'text-orange-500', description: 'File a hazard or near-miss report in seconds with photo + voice AI.' },
   { id: 'health', title: 'Health Module', icon: Activity, color: 'text-red-500', description: 'Manage occupational health, fire safety, and medical records.' },
+  { id: 'occupational-hygiene', title: 'Occupational Hygiene', icon: Ear, color: 'text-amber-500', description: 'Noise dose and TWA, chemical TWA, STEL and mixtures, and heat stress against published criteria.' },
   { id: 'environment', title: 'Environment Module', icon: Leaf, color: 'text-green-500', description: 'Permits, monitoring, emissions, waste, spills, and reporting.' },
   { id: 'risk', title: 'Risk Management', icon: AlertTriangle, color: 'text-amber-500', description: 'Identify, assess, treat, monitor, and forecast operational risk.' },
   { id: 'security', title: 'Security Module', icon: Lock, color: 'text-blue-500', description: 'Access control, threats, and security incidents.' },

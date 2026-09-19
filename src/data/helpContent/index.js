@@ -14,6 +14,7 @@ import { teamManagementGuide } from './teamManagementGuide';
 import { qrObservationsGuide } from './qrObservationsGuide';
 import { orgSetupGuide } from './orgSetupGuide';
 import { safetyStatisticsGuide } from './safetyStatisticsGuide';
+import { occupationalHygieneGuide } from './occupationalHygieneGuide';
 import { safetyMomentsGuide } from './safetyMomentsGuide';
 import { reportingGuide } from './reportingGuide';
 import { troubleshootingGuide } from './troubleshootingGuide';
@@ -25,6 +26,7 @@ export const allGuides = {
   analytics: aiAnalyticsGuide,
   'safety-statistics': safetyStatisticsGuide,
   health: healthModuleGuide,
+  'occupational-hygiene': occupationalHygieneGuide,
   security: securityModuleGuide,
   environment: environmentModuleGuide,
   risk: riskManagementGuide,
