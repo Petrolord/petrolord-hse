@@ -1,0 +1,82 @@
+SET
+SET
+INSERT 0 1
+ ?column? |    subject_label     |              created_by              |              updated_by              | jsonb_array_length 
+----------+----------------------+--------------------------------------+--------------------------------------+--------------------
+ N1       | Compressor operators | 00000000-0000-0000-0000-00000000000a | 00000000-0000-0000-0000-00000000000a |                  3
+(1 row)
+
+INSERT 0 1
+ ?column? | count 
+----------+-------
+ N3 rows  |     2
+(1 row)
+
+INSERT 0 3
+ ?column? | count | count 
+----------+-------+-------
+ C1       |     3 |     1
+(1 row)
+
+ ?column? | count 
+----------+-------
+ C2       |     3
+(1 row)
+
+INSERT 0 1
+ ?column? | count 
+----------+-------
+ C4       |     4
+(1 row)
+
+SET
+INSERT 0 1
+ ?column? | count |                 max                  
+----------+-------+--------------------------------------
+ H1       |     1 | 00000000-0000-0000-0000-00000000000e
+(1 row)
+
+SET
+   ?column?    | count | count | count 
+---------------+-------+-------+-------
+ R1 staff sees |     2 |     4 |     1
+(1 row)
+
+UPDATE 0
+DELETE 0
+       ?column?        | count | count 
+-----------------------+-------+-------
+ R1 after staff writes |     0 |     4
+(1 row)
+
+SET
+SET
+     ?column?      | count | count | count 
+-------------------+-------+-------+-------
+ R3 other org sees |     0 |     0 |     0
+(1 row)
+
+INSERT 0 1
+    ?column?     | count 
+-----------------+-------
+ R3 own org rows |     1
+(1 row)
+
+SET
+SET
+UPDATE 1
+ ?column? |       subject_label        |              created_by              |              updated_by              | ?column? 
+----------+----------------------------+--------------------------------------+--------------------------------------+----------
+ T1       | Compressor operators (rev) | 00000000-0000-0000-0000-00000000000a | 00000000-0000-0000-0000-00000000000e | t
+(1 row)
+
+RESET
+SET
+SET
+  ?column?   |           organization_id            
+-------------+--------------------------------------
+ T2 org kept | 10000000-0000-0000-0000-000000000001
+(1 row)
+
+RESET
+SET
