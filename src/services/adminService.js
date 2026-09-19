@@ -96,6 +96,21 @@ export const adminService = {
     return data;
   },
 
+  // The stored permission catalogue and which of it each role holds
+  // (public.permissions, public.role_permissions; super-admin RLS).
+  async getPermissions() {
+    const { data, error } = await supabase.from('permissions').select('id, resource, action, description');
+    if (error) throw error;
+    return data || [];
+  },
+
+  async getRolePermissionIds(roleId) {
+    if (!roleId) return [];
+    const { data, error } = await supabase.from('role_permissions').select('permission_id').eq('role_id', roleId);
+    if (error) throw error;
+    return (data || []).map((r) => r.permission_id);
+  },
+
   // --- Audit ---
   async logAudit(action, details, metadata = {}) {
     const { data: { user } } = await supabase.auth.getUser();
