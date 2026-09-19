@@ -24,33 +24,22 @@ export const getHealthScore = async (organizationId) => {
  */
 export const healthService = {
     /**
-     * Real dashboard stats from the `hse.health_records` table (org-scoped) plus
-     * the latest `vaccination_rate` from `public.health_metrics`. Returns honest
-     * zeros for an org with no records, and `vaccinationRate: null` when no
-     * metric has been recorded (the dashboard renders that as '--').
+     * Health dashboard KPIs. The record-derived counts used to be read from
+     * `hse.health_records` through supabase.schema('hse'), which PostgREST
+     * does not expose on this project (PGRST106), so they always failed. That
+     * table also has no writer anywhere in the app and holds no rows, so
+     * there is no health-record data to count: the counts are honestly 0 and
+     * the charts empty, without a request that can only fail. The
+     * vaccination rate is the latest `vaccination_rate` from
+     * `public.health_metrics`, or null (rendered '--') when none is recorded.
      */
     getHealthStats: async (orgId) => {
         const empty = { totalMonitored: 0, recordsThisMonth: 0, exposureIncidents: 0, vaccinationRate: null };
         if (!orgId) return empty;
         try {
-            const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
-            const hse = supabase.schema('hse');
-            const [employees, monthly, exposure, vaccination] = await Promise.all([
-                // Distinct employees with at least one health record.
-                hse.from('health_records').select('user_id').eq('org_id', orgId),
-                hse.from('health_records').select('id', { count: 'exact', head: true }).eq('org_id', orgId).gte('created_at', startOfMonth),
-                hse.from('health_records').select('id', { count: 'exact', head: true }).eq('org_id', orgId).ilike('record_type', '%exposure%'),
-                supabase.from('health_metrics').select('value').eq('organization_id', orgId).ilike('metric_name', 'vaccination_rate').order('recorded_at', { ascending: false }).limit(1),
-            ]);
-
-            const totalMonitored = new Set((employees.data || []).map(r => r.user_id).filter(Boolean)).size;
-            const vaxValue = vaccination.data?.[0]?.value;
-            return {
-                totalMonitored,
-                recordsThisMonth: monthly.count || 0,
-                exposureIncidents: exposure.count || 0,
-                vaccinationRate: vaxValue == null ? null : Math.round(Number(vaxValue)),
-            };
+            const { data } = await supabase.from('health_metrics').select('value').eq('organization_id', orgId).ilike('metric_name', 'vaccination_rate').order('recorded_at', { ascending: false }).limit(1);
+            const vaxValue = data?.[0]?.value;
+            return { ...empty, vaccinationRate: vaxValue == null ? null : Math.round(Number(vaxValue)) };
         } catch (e) {
             console.error('Error getting health stats:', e);
             return empty;
@@ -58,55 +47,11 @@ export const healthService = {
     },
 
     /**
-     * Real chart data for the Health dashboard, derived from a single
-     * `hse.health_records` read (org-scoped):
-     *   - statusDistribution: record count grouped by status (pie chart)
-     *   - exposureTrend: exposure-typed records per month for the last 6 months (line chart)
-     * Both return [] / all-zero when the org has no relevant records, so the
-     * dashboard can show an honest empty state instead of a fabricated chart.
+     * Health dashboard charts. No health-record source exists (see
+     * getHealthStats), so both series are empty and the dashboard shows its
+     * "No health records yet." state.
      */
-    getHealthCharts: async (orgId) => {
-        const empty = { statusDistribution: [], exposureTrend: [] };
-        if (!orgId) return empty;
-        try {
-            const { data, error } = await supabase.schema('hse')
-                .from('health_records')
-                .select('status, record_type, created_at')
-                .eq('org_id', orgId);
-            if (error) throw error;
-            const rows = data || [];
-
-            // Pie: distribution by status.
-            const statusCounts = {};
-            rows.forEach(r => {
-                const key = r.status || 'Unknown';
-                statusCounts[key] = (statusCounts[key] || 0) + 1;
-            });
-            const statusDistribution = Object.entries(statusCounts).map(([name, value]) => ({ name, value }));
-
-            // Line: exposure records per month over the trailing 6 months.
-            const now = new Date();
-            const months = [];
-            const monthIndex = {};
-            for (let i = 5; i >= 0; i--) {
-                const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-                const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-                monthIndex[key] = months.length;
-                months.push({ month: d.toLocaleString('default', { month: 'short' }), exposures: 0 });
-            }
-            rows.forEach(r => {
-                if (!r.record_type || !/exposure/i.test(r.record_type) || !r.created_at) return;
-                const d = new Date(r.created_at);
-                const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-                if (key in monthIndex) months[monthIndex[key]].exposures += 1;
-            });
-
-            return { statusDistribution, exposureTrend: months };
-        } catch (e) {
-            console.error('Error getting health charts:', e);
-            return empty;
-        }
-    },
+    getHealthCharts: async () => ({ statusDistribution: [], exposureTrend: [] }),
 
     getHealthRecords: async (orgId, filters) => {
         try {

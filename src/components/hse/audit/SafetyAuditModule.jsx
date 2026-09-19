@@ -30,12 +30,18 @@ export default function SafetyAuditModule() {
 
   const fetchResources = async () => {
     if (!currentOrganization) return;
+    // organization_sites is the live site table (public.sites is an empty
+    // legacy table) and hse_audit_schedule.location_id references it; the
+    // auditor list is the org's active members (organization_users does not
+    // exist on this project).
     const [sitesData, usersData] = await Promise.all([
-      supabase.from('sites').select('*').eq('org_id', currentOrganization.id),
-      supabase.from('organization_users').select('*, user:user_id(raw_user_meta_data)').eq('organization_id', currentOrganization.id)
+      supabase.from('organization_sites').select('id, name').eq('organization_id', currentOrganization.id).order('name', { ascending: true }),
+      supabase.from('organization_members').select('user_id, full_name, email, status').eq('organization_id', currentOrganization.id)
     ]);
     setSites(sitesData.data || []);
-    setUsers(usersData.data?.map(u => ({ id: u.user_id, ...u.user })) || []);
+    setUsers((usersData.data || [])
+      .filter(m => (m.status || 'active').toLowerCase() === 'active')
+      .map(m => ({ id: m.user_id, email: m.email, raw_user_meta_data: { full_name: m.full_name || m.email } })));
   };
 
   useEffect(() => {
