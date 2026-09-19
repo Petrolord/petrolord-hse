@@ -45,11 +45,6 @@ export default function UpgradeToSuiteModal({ isOpen, onClose, featureName }) {
             <BenefitItem text="Priority 24/7 Support" />
           </div>
 
-          <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 text-sm text-blue-200">
-            <p>
-              <strong>Did you know?</strong> Organizations upgrading to Suite see a 40% reduction in incident reporting time.
-            </p>
-          </div>
         </div>
 
         {/* Footer Actions */}

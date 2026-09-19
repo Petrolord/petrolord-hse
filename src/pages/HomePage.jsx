@@ -15,7 +15,7 @@ import PricingToggle from '@/components/pricing/PricingToggle';
 const features = [{
   icon: AlertTriangle,
   title: "Real-Time Incident Management",
-  description: "Track, report, and manage incidents instantly with automated workflows and compliance tracking.",
+  description: "Report, assign and investigate incidents and observations from one place.",
   slug: "incident-management"
 }, {
   icon: ShieldCheck,
@@ -34,13 +34,13 @@ const features = [{
   slug: "analytics-reporting"
 }, {
   icon: HardHat,
-  title: "Contractor & Visitor Management",
-  description: "Streamline onboarding, inductions, and safety compliance for all site personnel.",
+  title: "Contractor Management",
+  description: "Keep contractor records, induction records and contractor incidents in one place.",
   slug: "contractor-management"
 }, {
   icon: Leaf,
-  title: "Carbon & Environmental Compliance",
-  description: "Track emissions, waste, spills, and permits with audit-ready logs, ESG dashboards, and automated reminders for regulatory filings.",
+  title: "Environmental Compliance",
+  description: "Log flaring, waste manifests, spills and permits, and export CSV compliance packs.",
   slug: "environmental-compliance"
 }];
 
@@ -65,13 +65,13 @@ const benefits = [
   },
   {
     title: "Regulatory Compliance",
-    desc: "Stay audit-ready with automated tracking for ISO 45001, OSHA, and local regulations. Never miss a compliance deadline.",
+    desc: "Record the frameworks that apply to you, such as ISO 45001 or OSHA, and keep permits and audits in one place.",
     icon: CheckCircle2,
     highlight: "Audit-ready"
   },
   {
     title: "Scalable & Flexible",
-    desc: "Whether you're a small team or a global enterprise, our platform grows with you. Custom workflows adapt to your specific needs.",
+    desc: "Whether you're a small team or a global enterprise, add sites, departments and team members as you grow.",
     icon: Leaf,
     highlight: "Future-proof"
   },
@@ -83,19 +83,19 @@ const benefits = [
   },
   {
     title: "Global Site Management",
-    desc: "Manage unlimited sites worldwide with our intuitive map-based interface. Click to select and visualize your entire operation.",
+    desc: "Manage all your sites and departments, and post site QR codes so anyone on site can report an observation.",
     icon: Globe,
     highlight: "Visual Control"
   },
   {
-    title: "Automated Incident Workflows",
-    desc: "Streamline response with intelligent automation. Notifications and task assignments ensure nothing falls through the cracks.",
+    title: "Incident Investigation Workflows",
+    desc: "Supervisors assign reports for investigation and record root causes with a 5 Whys analysis.",
     icon: Zap,
     highlight: "Efficiency"
   },
   {
     title: "Enterprise Security",
-    desc: "Bank-level encryption, MFA, and comprehensive audit trails. Meet GDPR and other data protection standards with confidence.",
+    desc: "Encrypted connections, per-organization data isolation and an audit log of investigation activity.",
     icon: Lock,
     highlight: "Secure"
   },
@@ -121,7 +121,7 @@ const faqs = [{
   a: "Absolutely. We use enterprise-grade encryption and security protocols to ensure your data is safe and compliant."
 }, {
   q: "Can I export my data?",
-  a: "Yes, you own your data. You can export reports and datasets in various formats (PDF, CSV, Excel) at any time."
+  a: "Yes, you own your data. You can export registers and compliance packs as CSV and analytics summaries as PDF."
 }, {
   q: "Is there a limit on users?",
   a: "No. Every plan, including Free, lets your entire workforce join so everyone can be part of the safety culture. Paid plans are priced by team size band rather than a hard user cap."
