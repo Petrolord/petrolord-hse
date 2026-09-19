@@ -84,19 +84,21 @@ export default function InvitationAcceptance() {
 
     setProcessing(true);
     try {
-      // 1. Sign Up (Create Account)
+      // 1. Sign Up (Create Account) AND join, in one step.
+      // The invitation token rides in the signup metadata; the database
+      // signup trigger checks it (pending, unexpired, sent to this email,
+      // issued by an org admin) and adds the membership with the
+      // INVITATION's role. Organization and role are never sent from here:
+      // the trigger refuses an organization_id without a valid token. This
+      // works whether or not email confirmation is on (no session needed).
       const { data: authData, error: signUpError } = await supabase.auth.signUp({
         email: invite.email,
         password: password,
         options: {
           data: {
             full_name: invite.first_name ? `${invite.first_name} ${invite.last_name || ''}`.trim() : null,
-            organization_id: invite.org_id,
-            // handle_new_user defaults role to 'owner' when absent, which would
-            // make every invitee an org admin. Always pass the invited role.
-            role: invite.role || 'member',
-            // ...and it defaults primary_app to 'suite', which would provision
-            // a Suite trial app onto this HSE org. Pin it to hse.
+            invitation_token: token,
+            // handle_new_user defaults primary_app to 'suite'; pin hse.
             primary_app: 'hse'
           }
         }
@@ -104,21 +106,25 @@ export default function InvitationAcceptance() {
 
       if (signUpError) throw signUpError;
 
-      // 2. Accept Invitation
-      // Note: We need the user ID. signUp returns it.
+      // With email confirmation on, an address that already has an account
+      // comes back as a user with no identities instead of an error.
+      if (authData?.user && Array.isArray(authData.user.identities) && authData.user.identities.length === 0) {
+        throw new Error('User already registered');
+      }
+
       if (authData.user) {
-        await inviteUserService.acceptInvitation(token, authData.user.id);
-        
         toast({
           title: "Account Setup Complete!",
-          description: "Your account has been created. Please sign in to continue.",
+          description: authData.session
+            ? "Your account has been created. Please sign in to continue."
+            : "Your account has been created. Confirm your email, then sign in.",
           className: "bg-green-600 text-white border-none"
         });
 
-        // 3. Explicitly Sign Out to enforce "Set Password -> Login" flow
+        // 2. Explicitly Sign Out to enforce "Set Password -> Login" flow
         await supabase.auth.signOut();
         
-        // 4. Redirect to Login
+        // 3. Redirect to Login
         navigate('/login', { 
           state: { 
             email: invite.email, 
@@ -126,8 +132,6 @@ export default function InvitationAcceptance() {
           } 
         });
       } else {
-        // Edge case: Email confirmation required before we get a user/session working fully?
-        // Typically signUp returns user object even if unconfirmed.
         throw new Error("Account creation failed. Please try again.");
       }
 
@@ -154,7 +158,8 @@ export default function InvitationAcceptance() {
   const handleExistingUserAccept = async () => {
     setProcessing(true);
     try {
-      await inviteUserService.acceptInvitation(token, currentUser.id);
+      // The RPC acts for the signed-in session only; no user id is sent.
+      await inviteUserService.acceptInvitation(token);
       toast({
         title: "Welcome aboard!",
         description: `You have successfully joined ${invite.organizations?.name}.`,

@@ -5,7 +5,17 @@
 // is owned by the Suite admin panel and expects a different payload
 // (organization_id vs org_id) so HSE invites 400ed against it.
 //
-// POST body: { email, role, org_id, invited_by?, is_resend? }
+// POST body: { email, role, org_id, is_resend? }   (invited_by is ignored)
+//
+// Security fix 2026-09-19: this function had NO caller check, so anyone with
+// the public anon key could create an 'admin' invitation into any
+// organization for an address they control and receive the link in the
+// response. It now requires a signed-in caller who is an ACTIVE
+// owner/admin/org_admin/super_admin member of org_id (or a platform super
+// admin by email allow-list, as public.is_super_admin()), and stamps
+// invited_by from the session. The database (Suite migration
+// 20260919190000_security_invitation_acceptance) independently refuses to
+// redeem an invitation whose inviter is not an admin of the org.
 // Response (always 200 unless the invitation row itself could not be
 // created/updated):
 //   { success: true, emailSent: boolean, invite, inviteLink, emailError? }
@@ -24,6 +34,8 @@ const supabaseAdmin = createClient(
 );
 
 const ALLOWED_ROLES = ['member', 'admin', 'supervisor'];
+const ADMIN_ROLES = ['owner', 'admin', 'org_admin', 'super_admin'];
+const SUPER_ADMIN_EMAILS = ['info@petrolord.com', 'ayoasaolu@gmail.com', 'ayodejiasaolu1@gmail.com'];
 const INVITE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
 const json = (body: unknown, status = 200) =>
@@ -38,11 +50,40 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { email, role, org_id, invited_by } = await req.json();
+    // 1. Who is calling? A real user session is required; the anon key alone
+    //    is not a user.
+    const jwt = (req.headers.get('Authorization') || '').replace(/^Bearer\s+/i, '');
+    const { data: authData, error: authError } = jwt
+      ? await supabaseAdmin.auth.getUser(jwt)
+      : { data: null, error: new Error('missing token') };
+    const caller = authData?.user ?? null;
+    if (authError || !caller) {
+      return json({ error: 'Unauthorized: sign in to invite members.' }, 401);
+    }
+
+    const { email, role, org_id } = await req.json();
 
     if (!email || !org_id) {
       return json({ error: 'Email and organization id are required.' }, 400);
     }
+
+    // 2. The caller must administer org_id.
+    const { data: callerRows, error: memberError } = await supabaseAdmin
+      .from('organization_members')
+      .select('role, status')
+      .eq('organization_id', org_id)
+      .eq('user_id', caller.id);
+    if (memberError) {
+      console.error('[hse-invite-user] membership check error:', memberError);
+      return json({ error: 'Could not verify your permissions.' }, 500);
+    }
+    const isOrgAdmin = (callerRows ?? []).some((m) =>
+      String(m.status ?? 'active').toLowerCase() === 'active' && ADMIN_ROLES.includes(m.role));
+    const isPlatformAdmin = SUPER_ADMIN_EMAILS.includes(String(caller.email || '').toLowerCase());
+    if (!isOrgAdmin && !isPlatformAdmin) {
+      return json({ error: 'Only organization admins can invite members.' }, 403);
+    }
+    const invited_by = caller.id;
     if (role && !ALLOWED_ROLES.includes(role)) {
       return json({ error: `Invalid role. Must be one of: ${ALLOWED_ROLES.join(', ')}` }, 400);
     }
@@ -75,7 +116,7 @@ Deno.serve(async (req) => {
           token: newToken,
           created_at: new Date().toISOString(),
           expires_at: newExpiry,
-          invited_by: invited_by || existing.invited_by,
+          invited_by,
           role: role || existing.role,
         })
         .eq('id', existing.id)
