@@ -10,7 +10,7 @@ import { incidentService } from '@/services/incidentService';
 
 export default function SecurityDashboard({ setActiveTab }) {
   const { currentOrganization, currentUser } = useHSE();
-  const [riskScore, setRiskScore] = useState(0);
+  const [riskScore, setRiskScore] = useState(null);
   const [recentIncidents, setRecentIncidents] = useState([]);
   const [stats, setStats] = useState({ incidentsYTD: 0, pendingTrainings: 0, expiringCredentials: 0 });
   const [loading, setLoading] = useState(true);
@@ -44,12 +44,14 @@ export default function SecurityDashboard({ setActiveTab }) {
               <Shield className="h-5 w-5 text-blue-500" />
               My Risk Score
             </CardTitle>
-            <CardDescription className="text-gray-400">AI-calculated security posture</CardDescription>
+            <CardDescription className="text-gray-400">Score recorded on your security profile</CardDescription>
           </CardHeader>
           <CardContent className="flex-1 flex flex-col items-center justify-center pb-8">
             <SecurityRiskGauge score={riskScore} loading={loading} />
             <p className="text-center text-sm text-gray-400 mt-2 px-4">
-              Your risk score is calculated based on training completion, incident history, and access patterns.
+              {riskScore === null && !loading
+                ? 'No risk score has been recorded for you yet.'
+                : 'Lower is better. The score comes from your security profile.'}
             </p>
           </CardContent>
         </Card>
@@ -144,7 +146,6 @@ export default function SecurityDashboard({ setActiveTab }) {
                 <Phone className="h-4 w-4 group-hover:scale-110 transition-transform" /> Emergency
               </div>
               <p className="text-2xl text-white font-mono">911 / 112</p>
-              <p className="text-xs text-gray-400">Global SOC: +1-800-555-0199</p>
             </div>
             <div className="space-y-2 pt-2">
               <ResourceLink label="Security Policy 2025" />

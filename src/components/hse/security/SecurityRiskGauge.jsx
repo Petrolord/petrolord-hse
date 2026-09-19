@@ -1,17 +1,18 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-export default function SecurityRiskGauge({ score = 0, loading = false }) {
+export default function SecurityRiskGauge({ score = null, loading = false }) {
+  const hasScore = score !== null && score !== undefined && !Number.isNaN(Number(score));
   const getColor = (s) => {
     if (s < 30) return '#4ade80'; // Green (Low Risk)
     if (s < 70) return '#facc15'; // Yellow (Medium Risk)
     return '#ef4444'; // Red (High Risk)
   };
 
-  const color = getColor(score);
+  const color = hasScore ? getColor(score) : '#2a2a40';
   const radius = 80;
   const circumference = 2 * Math.PI * radius;
-  const offset = circumference - (score / 100) * circumference;
+  const offset = hasScore ? circumference - (score / 100) * circumference : circumference;
 
   return (
     <div className="relative h-48 w-48 flex items-center justify-center">
@@ -30,8 +31,8 @@ export default function SecurityRiskGauge({ score = 0, loading = false }) {
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
-        <span className="text-4xl font-bold">{loading ? '--' : score}</span>
-        <span className="text-xs text-gray-400 font-medium tracking-wider">RISK SCORE</span>
+        <span className="text-4xl font-bold">{loading || !hasScore ? '--' : score}</span>
+        <span className="text-xs text-gray-400 font-medium tracking-wider">{!loading && !hasScore ? 'NO DATA YET' : 'RISK SCORE'}</span>
       </div>
     </div>
   );
