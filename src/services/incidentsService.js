@@ -71,9 +71,15 @@ export const incidentsService = {
   // Update incident status
   async updateIncident(id, updates) {
     try {
+      // Record when an incident is closed so resolution time and the monthly
+      // closure trend can be computed from real dates (the column already exists).
+      const payload = { ...updates };
+      if (payload.status === 'closed' && !payload.closed_at) {
+        payload.closed_at = new Date().toISOString();
+      }
       const { data, error } = await supabase
         .from('incidents')
-        .update(updates)
+        .update(payload)
         .eq('id', id)
         .select()
         .single();

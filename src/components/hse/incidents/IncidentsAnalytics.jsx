@@ -1,20 +1,46 @@
 import React, { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { AlertTriangle, Clock, TrendingUp, CheckCircle, MapPin, BarChart3, PieChart, Users } from 'lucide-react';
+import { AlertTriangle, Clock, TrendingUp, CheckCircle, BarChart3, PieChart } from 'lucide-react';
 import { 
   ResponsiveContainer, AreaChart, Area, BarChart, Bar, XAxis, YAxis, 
-  CartesianGrid, Tooltip, Legend, Pie, Cell, LineChart, Line
+  CartesianGrid, Tooltip, Legend, Pie, Cell, PieChart as RePieChart
 } from 'recharts';
 
 // --- DATA PROCESSING HELPERS ---
-const processTimeTrend = (data) => {
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  // Mock trend generation since we might not have enough historical data
-  return months.map((m, i) => ({
-    name: m,
-    incidents: Math.floor(Math.random() * 15) + (i > 8 ? 5 : 2), // increasing trend
-    closed: Math.floor(Math.random() * 10) + 2
-  }));
+const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+const toDate = (value) => {
+  if (!value) return null;
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? null : d;
+};
+
+// When the incident happened, falling back to when it was reported.
+const occurredAt = (incident) => toDate(incident.incident_date) || toDate(incident.created_at);
+
+const monthKey = (d) => `${d.getFullYear()}-${d.getMonth()}`;
+
+// Real monthly counts for the trailing 12 months (current month included):
+// reports grouped by incident date, closures grouped by closed_at.
+const processTimeTrend = (data, now = new Date()) => {
+  const buckets = [];
+  for (let i = 11; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    buckets.push({
+      key: monthKey(d),
+      name: `${MONTH_LABELS[d.getMonth()]} ${String(d.getFullYear()).slice(-2)}`,
+      incidents: 0,
+      closed: 0,
+    });
+  }
+  const byKey = Object.fromEntries(buckets.map(b => [b.key, b]));
+  data.forEach(inc => {
+    const occurred = occurredAt(inc);
+    if (occurred && byKey[monthKey(occurred)]) byKey[monthKey(occurred)].incidents += 1;
+    const closed = toDate(inc.closed_at);
+    if (closed && byKey[monthKey(closed)]) byKey[monthKey(closed)].closed += 1;
+  });
+  return buckets.map(({ key, ...rest }) => rest);
 };
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
@@ -22,14 +48,37 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 export default function IncidentsAnalytics({ incidents }) {
   
   const stats = useMemo(() => {
-    const s = {
+    const closedIncidents = incidents.filter(i => i.status === 'closed');
+
+    // Average resolution only from incidents that carry both dates.
+    const resolutionDays = closedIncidents
+      .map(i => {
+        const start = occurredAt(i);
+        const end = toDate(i.closed_at);
+        if (!start || !end || end < start) return null;
+        return (end - start) / (1000 * 60 * 60 * 24);
+      })
+      .filter(v => v !== null);
+    const avgTime = resolutionDays.length
+      ? (resolutionDays.reduce((a, b) => a + b, 0) / resolutionDays.length).toFixed(1)
+      : null;
+
+    const now = new Date();
+    const thisMonth = incidents.filter(i => {
+      const d = occurredAt(i);
+      return d && d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+    }).length;
+
+    return {
       total: incidents.length,
       open: incidents.filter(i => i.status === 'open').length,
-      closed: incidents.filter(i => i.status === 'closed').length,
+      closed: closedIncidents.length,
       critical: incidents.filter(i => i.severity === 'critical').length,
-      avgTime: 4.2 
+      avgTime,
+      resolvedSample: resolutionDays.length,
+      closedWithoutDate: closedIncidents.filter(i => !toDate(i.closed_at)).length,
+      thisMonth,
     };
-    return s;
   }, [incidents]);
 
   const chartData = useMemo(() => {
@@ -59,10 +108,16 @@ export default function IncidentsAnalytics({ incidents }) {
     <div className="space-y-6 p-6 h-full overflow-y-auto scrollbar-thin scrollbar-thumb-[#3a3a5a]">
       {/* 1. KPI Cards Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <KpiCard title="Total Incidents" value={stats.total} icon={AlertTriangle} color="text-[#FFC107]" sub="+12% vs last month" />
-        <KpiCard title="Open Cases" value={stats.open} icon={TrendingUp} color="text-blue-400" sub="5 requires action" />
-        <KpiCard title="Avg Resolution" value={`${stats.avgTime} Days`} icon={Clock} color="text-orange-400" sub="-0.5 days improvement" />
-        <KpiCard title="Closure Rate" value={`${stats.total ? Math.round((stats.closed / stats.total) * 100) : 0}%`} icon={CheckCircle} color="text-green-400" sub="Target: 90%" />
+        <KpiCard title="Total Incidents" value={stats.total} icon={AlertTriangle} color="text-[#FFC107]" sub={`${stats.thisMonth} this month`} />
+        <KpiCard title="Open Cases" value={stats.open} icon={TrendingUp} color="text-blue-400" />
+        <KpiCard
+          title="Avg Resolution"
+          value={stats.avgTime !== null ? `${stats.avgTime} Days` : 'Not enough data'}
+          icon={Clock}
+          color="text-orange-400"
+          sub={stats.avgTime !== null ? `from ${stats.resolvedSample} closed with a close date` : null}
+        />
+        <KpiCard title="Closure Rate" value={stats.total ? `${Math.round((stats.closed / stats.total) * 100)}%` : 'No data yet'} icon={CheckCircle} color="text-green-400" />
       </div>
 
       {/* 2. Main Charts Row */}
@@ -72,11 +127,15 @@ export default function IncidentsAnalytics({ incidents }) {
         <Card className="bg-[#252541] border-[#3a3a5a]">
           <CardHeader>
             <CardTitle className="text-white text-lg flex items-center gap-2">
-                <BarChart3 className="h-5 w-5 text-blue-400" /> Incident Trends (Yearly)
+                <BarChart3 className="h-5 w-5 text-blue-400" /> Incident Trends (Last 12 Months)
             </CardTitle>
-            <CardDescription className="text-[#7a7a9a]">Reported vs Closed incidents over time</CardDescription>
+            <CardDescription className="text-[#7a7a9a]">
+              Reported incidents by incident date, closures by close date
+              {stats.closedWithoutDate > 0 && ` (${stats.closedWithoutDate} closed without a recorded close date are not plotted)`}
+            </CardDescription>
           </CardHeader>
           <CardContent className="h-[300px]">
+            {stats.total === 0 ? <EmptyChart /> : (
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={chartData.trends}>
                 <defs>
@@ -101,6 +160,7 @@ export default function IncidentsAnalytics({ incidents }) {
                 <Area type="monotone" dataKey="closed" stroke="#82ca9d" fillOpacity={1} fill="url(#colorClosed)" name="Resolved" />
               </AreaChart>
             </ResponsiveContainer>
+            )}
           </CardContent>
         </Card>
 
@@ -113,6 +173,7 @@ export default function IncidentsAnalytics({ incidents }) {
             <CardDescription className="text-[#7a7a9a]">Distribution of incidents by impact level</CardDescription>
           </CardHeader>
           <CardContent className="h-[300px]">
+             {chartData.severity.length === 0 ? <EmptyChart /> : (
              <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={chartData.severity} layout="vertical" margin={{ left: 20 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#3a3a5a" horizontal={false} />
@@ -129,20 +190,22 @@ export default function IncidentsAnalytics({ incidents }) {
                     </Bar>
                 </BarChart>
              </ResponsiveContainer>
+             )}
           </CardContent>
         </Card>
       </div>
 
       {/* 3. Secondary Metrics Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6">
          {/* Incident Types */}
-         <Card className="bg-[#252541] border-[#3a3a5a] lg:col-span-1">
+         <Card className="bg-[#252541] border-[#3a3a5a]">
             <CardHeader>
                 <CardTitle className="text-white text-base">Types Breakdown</CardTitle>
             </CardHeader>
             <CardContent className="h-[250px] flex justify-center">
+                {chartData.types.length === 0 ? <EmptyChart /> : (
                 <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
+                    <RePieChart>
                         <Pie
                             data={chartData.types}
                             innerRadius={60}
@@ -156,40 +219,22 @@ export default function IncidentsAnalytics({ incidents }) {
                         </Pie>
                         <Tooltip contentStyle={{ backgroundColor: '#1a1a2e', borderColor: '#3a3a5a', color: '#fff' }} />
                         <Legend verticalAlign="bottom" height={36} />
-                    </PieChart>
+                    </RePieChart>
                 </ResponsiveContainer>
-            </CardContent>
-         </Card>
-
-         {/* Compliance / Performance (Mocked for now) */}
-         <Card className="bg-[#252541] border-[#3a3a5a] lg:col-span-2">
-            <CardHeader>
-                <CardTitle className="text-white text-base flex items-center gap-2"><Users className="h-4 w-4"/> Team Performance</CardTitle>
-            </CardHeader>
-            <CardContent>
-                <div className="space-y-4">
-                    {['Drilling Team Alpha', 'Logistics Crew B', 'Maintenance Unit', 'Site Security'].map((team, i) => (
-                        <div key={i} className="flex items-center gap-4">
-                            <div className="w-32 text-sm text-[#b0b0c0]">{team}</div>
-                            <div className="flex-1 bg-[#1a1a2e] rounded-full h-2.5 overflow-hidden">
-                                <div 
-                                    className="h-full rounded-full transition-all duration-1000"
-                                    style={{ 
-                                        width: `${Math.random() * 40 + 60}%`,
-                                        backgroundColor: i === 0 ? '#ef4444' : i === 1 ? '#eab308' : '#22c55e'
-                                    }}
-                                />
-                            </div>
-                            <div className="w-12 text-right text-xs font-mono text-white">{Math.floor(Math.random() * 40 + 60)}%</div>
-                        </div>
-                    ))}
-                </div>
-                <p className="text-xs text-[#7a7a9a] mt-4 text-center">* Scores based on reporting timeliness and training completion.</p>
+                )}
             </CardContent>
          </Card>
       </div>
     </div>
   );
+}
+
+function EmptyChart() {
+    return (
+        <div className="h-full w-full flex items-center justify-center text-sm text-[#7a7a9a]">
+            No data yet
+        </div>
+    );
 }
 
 function KpiCard({ title, value, icon: Icon, color, sub }) {
@@ -200,7 +245,7 @@ function KpiCard({ title, value, icon: Icon, color, sub }) {
                     <div className="p-2 rounded-lg bg-[#1a1a2e] border border-[#3a3a5a]">
                         <Icon className={`h-5 w-5 ${color}`} />
                     </div>
-                    {sub && <span className={`text-[10px] ${sub.includes('-') || sub.includes('action') ? 'text-red-400' : 'text-green-400'}`}>{sub}</span>}
+                    {sub && <span className="text-[10px] text-[#7a7a9a] text-right">{sub}</span>}
                 </div>
                 <div className="mt-2">
                     <h3 className="text-2xl font-bold text-white">{value}</h3>
