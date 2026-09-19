@@ -143,71 +143,49 @@ export const inviteUserService = {
   },
 
   /**
-   * Validate invitation token for acceptance page
+   * Look up an invitation for the acceptance page by its token.
+   *
+   * Security fix 2026-09-19 (Suite migration
+   * 20260919190000_security_invitation_acceptance): the invitations table is
+   * no longer readable by anyone but org admins, so the page asks the
+   * get_invitation_by_token RPC, which answers only for a pending, unexpired
+   * invitation and never returns the token. Same shape as before:
+   * { id, email, role, first_name, last_name, org_id, expires_at,
+   *   organizations: { name } }, or null.
    */
   async validateToken(token) {
-    const { data, error } = await supabase
-      .from('invitations')
-      .select(`
-        *,
-        organizations (name)
-      `)
-      .eq('token', token)
-      .eq('status', 'pending')
-      .gt('expires_at', new Date().toISOString())
-      .single();
-
+    if (!token) return null;
+    const { data, error } = await supabase.rpc('get_invitation_by_token', { p_token: token });
     if (error) return null;
-    return data;
+    return data || null;
   },
 
   /**
-   * Accept invitation (creates user link)
+   * Accept an invitation as the SIGNED-IN user.
+   *
+   * accept_invitation checks the token, that the signed-in account's email
+   * is the invited email, and that the inviter is still an admin, then adds
+   * the membership with the invitation's role and marks the invitation
+   * accepted, in one transaction. It takes no user id and no role.
+   * A brand-new account does not call this: it signs up with
+   * { invitation_token } in its metadata and the signup trigger runs the
+   * same checks (there may be no session yet if email confirmation is on).
    */
-  async acceptInvitation(token, userId) {
-    // 1. Validate Token again to get details
-    const invite = await this.validateToken(token);
-    if (!invite) throw new Error("Invalid or expired invitation");
-
-    // 2. Create Organization User Link using RPC to bypass RLS
-    // The 'add_user_to_organization' function is SECURITY DEFINER, running with admin privileges
-    const { error: rpcError } = await supabase.rpc('add_user_to_organization', {
-      p_user_id: userId,
-      p_org_id: invite.org_id,
-      p_role: invite.role
-    });
-
-    if (rpcError) {
-      console.error("RPC Error (add_user_to_organization):", rpcError);
-      throw new Error(`Failed to join organization: ${rpcError.message}`);
+  async acceptInvitation(token) {
+    const { data, error } = await supabase.rpc('accept_invitation', { p_token: token });
+    if (error) {
+      console.error('RPC Error (accept_invitation):', error);
+      throw new Error(error.message || 'Failed to join organization.');
     }
-
-    // 3. Update Invitation Status
-    // Users can update their own invitations via RLS (email match)
-    const { error: updateError } = await supabase
-      .from('invitations')
-      .update({ 
-        status: 'accepted', 
-        accepted_at: new Date() 
-      })
-      .eq('id', invite.id);
-
-    if (updateError) {
-        console.warn("Invitation status update failed (non-critical):", updateError);
-    }
-
-    return true;
+    return data;
   },
 
   /**
    * Decline invitation
    */
   async declineInvitation(token) {
-    const { error } = await supabase
-      .from('invitations')
-      .update({ status: 'declined' })
-      .eq('token', token);
-    
+    // Token holders may decline; nothing else about the row can be changed.
+    const { error } = await supabase.rpc('decline_invitation', { p_token: token });
     if (error) throw error;
   }
 };
