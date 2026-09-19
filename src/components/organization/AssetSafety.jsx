@@ -46,8 +46,12 @@ export const AssetSafety = ({ organization }) => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold text-green-500">{safetyData?.score || 0}%</p>
-            <p className="text-xs text-gray-400 mt-2">Overall safety rating</p>
+            {safetyData?.score != null ? (
+              <p className="text-3xl font-bold text-green-500">{safetyData.score}%</p>
+            ) : (
+              <p className="text-xl font-semibold text-gray-400">No data yet</p>
+            )}
+            <p className="text-xs text-gray-400 mt-2">Share of assets marked safe</p>
           </CardContent>
         </Card>
 
@@ -98,53 +102,37 @@ export const AssetSafety = ({ organization }) => {
           <CardDescription className="text-gray-400">Assets due for inspection or maintenance</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3 text-white">
-            {[
-              { asset: 'Forklift #1', dueDate: '2025-12-28', type: 'Inspection' },
-              { asset: 'Safety Harness Set', dueDate: '2025-12-30', type: 'Certification' },
-              { asset: 'Fire Extinguisher A', dueDate: '2026-01-05', type: 'Refill' },
-            ].map((item, idx) => (
-              <div key={idx} className="flex items-center justify-between p-3 bg-gray-700 rounded-lg">
-                <div>
-                  <p className="font-medium">{item.asset}</p>
-                  <p className="text-sm text-gray-400">{item.type}</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-medium">{new Date(item.dueDate).toLocaleDateString()}</p>
-                  <Badge className="bg-yellow-900 text-yellow-100 mt-1 hover:bg-yellow-800">Due Soon</Badge>
-                </div>
-              </div>
-            ))}
-          </div>
+          <p className="text-sm text-gray-400">No data yet. Asset records do not carry maintenance due dates.</p>
         </CardContent>
       </Card>
 
-      {/* Safety Incidents */}
+      {/* Flagged Assets */}
       <Card className="bg-gray-800 border-gray-700">
         <CardHeader>
-          <CardTitle className="text-white">Recent Safety Incidents</CardTitle>
-          <CardDescription className="text-gray-400">Incidents involving assets</CardDescription>
+          <CardTitle className="text-white">Assets Needing Attention</CardTitle>
+          <CardDescription className="text-gray-400">Assets currently marked warning or critical</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3 text-white">
-            {[
-              { asset: 'Ladder #3', incident: 'Missing safety label', date: '2025-12-20', severity: 'warning' },
-              { asset: 'PPE Kit #2', incident: 'Expired certification', date: '2025-12-18', severity: 'critical' },
-            ].map((item, idx) => (
-              <div key={idx} className="flex items-center justify-between p-3 bg-gray-700 rounded-lg border-l-4 border-yellow-500">
-                <div>
-                  <p className="font-medium">{item.asset}</p>
-                  <p className="text-sm text-gray-400">{item.incident}</p>
+          {(safetyData?.flagged || []).length === 0 ? (
+            <p className="text-sm text-gray-400">No assets are flagged.</p>
+          ) : (
+            <div className="space-y-3 text-white">
+              {safetyData.flagged.map((item) => (
+                <div key={item.id} className={`flex items-center justify-between p-3 bg-gray-700 rounded-lg border-l-4 ${item.safety_status === 'critical' ? 'border-red-500' : 'border-yellow-500'}`}>
+                  <div>
+                    <p className="font-medium">{item.name}</p>
+                    {item.safety_notes && <p className="text-sm text-gray-400">{item.safety_notes}</p>}
+                  </div>
+                  <div className="text-right">
+                    {item.updated_at && <p className="text-sm text-gray-400">{new Date(item.updated_at).toLocaleDateString()}</p>}
+                    <Badge className={item.safety_status === 'critical' ? 'bg-red-900 text-red-100 hover:bg-red-800' : 'bg-yellow-900 text-yellow-100 hover:bg-yellow-800'}>
+                      {item.safety_status.toUpperCase()}
+                    </Badge>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-sm text-gray-400">{new Date(item.date).toLocaleDateString()}</p>
-                  <Badge className={item.severity === 'critical' ? 'bg-red-900 text-red-100 hover:bg-red-800' : 'bg-yellow-900 text-yellow-100 hover:bg-yellow-800'}>
-                    {item.severity.toUpperCase()}
-                  </Badge>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

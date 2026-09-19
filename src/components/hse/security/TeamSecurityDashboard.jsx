@@ -1,13 +1,23 @@
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, AlertTriangle } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Card, CardContent } from "@/components/ui/card";
+import { Users } from 'lucide-react';
+import { useHSE } from '@/context/HSEContext';
+import { incidentService } from '@/services/incidentService';
+import SecurityEmptyState from './SecurityEmptyState';
 
+// Only the open-incident count has a data source (security_incidents). Team risk
+// scores and training compliance were hardcoded (including three made-up people)
+// and are shown as not available until they are recorded.
 export default function TeamSecurityDashboard() {
-  const teamMembers = [
-    { name: 'Alice Smith', risk: 85, status: 'High Risk' },
-    { name: 'Bob Jones', risk: 20, status: 'Low Risk' },
-    { name: 'Charlie Day', risk: 45, status: 'Medium Risk' },
-  ];
+  const { currentOrganization } = useHSE();
+  const [openIncidents, setOpenIncidents] = useState(null);
+
+  useEffect(() => {
+    if (!currentOrganization?.id) return;
+    incidentService.getSecurityIncidents(currentOrganization.id).then((rows) => {
+      setOpenIncidents(rows.filter(r => (r.status || '').toLowerCase() === 'open').length);
+    });
+  }, [currentOrganization]);
 
   return (
     <div className="space-y-6">
@@ -15,42 +25,28 @@ export default function TeamSecurityDashboard() {
         <Card className="bg-[#1e1e30] border-[#2a2a40]">
           <CardContent className="p-6">
             <h3 className="text-gray-400 text-sm uppercase">Team Avg Risk</h3>
-            <p className="text-3xl font-bold text-white mt-2">42/100</p>
+            <p className="text-xl font-semibold text-gray-400 mt-2">No data yet</p>
           </CardContent>
         </Card>
         <Card className="bg-[#1e1e30] border-[#2a2a40]">
           <CardContent className="p-6">
             <h3 className="text-gray-400 text-sm uppercase">Training Compliance</h3>
-            <p className="text-3xl font-bold text-green-400 mt-2">100%</p>
+            <p className="text-xl font-semibold text-gray-400 mt-2">No data yet</p>
           </CardContent>
         </Card>
         <Card className="bg-[#1e1e30] border-[#2a2a40]">
           <CardContent className="p-6">
             <h3 className="text-gray-400 text-sm uppercase">Open Incidents</h3>
-            <p className="text-3xl font-bold text-yellow-400 mt-2">1</p>
+            <p className="text-3xl font-bold text-yellow-400 mt-2">{openIncidents === null ? '--' : openIncidents}</p>
           </CardContent>
         </Card>
       </div>
 
-      <Card className="bg-[#1e1e30] border-[#2a2a40]">
-        <CardHeader><CardTitle className="text-white flex items-center gap-2"><Users className="h-5 w-5" /> Member Risk Profile</CardTitle></CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {teamMembers.map((member, i) => (
-              <div key={i} className="flex justify-between items-center p-3 bg-[#252541] rounded">
-                <div className="flex items-center gap-3">
-                  <div className={`h-2 w-2 rounded-full ${member.risk > 70 ? 'bg-red-500' : member.risk > 40 ? 'bg-yellow-500' : 'bg-green-500'}`} />
-                  <span className="text-white font-medium">{member.name}</span>
-                </div>
-                <div className="flex items-center gap-4">
-                  <span className="text-sm text-gray-400">Score: {member.risk}</span>
-                  {member.risk > 70 && <AlertTriangle className="h-4 w-4 text-red-400" />}
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      <SecurityEmptyState
+        icon={Users}
+        title="No member risk profiles yet"
+        message="Individual security risk scores will appear here once they are recorded on members' security profiles."
+      />
     </div>
   );
 }

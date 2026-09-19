@@ -182,7 +182,7 @@ export default function QuickReportPreview({ reportData, onEdit, onSubmit, onCan
             <MapPin className="h-3 w-3" /> Location
           </div>
           <p className="text-sm font-medium text-slate-900 truncate">
-            {editedData.location}
+            {editedData.location || 'Not set'}
           </p>
         </div>
       </div>
@@ -516,6 +516,7 @@ export default function QuickReportPreview({ reportData, onEdit, onSubmit, onCan
         <Label className="text-slate-700">Location</Label>
         <Input 
           value={editedData.location}
+          placeholder="Where did this happen?"
           onChange={(e) => setEditedData({...editedData, location: e.target.value})}
           className="bg-white border-slate-300 text-slate-900"
         />

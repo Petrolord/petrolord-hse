@@ -86,7 +86,7 @@ export default function TeamLeaderboard({ organizationId }) {
           <CardTitle className="flex items-center gap-2">
             <Trophy className="h-5 w-5 text-[#FFC107]" /> Team Leaderboard
           </CardTitle>
-          <CardDescription className="text-[#b0b0c0]">Top performers this month</CardDescription>
+          <CardDescription className="text-[#b0b0c0]">Top performers by total points</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-center justify-center py-8">
@@ -123,7 +123,7 @@ export default function TeamLeaderboard({ organizationId }) {
           <CardTitle className="flex items-center gap-2">
             <Trophy className="h-5 w-5 text-[#FFC107]" /> Team Leaderboard
           </CardTitle>
-          <CardDescription className="text-[#b0b0c0]">Top performers this month</CardDescription>
+          <CardDescription className="text-[#b0b0c0]">Top performers by total points</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-center justify-center py-8">

@@ -9,12 +9,19 @@ import {
 } from 'lucide-react';
 import { ScrollArea } from "@/components/ui/scroll-area";
 
+const ACTIVITY_STYLE = {
+  Contractor: { icon: Users, color: 'text-purple-500' },
+  Permit: { icon: FileText, color: 'text-blue-500' },
+  Incident: { icon: AlertTriangle, color: 'text-orange-500' },
+};
+
 export default function ContractorDashboard({ setActiveTab }) {
   const { currentOrganization } = useHSE();
   const [metrics, setMetrics] = useState({
     totalContractors: 0,
     activeContractors: 0,
     totalIncidents: 0,
+    criticalIncidents: 0,
     openPermits: 0
   });
   const [recentActivity, setRecentActivity] = useState([]);
@@ -29,13 +36,7 @@ export default function ContractorDashboard({ setActiveTab }) {
     try {
       const data = await contractorService.getDashboardMetrics(currentOrganization.id);
       setMetrics(data);
-      // Mock recent activity for visual fullness if no backend logs yet
-      setRecentActivity([
-        { id: 1, type: 'Induction', message: 'Safety Induction completed for Global Tech', time: '2 hours ago', icon: CheckCircle, color: 'text-green-500' },
-        { id: 2, type: 'Permit', message: 'Hot Work Permit #WP-2025-001 Approved', time: '4 hours ago', icon: FileText, color: 'text-blue-500' },
-        { id: 3, type: 'Incident', message: 'Near miss reported at Site B', time: '1 day ago', icon: AlertTriangle, color: 'text-orange-500' },
-        { id: 4, type: 'Contractor', message: 'New Contractor "BuildSafe" onboarded', time: '2 days ago', icon: Users, color: 'text-purple-500' },
-      ]);
+      setRecentActivity((data.recentActivity || []).map(a => ({ ...a, ...ACTIVITY_STYLE[a.type] })));
     } catch (e) {
       console.error(e);
     }
@@ -57,8 +58,8 @@ export default function ContractorDashboard({ setActiveTab }) {
           />
           <KPICard 
             title="Compliance Rate" 
-            value="94%" 
-            subtitle="+2.5% from last month"
+            value="No data yet" 
+            subtitle="No compliance records yet"
             icon={BadgeCheck} 
             color="text-green-400" 
             bg="bg-green-400/10"
@@ -66,7 +67,6 @@ export default function ContractorDashboard({ setActiveTab }) {
           <KPICard 
             title="Active Permits" 
             value={metrics.openPermits} 
-            subtitle="Across 3 sites"
             icon={FileText} 
             color="text-purple-400" 
             bg="bg-purple-400/10"
@@ -74,7 +74,7 @@ export default function ContractorDashboard({ setActiveTab }) {
           <KPICard 
             title="Incidents (YTD)" 
             value={metrics.totalIncidents} 
-            subtitle="0 Critical"
+            subtitle={`${metrics.criticalIncidents || 0} Critical`}
             icon={ShieldAlert} 
             color="text-red-400" 
             bg="bg-red-400/10"
@@ -92,7 +92,7 @@ export default function ContractorDashboard({ setActiveTab }) {
             </CardHeader>
             <CardContent>
               <div className="h-64 flex items-center justify-center bg-[#1a1a2e] rounded-lg border border-[#3a3a5a] border-dashed">
-                <p className="text-[#7a7a9a]">Compliance Rate Chart Visualization</p>
+                <p className="text-[#7a7a9a]">No data yet</p>
               </div>
             </CardContent>
           </Card>
@@ -130,6 +130,9 @@ export default function ContractorDashboard({ setActiveTab }) {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
+                {recentActivity.length === 0 && (
+                  <p className="text-sm text-[#7a7a9a]">No recent activity yet.</p>
+                )}
                 {recentActivity.map((activity) => (
                   <div key={activity.id} className="flex items-start gap-3 pb-3 border-b border-[#3a3a5a] last:border-0 last:pb-0">
                     <div className={`p-2 rounded-full bg-opacity-10 ${activity.color.replace('text-', 'bg-')}`}>
@@ -138,7 +141,7 @@ export default function ContractorDashboard({ setActiveTab }) {
                     <div>
                       <p className="text-sm text-white font-medium">{activity.type}</p>
                       <p className="text-xs text-[#b0b0c0] line-clamp-1">{activity.message}</p>
-                      <p className="text-[10px] text-[#7a7a9a] mt-1">{activity.time}</p>
+                      <p className="text-[10px] text-[#7a7a9a] mt-1">{new Date(activity.at).toLocaleString()}</p>
                     </div>
                   </div>
                 ))}

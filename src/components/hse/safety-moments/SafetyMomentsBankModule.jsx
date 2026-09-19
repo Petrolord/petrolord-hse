@@ -150,7 +150,7 @@ export default function SafetyMomentsBankModule() {
       <div className="flex-1 overflow-hidden flex flex-col relative">
         {activeTab === 'dashboard' ? (
           <div className="overflow-y-auto h-full">
-             <SafetyMomentDashboard totalMoments={moments.length} />
+             <SafetyMomentDashboard moments={moments} />
           </div>
         ) : (
           <>

@@ -96,16 +96,18 @@ export const predictiveAnalyticsService = {
     const totalNearMisses = incidents.filter(i => i.report_type === 'Near Miss').length;
     
     // Near-miss to Incident Ratio (Leading Indicator)
-    const ratio = totalIncidents > 0 ? (totalNearMisses / totalIncidents).toFixed(1) : totalNearMisses;
+    // Undefined without at least one incident: null means "not enough data".
+    const ratio = totalIncidents > 0 ? (totalNearMisses / totalIncidents).toFixed(1) : null;
 
     // Corrective Action Closure Rate
     const closedActions = actions.filter(a => a.status === 'closed' || a.status === 'completed').length;
-    const closureRate = actions.length > 0 ? Math.round((closedActions / actions.length) * 100) : 0;
+    const closureRate = actions.length > 0 ? Math.round((closedActions / actions.length) * 100) : null;
 
-    // Average Compliance
-    const avgCompliance = audits.length > 0 
-      ? Math.round(audits.reduce((acc, curr) => acc + (curr.compliance_score || 0), 0) / audits.length) 
-      : 0;
+    // Average Compliance, over audits that actually carry a score
+    const scored = audits.filter(a => a.compliance_score !== null && a.compliance_score !== undefined && a.compliance_score !== '' && !Number.isNaN(Number(a.compliance_score)));
+    const avgCompliance = scored.length > 0
+      ? Math.round(scored.reduce((acc, curr) => acc + Number(curr.compliance_score), 0) / scored.length)
+      : null;
 
     return {
       incident_count: totalIncidents,

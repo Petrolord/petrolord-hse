@@ -38,12 +38,12 @@ export default function QuickReportSuccess({ reportData, resultData, onClose, on
           </div>
           <div className="bg-[#252541]/50 border border-[#3a3a5a] p-4 rounded-xl flex flex-col items-center">
             <span className="text-2xl mb-1">🔥</span>
-            <span className="text-orange-500 font-bold text-lg">{resultData.streak} Day</span>
+            <span className="text-orange-500 font-bold text-lg">{resultData.streak ? `${resultData.streak} Day` : '--'}</span>
             <span className="text-xs text-[#7a7a9a]">Streak Active</span>
           </div>
           <div className="bg-[#252541]/50 border border-[#3a3a5a] p-4 rounded-xl flex flex-col items-center">
             <span className="text-2xl mb-1">🚀</span>
-            <span className="text-blue-400 font-bold text-lg">Top 10%</span>
+            <span className="text-blue-400 font-bold text-lg">{resultData.ranking ? `#${resultData.ranking}` : '--'}</span>
             <span className="text-xs text-[#7a7a9a]">Team Rank</span>
           </div>
         </div>

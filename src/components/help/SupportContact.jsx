@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Mail, Phone, MessageSquare, Clock } from 'lucide-react';
+import { Mail, MessageSquare } from 'lucide-react';
 import { useToast } from "@/components/ui/use-toast";
 import { helpService } from '@/services/helpService';
 import { useHSE } from '@/context/HSEContext';
@@ -50,29 +50,13 @@ export default function SupportContact() {
         <p className="text-[#b0b0c0]">Can't find what you're looking for? Our team is here to help.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 max-w-md mx-auto">
         <Card className="bg-[#252541] border-[#3a3a5a]">
           <CardContent className="pt-6 flex flex-col items-center text-center">
             <Mail className="h-8 w-8 text-[#FFC107] mb-4" />
             <h3 className="font-bold text-white mb-2">Email Us</h3>
             <p className="text-sm text-gray-400 mb-4">support@petrolord.com</p>
             <span className="text-xs text-gray-500">Response time: 24 hours</span>
-          </CardContent>
-        </Card>
-        <Card className="bg-[#252541] border-[#3a3a5a]">
-          <CardContent className="pt-6 flex flex-col items-center text-center">
-            <Phone className="h-8 w-8 text-[#FFC107] mb-4" />
-            <h3 className="font-bold text-white mb-2">Call Us</h3>
-            <p className="text-sm text-gray-400 mb-4">+1 (555) 123-4567</p>
-            <span className="text-xs text-gray-500">Mon-Fri, 9am-6pm EST</span>
-          </CardContent>
-        </Card>
-        <Card className="bg-[#252541] border-[#3a3a5a]">
-          <CardContent className="pt-6 flex flex-col items-center text-center">
-            <Clock className="h-8 w-8 text-[#FFC107] mb-4" />
-            <h3 className="font-bold text-white mb-2">SLA Status</h3>
-            <p className="text-sm text-gray-400 mb-4">Systems Operational</p>
-            <span className="text-xs text-green-500 font-bold">99.9% Uptime</span>
           </CardContent>
         </Card>
       </div>

@@ -59,7 +59,7 @@ export default function QuickReport({ isOpen, onClose }) {
         photo: photo,
         audioBlob: audio,
         submittedBy: currentUser?.name || 'User',
-        location: 'Detected: Site Location', // Placeholder until GPS logic added
+        location: '', // No GPS capture exists; the reporter types the location in the preview
         recommendedActions: result.combinedAnalysis.recommendedActions || []
       };
 

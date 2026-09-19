@@ -8,14 +8,30 @@ import { AlertTriangle, CheckCircle, Database } from 'lucide-react';
 export default function DataQualityDashboard() {
   const { currentOrganization } = useHSE();
   const [metrics, setMetrics] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (currentOrganization?.id) {
-      dataQualityService.getMetrics(currentOrganization.id).then(setMetrics);
+      setLoading(true);
+      dataQualityService.getMetrics(currentOrganization.id)
+        .then(setMetrics)
+        .finally(() => setLoading(false));
     }
   }, [currentOrganization]);
 
-  if (!metrics) return <div className="p-8 text-center text-[#7a7a9a]">Checking data health...</div>;
+  if (loading) return <div className="p-8 text-center text-[#7a7a9a]">Checking data health...</div>;
+
+  if (!metrics) {
+    return (
+      <Card className="bg-[#1a1a2e] border-[#3a3a5a]">
+        <CardContent className="p-10 text-center text-[#7a7a9a]">
+          <Database className="h-10 w-10 mx-auto mb-3 opacity-30" />
+          <p className="text-white font-medium">No data yet</p>
+          <p className="text-sm mt-1">No data quality check has been recorded for your organization.</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
@@ -68,7 +84,7 @@ export default function DataQualityDashboard() {
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
-            {metrics.issues_found.map((issue, idx) => (
+            {(metrics.issues_found || []).map((issue, idx) => (
               <div key={idx} className="flex items-start gap-3 p-3 rounded bg-[#252541] border border-[#3a3a5a]">
                 <div className={`mt-1 h-2 w-2 rounded-full ${
                   issue.severity === 'High' ? 'bg-red-500' :

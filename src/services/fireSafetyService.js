@@ -13,18 +13,20 @@ export const fireSafetyService = {
 
     const totalEquipment = equipment.data?.length || 0;
     const operationalEq = equipment.data?.filter(e => e.status === 'Operational').length || 0;
-    const maintenanceScore = totalEquipment ? Math.round((operationalEq / totalEquipment) * 100) : 100;
+    // null when nothing is recorded, so the tab shows "No data yet" rather than a default score.
+    const maintenanceScore = totalEquipment ? Math.round((operationalEq / totalEquipment) * 100) : null;
 
     const totalComplianceItems = compliance.data?.length || 0;
     const compliantItems = compliance.data?.filter(c => c.is_compliant).length || 0;
-    const complianceScore = totalComplianceItems ? Math.round((compliantItems / totalComplianceItems) * 100) : 0;
+    const complianceScore = totalComplianceItems ? Math.round((compliantItems / totalComplianceItems) * 100) : null;
 
     // Calculate Risk Score (Inverse of average risk, simplified)
-    const avgRisk = risks.data?.reduce((acc, r) => acc + (r.risk_score || 0), 0) / (risks.data?.length || 1);
-    const riskScore = Math.max(0, 100 - (avgRisk * 4)); // Scale 25 max risk to 100
+    const totalRisks = risks.data?.length || 0;
+    const avgRisk = totalRisks ? risks.data.reduce((acc, r) => acc + (r.risk_score || 0), 0) / totalRisks : null;
+    const riskScore = avgRisk === null ? null : Math.max(0, 100 - (avgRisk * 4)); // Scale 25 max risk to 100
 
     return {
-      riskScore: Math.round(riskScore),
+      riskScore: riskScore === null ? null : Math.round(riskScore),
       complianceScore,
       maintenanceScore,
       drillsCount: drills.data?.length || 0,

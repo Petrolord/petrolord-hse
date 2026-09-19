@@ -586,17 +586,23 @@ export const quickReportService = {
 
       if (insertError) throw insertError;
 
-      // 6. Trigger Gamification Update
+      // 6. Trigger Gamification Update, then read back the stored streak and rank
+      let streak = null;
+      let ranking = null;
       if (!options.isAnonymous && !options.saveAsDraft) {
         await safeGamification('addPoints', user.id, organization.id, totalPoints, 'Quick Report Submission');
         await safeGamification('updateStreak', user.id, organization.id);
+        const score = await safeGamification('getUserScore', user.id);
+        streak = score?.current_streak || null;
+        ranking = score?.ranking || null;
       }
 
       return {
         success: true,
         reportId: insertedReport.id, // Use actual DB ID
         points: totalPoints,
-        streak: 1 // In real app, fetch actual streak
+        streak,
+        ranking,
       };
 
     } catch (error) {

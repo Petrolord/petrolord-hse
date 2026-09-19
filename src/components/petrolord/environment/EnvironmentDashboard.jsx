@@ -79,11 +79,11 @@ export default function EnvironmentDashboard({ onLogSpill, onSubmitMonitoring })
         <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-3 gap-4">
           <StatCard title="Permits Due (90 Days)" value={stats.expiringPermits} icon={FileCheck} color="text-yellow-400" />
           <StatCard title="Overdue Actions" value={stats.overdueActions} icon={Calendar} color="text-red-400" />
-          <StatCard title="Spills (YTD)" value={stats.spillCount} icon={Droplets} color="text-orange-400" />
+          <StatCard title="Spills (All Time)" value={stats.spillCount} icon={Droplets} color="text-orange-400" />
           
           <StatCard title="Flaring Volume" value={stats.totalFlaring.toLocaleString()} unit="m³" icon={Flame} color="text-purple-400" />
           <StatCard title="Waste Generated" value={stats.totalWaste} unit="tons" icon={Trash2} color="text-gray-400" />
-          <StatCard title="Carbon Tax Est." value="$12.5k" icon={Zap} color="text-green-400" />
+          <StatCard title="Carbon Tax Est." value="No data yet" icon={Zap} color="text-gray-400" />
         </div>
       </div>
 
