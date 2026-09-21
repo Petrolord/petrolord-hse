@@ -1,3 +1,9 @@
+
+/** Own-property preset lookup. `TABLE[key]` walks the prototype chain, so
+ *  'constructor', 'toString', 'valueOf', 'hasOwnProperty' and '__proto__'
+ *  are "found" in every object literal and walk through a falsy guard. */
+const ownPreset = (table, key) => (typeof key === 'string' || typeof key === 'number') && Object.prototype.hasOwnProperty.call(table, key);
+
 /**
  * Occupational hygiene exposure arithmetic (HSE H2): noise, chemical
  * and heat.
@@ -125,7 +131,7 @@ export const OSHA_TABLE_G16_MAX_DBA = 115;
  */
 export const resolveNoiseCriterion = (criterion = 'OSHA_PEL') => {
   if (typeof criterion === 'string') {
-    const preset = NOISE_CRITERIA[criterion];
+    const preset = ownPreset(NOISE_CRITERIA, criterion) ? NOISE_CRITERIA[criterion] : undefined;
     if (!preset) {
       return refuse('criterion', `criterion '${criterion}' is unknown: use one of ${Object.keys(NOISE_CRITERIA).join(', ')} or pass the parameters`);
     }
@@ -339,7 +345,7 @@ export const hearingProtectorEstimate = ({
   if (!isNum(exposureDb)) return refuse('exposureDb', 'exposureDb must be a finite number');
   if (weighting !== 'A' && weighting !== 'C') return refuse('weighting', "weighting must be 'A' or 'C'");
   if (!isNum(nrrDb) || nrrDb < 0) return refuse('nrrDb', 'nrrDb must be a finite number of dB, zero or more');
-  if (!HEARING_PROTECTOR_METHODS[method]) {
+  if (!ownPreset(HEARING_PROTECTOR_METHODS, method)) {
     return refuse('method', `method must be one of ${Object.keys(HEARING_PROTECTOR_METHODS).join(', ')}`);
   }
   let rawAttenuationDb;
@@ -358,7 +364,7 @@ export const hearingProtectorEstimate = ({
     rawAttenuationDb = (weighting === 'A' ? nrrDb - 7 : nrrDb) + 5;
     source = `${SOURCES.OSHA_OTM_NOISE}, Appendix E (dual protection)`;
   } else {
-    const factor = NIOSH_NRR_DERATING[protectorType];
+    const factor = ownPreset(NIOSH_NRR_DERATING, protectorType) ? NIOSH_NRR_DERATING[protectorType] : undefined;
     if (factor === undefined) {
       return refuse('protectorType', `protectorType must be one of ${Object.keys(NIOSH_NRR_DERATING).join(', ')} for the NIOSH method`);
     }
@@ -681,9 +687,11 @@ export const nioshHeatAssessment = ({ wbgtPeriods, metabolicPeriods, acclimatize
     return refuse('acclimatized', 'acclimatized must be true (REL) or false (RAL)');
   }
   const w = wbgtTwaC(wbgtPeriods);
-  if (w.error) return { ...w, field: w.field.replace(/^periods/, 'wbgtPeriods') };
+  // The field AND the message are renamed together, so a caller that prints the
+  // message names the same input the `field` names.
+  if (w.error) return { ...w, field: w.field.replace(/^periods/, 'wbgtPeriods'), error: w.error.replace(/^periods/, 'wbgtPeriods') };
   const m = metabolicRateTwaW(metabolicPeriods);
-  if (m.error) return { ...m, field: m.field.replace(/^periods/, 'metabolicPeriods') };
+  if (m.error) return { ...m, field: m.field.replace(/^periods/, 'metabolicPeriods'), error: m.error.replace(/^periods/, 'metabolicPeriods') };
   if (Math.abs(w.totalDurationMin - 60) > 1e-9) {
     return refuse('wbgtPeriods', `wbgtPeriods total ${w.totalDurationMin} min: the NIOSH limits apply to a 1-hour TWA`);
   }
