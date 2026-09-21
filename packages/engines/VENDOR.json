@@ -2,14 +2,14 @@
   "$comment": "Vendoring contract for packages/engines in Petrolord HSE. Checked by tools/check-vendored-engines.mjs (adapted from petrolord-suite tools/check-vendored-engines.mjs). Unlike the Suite, which vendors the WHOLE canonical tree, HSE vendors a SUBSET: only the engines the app imports, plus each one's test, golden, oracle and FINDINGS for provenance. The subset is listed below and the committed VENDOR.manifest carries the canonical blob hash of exactly those paths at the pinned commit. The check is against the PINNED commit, never against engines HEAD, so canonical moving on never blocks an HSE pull request; moving the pin is a deliberate, reviewed vendoring pass. knownDeviations is the same ledger the Suite uses (reason, group, burnDownWhen, and a vendoredSha pin for a differing or extra path); the expected state is an empty list.",
   "canonical": {
     "repo": "git@github.com:Petrolord/petrolord-engines.git",
-    "commit": "6703c00a7a9ffcb398110bc5888eb9e0b75e7498",
+    "commit": "16fd6c96dcb91f372d2d76b4ecd2c7fa4cbd4b4f",
     "manifest": "VENDOR.manifest"
   },
   "vendoring": {
     "method": "file-by-file copy of the listed subset from a canonical clone at the pinned commit (git show <commit>:<path>), verified by blob hash with this guard, hashed from the files on disk rather than from the git index",
     "$comment": "NEVER a whole-tree `git subtree pull`: in the Suite that silently deleted 24 downstream files on 2026-09-14, and here it would drag in hundreds of engines the app does not use. To move the pin: fetch the canonical clone, copy each subset path at the new commit, run `node tools/check-vendored-engines.mjs --write-manifest <clone>` to regenerate VENDOR.manifest, then `node tools/check-vendored-engines.mjs --canonical <clone>` and `npm test`.",
-    "lastVendored": "2026-09-19",
-    "lastVendoredRange": "second vendoring (HS2). Pin moved f123a575f06cb5fcef0fa9af2bbce951a3ac1305 -> 6703c00a7a9ffcb398110bc5888eb9e0b75e7498 (engines main after PR #217 feat(hse): H2 exposure engine and PR #218 H3 LOPA). 5 paths added (the H2 exposure engine, its test, golden, oracle and FINDINGS); the 5 safetyStats paths are byte-identical at both commits. H3 LOPA is not vendored: the app does not import it yet."
+    "lastVendored": "2026-09-21",
+    "lastVendoredRange": "third vendoring. Pin moved 6703c00a7a9ffcb398110bc5888eb9e0b75e7498 -> 16fd6c96dcb91f372d2d76b4ecd2c7fa4cbd4b4f (engines main after PR #222 fix(hse): safetyStats Garwood rationale and pseRate base hint, plus the exposure heat refusal message rename, and PR #231 own-property preset lookups). 8 subset paths changed: exposure.js (own-property lookups for the noise criterion, hearing protector method and protectorType; the heat refusal message names the renamed period field), safetyStats.js (pseRate base hint, Garwood comment), both engine tests, the safetyStats golden, oracle_safetystats.py and both FINDINGS. exposure_cases.json and oracle_exposure.py are byte-identical at both commits. No paths added or removed."
   },
   "subset": [
     "__tests__/hse.exposure.test.js",
