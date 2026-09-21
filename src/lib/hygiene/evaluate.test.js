@@ -14,7 +14,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import * as forms from './forms';
 import * as evaluate from './evaluate';
-import { mixtureExposureIndex, hearingProtectorEstimate, NOISE_CRITERIA } from '@/lib/engines/exposure';
+import { mixtureExposureIndex, hearingProtectorEstimate, NOISE_CRITERIA, resolveNoiseCriterion, noiseDose } from '@/lib/engines/exposure';
 
 const GOLDEN = JSON.parse(fs.readFileSync(
   path.resolve(__dirname, '../../../packages/engines/test-data/hse/goldens/exposure_cases.json'), 'utf8',
@@ -489,5 +489,41 @@ describe('database rows', () => {
 
   test('the presets shown side by side are the engine\'s own', () => {
     expect(evaluate.NOISE_PRESET_IDS.map((id) => NOISE_CRITERIA[id].id)).toEqual(['OSHA_PEL', 'OSHA_ACTION_LEVEL', 'NIOSH_REL']);
+  });
+});
+
+/* ------------------------------------------------------------------ */
+/* Inherited names (engines PR #231, own-property preset lookups).     */
+/* ------------------------------------------------------------------ */
+
+describe('an inherited object name is refused, never read as a preset', () => {
+  const INHERITED = ['constructor', 'toString', 'valueOf', 'hasOwnProperty', '__proto__'];
+  const periods = [{ levelDbA: 95, durationH: 8 }];
+
+  test.each(INHERITED)("protectorType '%s' refuses through evaluateNoise (NIOSH method)", (name) => {
+    const r = evaluate.evaluateNoise({ periods, protector: { method: 'NIOSH_TYPE', nrrDb: 25, weighting: 'A', protectorType: name } });
+    expect(r.protector.skipped).toBeUndefined();
+    expect(evaluate.isRefusal(r.protector.result)).toBe(true);
+    expect(r.protector.result.field).toBe('protectorType');
+  });
+
+  test.each(INHERITED)("protector method '%s' refuses through evaluateNoise", (name) => {
+    const r = evaluate.evaluateNoise({ periods, protector: { method: name, nrrDb: 25, weighting: 'C', cWeightedDb: 100 } });
+    expect(evaluate.isRefusal(r.protector.result)).toBe(true);
+    expect(r.protector.result.field).toBe('method');
+  });
+
+  test.each(INHERITED)("noise criterion '%s' refuses in the engine the service calls", (name) => {
+    const r = resolveNoiseCriterion(name);
+    expect(evaluate.isRefusal(r)).toBe(true);
+    expect(r.field).toBe('criterion');
+    const dose = noiseDose(periods, name);
+    expect(evaluate.isRefusal(dose)).toBe(true);
+  });
+
+  test('the own presets still resolve', () => {
+    const r = evaluate.evaluateNoise({ periods, protector: { method: 'NIOSH_TYPE', nrrDb: 25, weighting: 'A', protectorType: 'earmuff' } });
+    expect(evaluate.isRefusal(r.protector.result)).toBe(false);
+    expect(resolveNoiseCriterion('OSHA_PEL').id).toBe('OSHA_PEL');
   });
 });
