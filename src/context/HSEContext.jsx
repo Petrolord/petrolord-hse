@@ -8,6 +8,7 @@ import React, { createContext, useContext, useState, useEffect, useMemo } from '
 import { supabase } from '@/lib/customSupabaseClient';
 import { hseQueries } from '@/lib/supabase';
 import { useToast } from '@/components/ui/use-toast';
+import { normalizeRole, hseAccessLevel } from '@/lib/hseAccess';
 
 export const HSEContext = createContext(null);
 
@@ -18,17 +19,9 @@ const SUPER_ADMIN_EMAILS = [
   'support@petrolord.com'
 ];
 
-// organization_members.role vocabulary is wider than the UI's canonical set
-// (LeftNav gates on super_admin/org_admin/manager/supervisor/staff plus the
-// specialist roles). Aliases map stored roles onto that set so invited
-// members don't land on an empty sidebar.
-const ROLE_ALIASES = {
-  owner: 'org_admin',
-  admin: 'org_admin',
-  member: 'staff',
-  employee: 'staff'
-};
-const normalizeRole = (r) => ROLE_ALIASES[r] || r || 'staff';
+// organization_members.role is shared with the Suite, whose roles
+// (engineer, viewer, ...) HSE does not know; normalizeRole maps every
+// stored role onto HSE's set so no member lands on an empty sidebar.
 
 export function HSEProvider({ children }) {
   const { toast } = useToast();
@@ -132,6 +125,7 @@ export function HSEProvider({ children }) {
       });
 
       let activeOrgId = null; // org the entitlement check below must evaluate
+      let activeOrg = null;   // its organizations row (is_internal)
 
       if (isSuperAdminEmail) {
         setRealRole('super_admin');
@@ -197,6 +191,7 @@ export function HSEProvider({ children }) {
 
         if (activeMembership) {
             activeOrgId = activeMembership.organization_id;
+            activeOrg = activeMembership.organization;
             const mappedRole = normalizeRole(activeMembership.role);
             setRealRole(mappedRole);
             // userModules now derived from organization_apps in the access check below
@@ -233,15 +228,13 @@ export function HSEProvider({ children }) {
                 .eq('organization_id', userOrgId)
                 .eq('status', 'ACTIVE');
 
-              const hseApp = (orgApps || []).find(a => a.app_id === 'hse');
-              if (hseApp) {
-                const isPremium = hseApp.module_id !== 'hse_free';
-                setAccessLevel(isPremium ? 'premium' : 'basic');
-                setUserModules((orgApps || []).map(a => a.app_id));
-              } else {
-                setAccessLevel('none');
-                setUserModules([]);
-              }
+              // an internal org (Lordsway) is Professional regardless of its rows
+              const level = hseAccessLevel(orgApps, activeOrg);
+              setAccessLevel(level);
+              setLimits(level === 'premium'
+                ? { email_limit: -1, image_limit: -1, video_limit: -1 }
+                : { email_limit: 25, image_limit: 5, video_limit: 0 });
+              setUserModules(level === 'none' ? [] : Array.from(new Set([...(orgApps || []).map(a => a.app_id), 'hse'])));
             } else {
               setAccessLevel('none');
             }
