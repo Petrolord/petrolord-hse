@@ -1,7 +1,7 @@
 ## Pages
 - [- Petrolord HSE](/benefit): No description available
 - [Confirming payment - Petrolord HSE](/paymentverify): No description available
-- [Petrolord HSE - Free Integrated Health, Safety & Environment Platform](/home): The comprehensive, free HSSE management platform for the modern energy enterprise. Track incidents, manage risks, and ensure compliance.
+- [Petrolord HSE | Health, safety, security and environment in one place](/home): Incident reporting, risk assessment, work permits, audits, contractor safety and environmental compliance for the whole workforce. Free forever with unlimited users, with a Professional plan as your team grows.
 - [Pricing - Petrolord HSE](/pricing): Simple, transparent pricing for teams of all sizes. Start for free.
 - [Security - Petrolord HSE](/security): Petrolord HSE Security Architecture and Practices. Detailed overview of our enterprise-grade security measures.
 - [Terms of Service - Petrolord HSE](/termsofservice): Terms of Service for Petrolord HSE. Read strict guidelines regarding usage, liability, and user responsibilities.

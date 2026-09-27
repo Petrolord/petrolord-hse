@@ -1,411 +1,459 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { motion } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
-import PublicNavbar from '@/components/layout/PublicNavbar';
-import PublicFooter from '@/components/layout/PublicFooter';
-import { Button } from '@/components/ui/button';
-import { ShieldCheck, AlertTriangle, Users, BarChart3, HardHat, CheckCircle2, Globe, Zap, Database, ArrowRight, ChevronRight, Leaf, Brain, Lock, Headphones as Headset, Layers } from 'lucide-react';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Card, CardContent } from "@/components/ui/card";
-import PricingCards from '@/components/pricing/PricingCards';
-import PricingToggle from '@/components/pricing/PricingToggle';
+import { ArrowRight, Check, Menu, X } from 'lucide-react';
+import { useAuth } from '@/contexts/SupabaseAuthContext';
+import { pricingTiers, professionalPricing } from '@/components/pricing/data';
+import './HomePage.css';
 
-// Updated features array with slugs matching benefitsData
-const features = [{
-  icon: AlertTriangle,
-  title: "Real-Time Incident Management",
-  description: "Report, assign and investigate incidents and observations from one place.",
-  slug: "incident-management"
-}, {
-  icon: ShieldCheck,
-  title: "Comprehensive Risk Assessment",
-  description: "Identify, evaluate, and mitigate risks across all operations with data-driven insights.",
-  slug: "risk-assessment"
-}, {
-  icon: Users,
-  title: "Team Collaboration & Compliance",
-  description: "Unified platform for team coordination, training, and regulatory compliance management.",
-  slug: "team-collaboration"
-}, {
-  icon: BarChart3,
-  title: "Advanced Analytics & Reporting",
-  description: "Generate professional reports, track KPIs, and gain actionable insights from real-time data.",
-  slug: "analytics-reporting"
-}, {
-  icon: HardHat,
-  title: "Contractor Management",
-  description: "Keep contractor records, induction records and contractor incidents in one place.",
-  slug: "contractor-management"
-}, {
-  icon: Leaf,
-  title: "Environmental Compliance",
-  description: "Log flaring, waste manifests, spills and permits, and export CSV compliance packs.",
-  slug: "environmental-compliance"
-}];
+// Public homepage, redesigned 2026-09-27 into the Petrolord visual family
+// shared with the Suite (petrolord.com) and NextGen Academy homepages:
+// petrol-green ink, ivory paper, gold accent; Cormorant Garamond for display,
+// Public Sans for text, IBM Plex Mono for figures. Every style is scoped under
+// .hse-home in HomePage.css, so the app screens do not change.
+//
+// Plans and prices come from src/components/pricing/data.js, the same source
+// the /pricing page and the in-app upgrade read. Copy follows the owner style
+// rule: no em dashes and no contrastive "X, not Y" constructions.
 
-const benefits = [
-  {
-    title: "Comprehensive HSE Management",
-    desc: "A single, unified platform covering Health, Safety, Security, and Environment. Eliminate silos and manage everything in one place.",
-    icon: Layers,
-    highlight: "All-in-one"
-  },
-  {
-    title: "Real-Time Reporting & Analytics",
-    desc: "Generate professional reports instantly and track KPIs with live dashboards. Turn data into actionable safety insights.",
-    icon: BarChart3,
-    highlight: "Data-driven"
-  },
-  {
-    title: "Seamless Collaboration",
-    desc: "Connect your entire workforce, from field staff to management. Assign tasks, share updates, and drive safety culture together.",
-    icon: Users,
-    highlight: "Team-focused"
-  },
-  {
-    title: "Regulatory Compliance",
-    desc: "Record the frameworks that apply to you, such as ISO 45001 or OSHA, and keep permits and audits in one place.",
-    icon: CheckCircle2,
-    highlight: "Audit-ready"
-  },
-  {
-    title: "Scalable & Flexible",
-    desc: "Whether you're a small team or a global enterprise, add sites, departments and team members as you grow.",
-    icon: Leaf,
-    highlight: "Future-proof"
-  },
-  {
-    title: "Predictive Risk Intelligence",
-    desc: "AI-powered analytics that predict potential hazards before they occur, helping you stay ahead of risks and prevent incidents.",
-    icon: Brain,
-    highlight: "Proactive AI"
-  },
-  {
-    title: "Global Site Management",
-    desc: "Manage all your sites and departments, and post site QR codes so anyone on site can report an observation.",
-    icon: Globe,
-    highlight: "Visual Control"
-  },
-  {
-    title: "Incident Investigation Workflows",
-    desc: "Supervisors assign reports for investigation and record root causes with a 5 Whys analysis.",
-    icon: Zap,
-    highlight: "Efficiency"
-  },
-  {
-    title: "Enterprise Security",
-    desc: "Encrypted connections, per-organization data isolation and an audit log of investigation activity.",
-    icon: Lock,
-    highlight: "Secure"
-  },
-  {
-    title: "Expert Guidance & Support",
-    desc: "From onboarding to optimization, our HSE experts are with you. Dedicated account managers and 24/7 support ensure success.",
-    icon: Headset,
-    highlight: "24/7 Support"
-  }
+const WORDMARK = '/petrolord-hse-wordmark.png';
+const SUITE_URL = 'https://petrolord.com';
+const NEXTGEN_URL = 'https://nextgen.petrolord.com';
+const SUPPORT_EMAIL = 'support@petrolord.com';
+
+export const NAV = [
+  ['#features', 'Features'],
+  ['#benefits', 'Why HSE'],
+  ['#start', 'How it works'],
+  ['#pricing', 'Pricing'],
+  ['#faq', 'FAQ'],
 ];
 
-const faqs = [{
-  q: "Is the Free tier really free?",
-  a: "Yes. The Free tier is free forever, with unlimited users and the core safety modules: Incident Management, Observations, Risk Assessments and a basic dashboard. It has monthly usage caps on reports and incidents, and it does not send emails."
-}, {
-  q: "How does paid pricing work?",
-  a: "The Professional plan is priced by team size band, from 1-10 users up to 2,501-5,000 users. Pick your band on the pricing card and the price updates instantly. Above 5,000 users, talk to us about Enterprise."
-}, {
-  q: "How do I get started?",
-  a: "Click 'Get Started Free', create your organization account, and invite your team. It takes less than 2 minutes and no credit card is needed."
-}, {
-  q: "Is my data secure?",
-  a: "Absolutely. We use enterprise-grade encryption and security protocols to ensure your data is safe and compliant."
-}, {
-  q: "Can I export my data?",
-  a: "Yes, you own your data. You can export registers and compliance packs as CSV and analytics summaries as PDF."
-}, {
-  q: "Is there a limit on users?",
-  a: "No. Every plan, including Free, lets your entire workforce join so everyone can be part of the safety culture. Paid plans are priced by team size band rather than a hard user cap."
-}];
+// Feature cards link to the existing /benefits/:slug pages (src/data/benefitsData.js).
+export const FEATURES = [
+  { slug: 'incident-management', title: 'Incident management', body: 'Report, assign and investigate incidents and observations from one place.' },
+  { slug: 'risk-assessment', title: 'Risk assessment', body: 'Identify, evaluate and mitigate risks across all operations with a live risk register.' },
+  { slug: 'team-collaboration', title: 'Team collaboration and compliance', body: 'Coordinate teams, training and regulatory compliance on one platform.' },
+  { slug: 'analytics-reporting', title: 'Analytics and reporting', body: 'Track KPIs on live dashboards and produce reports from your own records.' },
+  { slug: 'contractor-management', title: 'Contractor management', body: 'Keep contractor records, induction records and contractor incidents in one place.' },
+  { slug: 'environmental-compliance', title: 'Environmental compliance', body: 'Log flaring, waste manifests, spills and permits, and export CSV compliance packs.' },
+];
+
+export const PILLARS = [
+  { title: 'Health, safety, security and environment together', body: 'One platform for all four disciplines, so reports, actions and audits no longer sit in separate systems.' },
+  { title: 'Anyone on site can report', body: 'Post a QR code at each site. Anyone can scan it and report an observation, and the report lands with your supervisors.' },
+  { title: 'Investigations that close', body: 'Supervisors assign reports for investigation, record root causes with a 5 Whys analysis and track actions to completion.' },
+  { title: 'Ready for the auditor', body: 'Record the frameworks that apply to you, such as ISO 45001 or OSHA, and keep permits and audits in one place.' },
+  { title: 'Every level of the workforce', body: 'Field staff, supervisors, managers and administrators each see the tools for their role, and everyone can join on every plan.' },
+  { title: 'Grows with your operation', body: 'Add sites, departments and team members as you grow, and move up a team size band when you need to.' },
+  { title: 'Forecasts from your own history', body: 'An AI safety forecast reads your own incident and observation records and highlights where risk is rising.' },
+  { title: 'Secure by design', body: 'Encrypted connections, per-organisation data isolation and an audit log of investigation activity.' },
+];
+
+export const STEPS = [
+  { title: 'Sign up free', body: 'Create your organisation account in minutes. No credit card is needed.' },
+  { title: 'Set up your organisation', body: 'Add your sites, departments and team, and choose each person’s role.' },
+  { title: 'Start recording', body: 'Log incidents, observations, permits and audits from the field or the office.' },
+  { title: 'See the picture', body: 'Follow live dashboards and safety statistics, and export reports when you need them.' },
+];
+
+export const FAQS = [
+  { q: 'Is the Free tier really free?', a: 'Yes. The Free tier is free forever, with unlimited users and the core safety modules: Incident Management, Observations, Risk Assessments and a basic dashboard. It has monthly usage caps on reports and incidents, and it does not send emails.' },
+  { q: 'How does paid pricing work?', a: 'The Professional plan is priced by team size band, from 1-10 users up to 2,501-5,000 users. Pick your band on the pricing card and the price updates instantly. Above 5,000 users, talk to us about Enterprise.' },
+  { q: 'How do I pay for Professional?', a: 'Professional plans are bought and renewed online, by card or bank transfer, through our payment partners Paystack and Stripe.' },
+  { q: 'How do I get started?', a: 'Choose Get started free, create your organisation account and invite your team. It takes a couple of minutes and no credit card is needed.' },
+  { q: 'Is my data secure?', a: 'Connections are encrypted, each organisation’s data is kept apart from every other organisation, and investigation activity is written to an audit log.' },
+  { q: 'Can I export my data?', a: 'Yes, you own your data. You can export registers and compliance packs as CSV and analytics summaries as PDF.' },
+  { q: 'Is there a limit on users?', a: 'No. Every plan, including Free, lets your entire workforce join so everyone can be part of the safety culture. Paid plans are priced by team size band, with no hard cap on users inside a band.' },
+];
+
+// Module names shown in the hero illustration are the real sidebar entries
+// (src/components/LeftNav.jsx).
+const RAIL = ['Dashboard', 'Safety Statistics', 'Work Permits', 'Risk Mgmt', 'Safety Audits', 'Environment', 'Training'];
+
+// Sample 5 x 5 risk matrix for the hero illustration (likelihood rows from
+// high to low, consequence columns from low to high). Illustrative only.
+const MATRIX = [
+  [0, 1, 0, 1, 0],
+  [1, 2, 3, 1, 0],
+  [2, 4, 2, 1, 0],
+  [3, 5, 2, 0, 0],
+  [4, 2, 1, 0, 0],
+];
+const band = (r, c) => {
+  const score = (5 - r) * (c + 1);
+  if (score >= 15) return 'hi';
+  if (score >= 8) return 'md';
+  return 'lo';
+};
+
+function HseWindow() {
+  return (
+    <div className="window" role="img" aria-label="Illustration of the Petrolord HSE workspace with a sample risk matrix">
+      <div className="win-bar" aria-hidden="true">
+        <span className="dots"><i /><i /><i /></span>
+        <span className="win-title">Petrolord HSE · Sample Site</span>
+      </div>
+      <div className="win-body" aria-hidden="true">
+        <ul className="win-rail">
+          {RAIL.map((m) => <li key={m} className={m === 'Risk Mgmt' ? 'on' : undefined}>{m}</li>)}
+        </ul>
+        <div className="win-main">
+          <div className="win-crumb">Risk Mgmt · Risk register · Sample Site</div>
+          <div className="matrix-card">
+            <div className="matrix">
+              {MATRIX.map((row, r) => row.map((n, c) => (
+                <span key={`${r}-${c}`} className={`cell ${band(r, c)}`}>{n || ''}</span>
+              )))}
+            </div>
+            <div className="axis">Rows show likelihood and columns show consequence.</div>
+          </div>
+          <div className="win-kpis">
+            <div><small>Open actions</small><b>12</b></div>
+            <div><small>Observations</small><b>48</b></div>
+            <div><small>Live permits</small><b>6</b></div>
+          </div>
+        </div>
+      </div>
+      <span className="win-sample" aria-hidden="true">Sample data</span>
+    </div>
+  );
+}
+
+// Plan cards. Mirrors PricingCards (the /pricing page) so the links and prices
+// are identical: signed-in users go to in-app checkout or the dashboard.
+function Plans({ session }) {
+  const [annual, setAnnual] = useState(true);
+  const [bandIdx, setBandIdx] = useState(0);
+  const b = professionalPricing[bandIdx];
+  const proPrice = annual ? b.annual : b.monthly;
+  const perUser = (proPrice / b.maxUsers).toFixed(2);
+
+  const price = (tier) => {
+    if (tier.id === 'free') return ['$0', '/mo'];
+    if (tier.id === 'enterprise') return ['Custom', ''];
+    return [`$${proPrice.toLocaleString('en-US')}`, '/mo'];
+  };
+  const sub = (tier) => {
+    if (tier.id === 'professional') {
+      return annual
+        ? `Billed $${(b.annual * 12).toLocaleString('en-US')} yearly. From $${perUser} per user per month.`
+        : `Billed monthly. From $${perUser} per user per month.`;
+    }
+    if (tier.id === 'free') return 'Free forever. No credit card required.';
+    return 'For teams above 5,000 users or special requirements.';
+  };
+  const href = (tier) => {
+    if (session && tier.id === 'professional') return '/dashboard/upgrade';
+    if (session && tier.id === 'free') return '/dashboard';
+    return tier.href;
+  };
+
+  return (
+    <>
+      <div className="billing" role="group" aria-label="Billing period">
+        <button type="button" aria-pressed={!annual} onClick={() => setAnnual(false)}>Monthly</button>
+        <button type="button" aria-pressed={annual} onClick={() => setAnnual(true)}>Annual <span className="save">save about 10%</span></button>
+      </div>
+      <div className="plans">
+        {pricingTiers.map((tier) => {
+          const [amount, period] = price(tier);
+          const to = href(tier);
+          const cls = `btn ${tier.highlight ? 'btn-gold' : 'btn-line'}`;
+          return (
+            <article key={tier.id} className={`plan${tier.highlight ? ' feature' : ''}`}>
+              <p className="eyebrow">{tier.name}</p>
+              <p className="plan-desc">{tier.description}</p>
+              <p className="amount">{amount}{period && <small>{period}</small>}</p>
+              <p className="plan-sub">{sub(tier)}</p>
+              {tier.id === 'professional' && (
+                <div className="bands">
+                  <p id="band-label">How many people are on your team?</p>
+                  <div role="radiogroup" aria-labelledby="band-label">
+                    {professionalPricing.map((pb, i) => (
+                      <button key={pb.label} type="button" role="radio" aria-checked={i === bandIdx} onClick={() => setBandIdx(i)}>
+                        {pb.label}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="bands-note">Users per band. More than 5,000 users? Enterprise is for you.</p>
+                </div>
+              )}
+              <ul className="ticks">
+                {tier.features.map((f) => <li key={f}>{f}</li>)}
+              </ul>
+              <div className="plan-cta">
+                {to.startsWith('/') ? <Link className={cls} to={to}>{tier.cta}</Link> : <a className={cls} href={to}>{tier.cta}</a>}
+              </div>
+            </article>
+          );
+        })}
+      </div>
+    </>
+  );
+}
 
 export default function HomePage() {
-  const [isAnnual, setIsAnnual] = useState(true);
+  const { session } = useAuth() || {};
   const location = useLocation();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const closeMenu = () => setMenuOpen(false);
 
-  // Scroll to section if hash is present
+  // Deep links such as /#pricing from other pages scroll to the section.
   useEffect(() => {
-    if (location.hash) {
-      const id = location.hash.replace('#', '');
-      const element = document.getElementById(id);
-      if (element) {
-        // Timeout to ensure DOM is ready and layout is stable
-        setTimeout(() => {
-          element.scrollIntoView({ behavior: 'smooth' });
-        }, 100);
-      }
-    }
+    if (!location.hash) return undefined;
+    const t = setTimeout(() => {
+      document.getElementById(location.hash.slice(1))?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+    return () => clearTimeout(t);
   }, [location]);
 
   return (
-    <div className="min-h-screen bg-[#1a1a2e] text-white overflow-x-hidden font-sans">
+    <div className="hse-home">
       <Helmet>
-        <title>Petrolord HSE - Free Integrated Health, Safety & Environment Platform</title>
-        <meta name="description" content="The comprehensive, free HSSE management platform for the modern energy enterprise. Track incidents, manage risks, and ensure compliance." />
+        <title>Petrolord HSE | Health, safety, security and environment in one place</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="theme-color" content="#0C1F16" />
+        <meta
+          name="description"
+          content="Incident reporting, risk assessment, work permits, audits, contractor safety and environmental compliance for the whole workforce. Free forever with unlimited users, with a Professional plan as your team grows."
+        />
       </Helmet>
 
-      <PublicNavbar />
+      <a className="skip" href="#main">Skip to content</a>
 
-      {/* HERO SECTION */}
-      <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden">
-        {/* Background Gradient */}
-        <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 opacity-20 pointer-events-none">
-           <div className="absolute top-[-10%] right-[-5%] w-[600px] h-[600px] rounded-full bg-emerald-500/30 blur-[120px]" />
-           <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-blue-600/20 blur-[100px]" />
-        </div>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-          <motion.div initial={{
-          opacity: 0,
-          y: 20
-        }} animate={{
-          opacity: 1,
-          y: 0
-        }} transition={{
-          duration: 0.6
-        }}>
-            <span className="inline-block py-1 px-3 rounded-full bg-[#FFC107]/10 border border-[#FFC107]/20 text-[#FFC107] text-sm font-bold mb-6 tracking-wide uppercase">100% FREE TO START</span>
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-white mb-6 leading-tight">
-              Integrated HSSE Management <br className="hidden md:block" />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">
-                for the Modern Energy Enterprise
-              </span>
-            </h1>
-            <p className="mt-4 max-w-2xl mx-auto text-xl text-[#b0b0c0] mb-10">
-              Petrolord HSE is the complete digital platform to manage health, safety, security, and environment workflows. Build a safer, more compliant future today.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Link to="/signup">
-                <Button className="h-14 px-8 text-lg bg-[#FFC107] hover:bg-[#FFD54F] text-[#1a1a2e] font-bold rounded-full shadow-[0_0_20px_rgba(255,193,7,0.3)] hover:shadow-[0_0_30px_rgba(255,193,7,0.5)] transition-all transform hover:-translate-y-1">
-                  Get Started Free
-                </Button>
-              </Link>
-            </div>
-            
-            <div className="mt-8"></div> 
-
-          </motion.div>
-        </div>
-        
-        {/* Abstract Hero Image Representation */}
-        <div className="mt-16 mx-auto max-w-6xl px-4 relative">
-            <div className="rounded-xl bg-[#1f1f35] border border-[#3a3a5a] p-2 shadow-2xl shadow-black/50 overflow-hidden">
-                <img 
-                  src="https://horizons-cdn.hostinger.com/b49b4b29-7343-48e8-91d9-c4b871e9bda0/046754b00008ad42902396493cf91e75.png" 
-                  alt="Petrolord HSE Dashboard Interface" 
-                  className="w-full h-auto rounded-lg opacity-90" 
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a2e] via-transparent to-transparent opacity-40"></div>
-            </div>
-        </div>
-      </section>
-
-      {/* FEATURES SECTION - Added scroll-mt-24 for header offset */}
-      <section id="features" className="py-24 bg-[#151525] scroll-mt-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Enterprise-Grade Features</h2>
-            <p className="text-[#b0b0c0] max-w-2xl mx-auto">Everything you need to manage safety, compliance, and risk in one unified platform.</p>
+      <header className="site">
+        <div className="wrap nav">
+          <Link className="brand" to="/" aria-label="Petrolord HSE home">
+            <img className="wordmark" src={WORDMARK} alt="Petrolord HSE" width="979" height="108" />
+          </Link>
+          <nav className="links" aria-label="Main">
+            {NAV.map(([href, label]) => <a key={href} href={href}>{label}</a>)}
+          </nav>
+          <div className="nav-cta">
+            {session ? (
+              <Link className="btn btn-gold" to="/dashboard">Dashboard</Link>
+            ) : (
+              <>
+                <Link className="login" to="/login">Log in</Link>
+                <Link className="btn btn-gold" to="/signup">Get started free</Link>
+              </>
+            )}
+            <button
+              type="button"
+              className="menu-btn"
+              aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={menuOpen}
+              aria-controls="hse-mobile-menu"
+              onClick={() => setMenuOpen((o) => !o)}
+            >
+              {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
           </div>
+        </div>
+        <nav id="hse-mobile-menu" className={`mobile-menu${menuOpen ? ' open' : ''}`} aria-label="Mobile">
+          {NAV.map(([href, label]) => <a key={href} href={href} onClick={closeMenu}>{label}</a>)}
+          {!session && <Link to="/login" onClick={closeMenu}>Log in</Link>}
+        </nav>
+      </header>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {features.map((feature, idx) => (
-              <motion.div key={idx} whileHover={{ y: -5 }} className="bg-[#1f1f35] p-8 rounded-xl border border-[#3a3a5a] hover:border-emerald-500/50 hover:shadow-lg hover:shadow-emerald-900/20 transition-all group h-full flex flex-col">
-                <div className="h-12 w-12 rounded-lg bg-emerald-500/10 flex items-center justify-center mb-6 group-hover:bg-emerald-500/20 transition-colors">
-                  <feature.icon className="h-6 w-6 text-emerald-400" />
-                </div>
-                <h3 className="text-xl font-bold text-white mb-3">{feature.title}</h3>
-                <p className="text-[#b0b0c0] mb-6 leading-relaxed flex-grow">{feature.description}</p>
-                <Link to={`/benefits/${feature.slug}`} className="text-emerald-400 font-semibold text-sm flex items-center hover:gap-2 transition-all mt-auto">
-                  Learn More <ArrowRight className="ml-1 h-4 w-4" />
+      <main id="main">
+        <section className="hero">
+          <div className="wrap hero-grid">
+            <div>
+              <p className="eyebrow">Petrolord HSE</p>
+              <h1>Health, safety, security and environment, <em>in one place for the whole workforce.</em></h1>
+              <p className="lede">
+                Petrolord HSE is the digital platform for your health, safety, security and environment workflows,
+                from the first observation on site to the audit report. Built for the modern energy enterprise.
+              </p>
+              <div className="ctas">
+                {session ? (
+                  <Link className="btn btn-gold" to="/dashboard">Open your dashboard <ArrowRight className="w-4 h-4" /></Link>
+                ) : (
+                  <Link className="btn btn-gold" to="/signup">Get started free <ArrowRight className="w-4 h-4" /></Link>
+                )}
+                <a className="btn btn-ghost" href="#pricing">See plans and pricing</a>
+              </div>
+              <p className="fine">Free forever with unlimited users. No credit card needed.</p>
+            </div>
+            <HseWindow />
+          </div>
+          <div className="ledger">
+            <ul className="wrap" aria-label="Petrolord HSE at a glance">
+              <li><strong>Free</strong><span>forever, with unlimited users on every plan</span></li>
+              <li><strong>4</strong><span>disciplines: health, safety, security and environment</span></li>
+              <li><strong>{professionalPricing.length}</strong><span>team size bands on the Professional plan</span></li>
+              <li><strong>0</strong><span>software to install. It runs in the browser</span></li>
+            </ul>
+          </div>
+        </section>
+
+        <section className="block cat-bg" id="features">
+          <div className="wrap">
+            <div className="head">
+              <p className="eyebrow">Features</p>
+              <h2>Everything your safety programme runs on.</h2>
+              <p>Manage safety, compliance and risk in one platform. Choose a feature to see how it works.</p>
+            </div>
+            <div className="card-grid">
+              {FEATURES.map((f) => (
+                <Link className="card" key={f.slug} to={`/benefits/${f.slug}`}>
+                  <h3>{f.title}</h3>
+                  <p>{f.body}</p>
+                  <span className="go">Learn more <ArrowRight className="w-3.5 h-3.5" /></span>
                 </Link>
-              </motion.div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* BENEFITS SECTION - Added scroll-mt-24 */}
-      <section id="benefits" className="py-24 bg-[#1a1a2e] relative overflow-hidden scroll-mt-24">
-        {/* Decorative background element */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-emerald-500/5 blur-[120px] rounded-full pointer-events-none" />
-        
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">Why Choose Petrolord HSE?</h2>
-            <p className="text-[#b0b0c0] max-w-2xl mx-auto text-lg">
-              10 reasons to run your safety program on a platform built for the energy industry.
-            </p>
+        <section className="block" id="benefits">
+          <div className="wrap">
+            <div className="head">
+              <p className="eyebrow">Why Petrolord HSE</p>
+              <h2>Built for the people who keep the site safe.</h2>
+              <p>A safety programme works when everyone can take part and every report leads somewhere.</p>
+            </div>
+            <ol className="pillars">
+              {PILLARS.map((p, i) => (
+                <li key={p.title}><span className="n">{String(i + 1).padStart(2, '0')}</span><h3>{p.title}</h3><p>{p.body}</p></li>
+              ))}
+            </ol>
           </div>
+        </section>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
-            {benefits.map((item, i) => (
-              <motion.div 
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1, duration: 0.5 }}
-                className="group"
-              >
-                <Card className="h-full bg-[#1f1f35]/80 backdrop-blur-sm border-2 border-[#3a3a5a] hover:border-[#FFC107] transition-all duration-300 hover:shadow-xl hover:shadow-[#FFC107]/10 hover:-translate-y-1">
-                  <CardContent className="p-6 flex flex-col h-full">
-                    <div className="flex justify-between items-start mb-4">
-                      <div className="p-3 rounded-lg bg-[#FFC107]/10 text-[#FFC107] group-hover:bg-[#FFC107] group-hover:text-[#1a1a2e] transition-colors duration-300">
-                        <item.icon className="h-6 w-6" />
-                      </div>
-                      {item.highlight && (
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-full border border-emerald-400/20">
-                          {item.highlight}
-                        </span>
-                      )}
-                    </div>
-                    
-                    <h3 className="text-lg font-bold text-white mb-3 leading-tight group-hover:text-[#FFC107] transition-colors">
-                      {item.title}
-                    </h3>
-                    
-                    <p className="text-[#9ca3af] text-sm leading-relaxed flex-grow">
-                      {item.desc}
-                    </p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
+        <section className="block cat-bg" id="start">
+          <div className="wrap">
+            <div className="head">
+              <p className="eyebrow">How it works</p>
+              <h2>Up and running in minutes.</h2>
+              <p>No complex setup and no credit card. Just effective safety management.</p>
+            </div>
+            <ol className="steps">
+              {STEPS.map((s, i) => (
+                <li key={s.title}><span className="n">Step {i + 1}</span><h3>{s.title}</h3><p>{s.body}</p></li>
+              ))}
+            </ol>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* HOW IT WORKS */}
-      <section className="py-24 bg-[#151525]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Get Started in Minutes</h2>
-            <p className="text-[#b0b0c0]">No complex setup. No credit card. Just effective safety management.</p>
+        <section className="block price-sec" id="pricing">
+          <div className="wrap">
+            <div className="head">
+              <p className="eyebrow">Pricing</p>
+              <h2>Start free. <em>Upgrade as your team grows.</em></h2>
+              <p>Start free with unlimited users, and upgrade for advanced compliance and automation. Prices are in US dollars and scale with your team size.</p>
+            </div>
+            <Plans session={session} />
+            <div className="plan-foot">
+              <p>Professional plans are bought and renewed online by card or bank transfer. Compare every feature, plan by plan, on the full pricing page.</p>
+              <Link className="btn btn-gold" to="/pricing">Compare all features <ArrowRight className="w-4 h-4" /></Link>
+            </div>
           </div>
+        </section>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 relative">
-            {[{
-            title: "Sign Up Free",
-            desc: "Create account in minutes, no credit card needed.",
-            icon: Users
-          }, {
-            title: "Configure Org",
-            desc: "Set up teams, roles, and safety parameters.",
-            icon: Database
-          }, {
-            title: "Start Tracking",
-            desc: "Log incidents, observations, and metrics.",
-            icon: CheckCircle2
-          }, {
-            title: "Gain Insights",
-            desc: "Access real-time dashboards and reports.",
-            icon: BarChart3
-          }].map((step, i) => <div key={i} className="relative flex flex-col items-center text-center">
-                <div className="h-16 w-16 rounded-full bg-[#252541] border border-[#3a3a5a] flex items-center justify-center mb-6 z-10 relative">
-                  <step.icon className="h-8 w-8 text-emerald-400" />
-                  <div className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-[#FFC107] text-[#1a1a2e] font-bold text-sm flex items-center justify-center">
-                    {i + 1}
-                  </div>
-                </div>
-                <h3 className="text-lg font-bold text-white mb-2">{step.title}</h3>
-                <p className="text-[#7a7a9a] text-sm">{step.desc}</p>
-                {i < 3 && <div className="hidden md:block absolute top-8 left-1/2 w-full h-[2px] bg-[#3a3a5a] -z-0" />}
-              </div>)}
+        <section className="block" id="family">
+          <div className="wrap">
+            <div className="head">
+              <p className="eyebrow">The Petrolord family</p>
+              <h2>Part of one platform for the energy enterprise.</h2>
+              <p>Your HSE sign-in and organisation work across Petrolord, so the whole team can grow into the rest of the family.</p>
+            </div>
+            <div className="family">
+              <article className="suite">
+                <p className="eyebrow">Petrolord Suite</p>
+                <h3>Engineering software for the whole energy asset.</h3>
+                <p>The digital operating system for the modern energy enterprise, connecting subsurface intelligence, operational efficiency and commercial strategy.</p>
+                <div className="actions"><a className="btn btn-gold" href={SUITE_URL}>Explore the Suite <ArrowRight className="w-4 h-4" /></a></div>
+              </article>
+              <article className="ng">
+                <p className="eyebrow">NextGen Academy</p>
+                <h3>Learn on the same apps you will work with.</h3>
+                <p>Hands-on energy courses taught inside the Petrolord Suite, from geoscience to HSE, with certificates anyone can verify.</p>
+                <div className="actions"><a className="btn btn-primary" href={NEXTGEN_URL}>Visit NextGen Academy <ArrowRight className="w-4 h-4" /></a></div>
+              </article>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* PRICING SECTION - Added scroll-mt-24 */}
-      <section id="pricing" className="py-24 bg-[#1a1a2e] relative overflow-hidden scroll-mt-24">
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5"></div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Flexible Plans for Every Safety Culture</h2>
-            <p className="text-[#b0b0c0]">Start for free with unlimited users. Upgrade for advanced compliance and automation. Prices are in USD and scale with your team size.</p>
+        <section className="block flush" id="faq">
+          <div className="wrap faq-wrap">
+            <div className="head">
+              <p className="eyebrow">Questions</p>
+              <h2>Frequently asked questions.</h2>
+            </div>
+            <div className="faq">
+              {FAQS.map((f) => (
+                <details key={f.q}>
+                  <summary>{f.q}</summary>
+                  <p>{f.a}</p>
+                </details>
+              ))}
+            </div>
           </div>
+        </section>
 
-          <PricingToggle isAnnual={isAnnual} setIsAnnual={setIsAnnual} />
-          
-          <div className="mt-8">
-            <PricingCards isAnnual={isAnnual} />
+        <section className="block final" id="contact">
+          <div className="wrap">
+            <p className="eyebrow">Start today</p>
+            <h2>Build a safer workplace, <em>starting today.</em></h2>
+            <p>Free to start and ready in minutes. Bring your whole workforce into the safety culture.</p>
+            <div className="ctas">
+              {session ? (
+                <Link className="btn btn-gold" to="/dashboard">Open your dashboard</Link>
+              ) : (
+                <Link className="btn btn-gold" to="/signup">Get started free</Link>
+              )}
+              <a className="btn btn-ghost" href={`mailto:${SUPPORT_EMAIL}?subject=Petrolord%20HSE%20enquiry`}>Talk to us</a>
+            </div>
+            <p className="contact-line"><a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a> · <a href={SUITE_URL}>petrolord.com</a></p>
           </div>
+        </section>
+      </main>
 
-          <div className="text-center mt-12">
-            <Link to="/pricing" className="text-[#FFC107] hover:text-[#FFD54F] font-semibold text-lg flex items-center justify-center gap-2 transition-colors">
-              See detailed feature comparison <ArrowRight className="h-5 w-5" />
+      <footer className="foot">
+        <div className="wrap foot-grid">
+          <div>
+            <Link className="brand" to="/" aria-label="Petrolord HSE home">
+              <img className="wordmark" src={WORDMARK} alt="Petrolord HSE" width="979" height="108" />
             </Link>
+            <p>The HSE component of the digital operating system for the modern energy enterprise. A Lordsway Energy company.</p>
           </div>
+          <FooterCol title="Product">
+            <a href="#features">Features</a>
+            <a href="#benefits">Why HSE</a>
+            <a href="#pricing">Pricing</a>
+            <Link to="/pricing">Compare plans</Link>
+            <a href="#faq">FAQ</a>
+          </FooterCol>
+          <FooterCol title="Petrolord">
+            <a href={SUITE_URL}>Petrolord Suite</a>
+            <a href={NEXTGEN_URL}>NextGen Academy</a>
+          </FooterCol>
+          <FooterCol title="Legal">
+            <Link to="/privacy-policy">Privacy Policy</Link>
+            <Link to="/terms-of-service">Terms of Service</Link>
+            <Link to="/security">Security</Link>
+          </FooterCol>
+          <FooterCol title="Contact">
+            <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>
+            <a href={SUITE_URL}>petrolord.com</a>
+          </FooterCol>
         </div>
-      </section>
-
-      {/* PETROLORD SUITE */}
-      <section className="py-20 bg-gradient-to-br from-[#1f1f35] to-[#151525] border-y border-[#3a3a5a]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 mb-4 opacity-70">
-             <Globe className="h-5 w-5 text-emerald-400" />
-             <span className="text-emerald-400 font-semibold tracking-wider text-sm uppercase">Part of the Ecosystem</span>
-          </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">The Petrolord Suite</h2>
-          <p className="text-xl text-[#b0b0c0] max-w-3xl mx-auto mb-10">
-            The Digital Operating System for the Modern Energy Enterprise. Connecting subsurface intelligence, operational efficiency, and commercial strategy.
-          </p>
-          <a href="https://petrolord.com" target="_blank" rel="noopener noreferrer">
-            <Button variant="outline" className="border-emerald-500 text-emerald-400 hover:bg-emerald-500/10 px-8 py-6 text-lg h-auto">
-              Explore the Full Suite <ChevronRight className="ml-2 h-5 w-5" />
-            </Button>
-          </a>
+        <div className="wrap foot-bottom">
+          <span>© {new Date().getFullYear()} Lordsway Energy. All rights reserved.</span>
         </div>
-      </section>
+      </footer>
+    </div>
+  );
+}
 
-      {/* FAQ SECTION - Added scroll-mt-24 */}
-      <section id="faq" className="py-24 bg-[#1a1a2e] scroll-mt-24">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-white mb-4">Frequently Asked Questions</h2>
-          </div>
-          <Accordion type="single" collapsible className="w-full space-y-4">
-            {faqs.map((item, i) => <AccordionItem key={i} value={`item-${i}`} className="border border-[#3a3a5a] rounded-lg bg-[#1f1f35] px-4">
-                <AccordionTrigger className="text-white hover:no-underline hover:text-emerald-400 text-left">
-                  {item.q}
-                </AccordionTrigger>
-                <AccordionContent className="text-[#b0b0c0]">
-                  {item.a}
-                </AccordionContent>
-              </AccordionItem>)}
-          </Accordion>
-        </div>
-      </section>
-
-      {/* FINAL CTA */}
-      <section className="py-24 bg-[#151525] relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-emerald-500/10 blur-[100px] rounded-full pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-blue-500/10 blur-[100px] rounded-full pointer-events-none" />
-        
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">Ready to Transform Your HSSE Management?</h2>
-          <p className="text-xl text-[#b0b0c0] mb-10">
-            Join the safety professionals using Petrolord HSE to build a safer workplace. Free to start, ready in minutes.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/signup">
-              <Button className="h-16 px-10 text-xl bg-[#FFC107] hover:bg-[#FFD54F] text-[#1a1a2e] font-bold rounded-full shadow-xl">
-                Get Started Free Now
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      <PublicFooter />
+function FooterCol({ title, children }) {
+  return (
+    <div className="foot-col">
+      <h2>{title}</h2>
+      {children}
     </div>
   );
 }
