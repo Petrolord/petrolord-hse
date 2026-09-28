@@ -124,39 +124,41 @@ export default function MyProfileTab() {
     }
   };
 
-  if (loading) return <div className="flex justify-center p-12"><Loader2 className="h-8 w-8 animate-spin text-[var(--accent)]" /></div>;
+  if (loading) return <div className="flex justify-center p-12"><Loader2 className="h-8 w-8 animate-spin text-pl-primary" aria-label="Loading profile" /></div>;
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 text-pl-text">
       
       {/* Left Column: Basic Info & Avatar */}
       <div className="lg:col-span-2 space-y-6">
-        <Card className="bg-[var(--bg-card)] border-[var(--border-color)]">
+        <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2"><User className="h-5 w-5 text-[var(--accent)]"/> Personal Information</CardTitle>
+            <CardTitle className="flex items-center gap-2"><User className="h-5 w-5 text-pl-muted" aria-hidden="true"/> Personal Information</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="flex items-center gap-6">
-              <div className="relative group h-24 w-24 rounded-full overflow-hidden bg-[var(--bg-app)] border-2 border-[var(--border-color)] flex items-center justify-center">
+            <div className="flex flex-wrap items-center gap-4 sm:gap-6">
+              <div className="relative group h-24 w-24 shrink-0 rounded-full overflow-hidden bg-pl-sunken border-2 border-pl-border flex items-center justify-center">
                 {profile.avatar_url ? (
                   <img src={profile.avatar_url} alt="Profile" className="h-full w-full object-cover" />
                 ) : (
-                  <User className="h-10 w-10 opacity-50" />
+                  <User className="h-10 w-10 text-pl-muted" aria-hidden="true" />
                 )}
-                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity cursor-pointer">
+                <div className="absolute inset-0 bg-pl-surface/85 text-pl-text opacity-0 group-hover:opacity-100 focus-within:opacity-100 flex items-center justify-center transition-opacity cursor-pointer">
                   <label className="cursor-pointer flex flex-col items-center">
-                    <Upload className="h-6 w-6 text-white mb-1" />
-                    <span className="text-[10px] text-white">Change</span>
+                    <Upload className="h-6 w-6 mb-1" aria-hidden="true" />
+                    <span className="text-[10px] font-medium">Change</span>
                     <input type="file" className="hidden" accept="image/*" onChange={handleAvatarUpload} />
                   </label>
                 </div>
               </div>
-              <div>
-                <h3 className="text-lg font-bold">{fullName || 'User'}</h3>
-                <p className="text-[var(--text-secondary)]">{currentUser?.email}</p>
-                <div className="flex gap-2 mt-1">
-                  <span className="text-xs px-2 py-0.5 rounded bg-[var(--accent)]/10 text-[var(--accent)] capitalize">{currentUser?.role?.replace('_', ' ')}</span>
-                </div>
+              <div className="min-w-0">
+                <h3 className="text-lg font-semibold text-pl-text">{fullName || 'User'}</h3>
+                <p className="text-pl-muted break-all">{currentUser?.email}</p>
+                {currentUser?.role && (
+                  <div className="flex gap-2 mt-1">
+                    <span className="text-xs px-2 py-0.5 rounded border border-pl-border bg-pl-sunken text-pl-text capitalize">{currentUser.role.replace('_', ' ')}</span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -171,7 +173,7 @@ export default function MyProfileTab() {
               </div>
               <div className="space-y-2">
                 <Label>Email</Label>
-                <Input value={currentUser?.email} disabled className="opacity-70 bg-[var(--bg-app)]" />
+                <Input value={currentUser?.email} disabled />
               </div>
               <div className="space-y-2">
                 <Label>Phone Number</Label>
@@ -190,13 +192,13 @@ export default function MyProfileTab() {
             </div>
 
             <div className="pt-4 flex justify-end">
-              <Button onClick={handleSave} className="petrolord-button">Save Changes</Button>
+              <Button onClick={handleSave}>Save Changes</Button>
             </div>
           </CardContent>
         </Card>
 
         {/* Notifications */}
-        <Card className="bg-[var(--bg-card)] border-[var(--border-color)]">
+        <Card>
           <CardHeader>
             <CardTitle className="text-lg">Notification Preferences</CardTitle>
           </CardHeader>
@@ -228,12 +230,12 @@ export default function MyProfileTab() {
 
       {/* Right Column: Security & Activity */}
       <div className="space-y-6">
-        <Card className="bg-[var(--bg-card)] border-[var(--border-color)]">
+        <Card>
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2"><Lock className="h-4 w-4"/> Security</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="space-y-3 pb-4 border-b border-[var(--border-color)]">
+            <div className="space-y-3 pb-4 border-b border-pl-border">
               <h4 className="text-sm font-semibold">Change Password</h4>
               <Input 
                 type="password" 
@@ -258,29 +260,29 @@ export default function MyProfileTab() {
               </Button>
             </div>
             
-            <div className="flex items-center justify-between p-3 border border-[var(--border-color)] rounded-lg">
+            <div className="flex items-center justify-between p-3 border border-pl-border rounded-lg">
               <span className="text-sm">Two-Factor Auth</span>
               <Switch checked={profile.two_factor_enabled || false} onCheckedChange={() => toast({ title: 'Not Available', description: '2FA setup requires external provider integration.', variant: 'destructive' })} />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-[var(--bg-card)] border-[var(--border-color)]">
+        <Card>
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2"><Activity className="h-4 w-4"/> Recent Activity</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {logs.length > 0 ? logs.map(log => (
-                <div key={log.id} className="flex gap-3 text-sm border-b border-[var(--border-color)] pb-2 last:border-0">
-                  <div className="mt-1 h-2 w-2 rounded-full bg-[var(--accent)] shrink-0" />
+                <div key={log.id} className="flex gap-3 text-sm border-b border-pl-border pb-2 last:border-0">
+                  <div className="mt-1 h-2 w-2 rounded-full bg-pl-border-strong shrink-0" aria-hidden="true" />
                   <div>
                     <p className="font-medium">{log.action}</p>
-                    <p className="text-xs text-[var(--text-muted)]">{new Date(log.created_at).toLocaleString()}</p>
+                    <p className="text-xs text-pl-muted font-pl-mono tabular-nums">{new Date(log.created_at).toLocaleString()}</p>
                   </div>
                 </div>
               )) : (
-                <p className="text-sm text-[var(--text-muted)]">No recent activity recorded.</p>
+                <p className="text-sm text-pl-muted">No recent activity recorded.</p>
               )}
             </div>
           </CardContent>

@@ -18,8 +18,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { PublicPage, AUTH_COLUMN, AUTH_ICON_TILE, TEXT_LINK } from '@/components/public/PublicPage';
 
-export default function InvitationAcceptance() {
+function InvitationAcceptance() {
   const { token } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -112,7 +113,7 @@ export default function InvitationAcceptance() {
         toast({
           title: "Account Setup Complete!",
           description: "Your account has been created. Please sign in to continue.",
-          className: "bg-green-600 text-white border-none"
+          variant: "success"
         });
 
         // 3. Explicitly Sign Out to enforce "Set Password -> Login" flow
@@ -190,25 +191,25 @@ export default function InvitationAcceptance() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0f172a] flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-[#FFC107]" />
+      <div className={AUTH_COLUMN} role="status" aria-label="Loading invitation">
+        <Loader2 className="h-8 w-8 animate-spin text-pl-primary-text" aria-hidden="true" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#0f172a] flex items-center justify-center p-4">
-        <Card className="w-full max-w-md bg-[#1a1a2e] border-[#3a3a5a] text-white">
+      <div className={AUTH_COLUMN}>
+        <Card className="w-full max-w-md shadow-pl-lg">
           <CardHeader className="text-center">
-            <div className="mx-auto bg-red-500/10 p-3 rounded-full w-fit mb-4">
-              <XCircle className="h-8 w-8 text-red-500" />
+            <div className={`${AUTH_ICON_TILE} bg-pl-danger-bg`}>
+              <XCircle className="h-8 w-8 text-pl-danger-text" aria-hidden="true" />
             </div>
             <CardTitle>Invitation Error</CardTitle>
-            <CardDescription className="text-[#b0b0c0] mt-2">{error}</CardDescription>
+            <CardDescription className="mt-2">{error}</CardDescription>
           </CardHeader>
           <CardFooter className="justify-center">
-            <Button variant="outline" onClick={() => navigate('/login')} className="border-[#3a3a5a] text-white hover:bg-[#3a3a5a]">
+            <Button variant="outline" onClick={() => navigate('/login')}>
               Back to Login
             </Button>
           </CardFooter>
@@ -225,35 +226,29 @@ export default function InvitationAcceptance() {
   const isEmailMatch = currentUser && currentUser.email?.toLowerCase() === invite.email?.toLowerCase();
 
   return (
-    <div className="min-h-screen bg-[#0f172a] flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Background decoration */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
-        <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-[#FFC107]/5 rounded-full blur-3xl"></div>
-      </div>
-
-      <Card className="w-full max-w-md bg-[#1a1a2e] border-[#3a3a5a] text-white z-10 shadow-2xl">
+    <div className={AUTH_COLUMN}>
+      <Card className="w-full max-w-md shadow-pl-lg">
         <CardHeader className="text-center pb-2">
-          <div className="mx-auto bg-[#FFC107]/10 p-3 rounded-full w-fit mb-4">
-            <ShieldCheck className="h-8 w-8 text-[#FFC107]" />
+          <div className={`${AUTH_ICON_TILE} bg-pl-primary/10`}>
+            <ShieldCheck className="h-8 w-8 text-pl-primary-text" aria-hidden="true" />
           </div>
-          <CardTitle className="text-2xl">Team Invitation</CardTitle>
-          <CardDescription className="text-[#b0b0c0] mt-2">
+          <CardTitle className="font-pl-display text-3xl">Team Invitation</CardTitle>
+          <CardDescription className="mt-2">
             You've been invited to join <strong>{invite.organizations?.name}</strong>
           </CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-6">
           {/* Invite Details */}
-          <div className="bg-[#252541] rounded-lg p-4 border border-[#3a3a5a]">
+          <div className="bg-pl-sunken rounded-lg p-4 border border-pl-border">
             <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <p className="text-[#7a7a9a]">Role</p>
-                <p className="font-medium text-white capitalize">{invite.role.replace('_', ' ')}</p>
+              <div className="min-w-0">
+                <p className="text-pl-muted">Role</p>
+                <p className="font-medium text-pl-text capitalize">{invite.role.replace('_', ' ')}</p>
               </div>
-              <div>
-                <p className="text-[#7a7a9a]">Invited As</p>
-                <p className="font-medium text-white">{invite.email}</p>
+              <div className="min-w-0">
+                <p className="text-pl-muted">Invited As</p>
+                <p className="font-medium text-pl-text break-all">{invite.email}</p>
               </div>
             </div>
           </div>
@@ -261,10 +256,10 @@ export default function InvitationAcceptance() {
           {/* === SCENARIO 1: Logged In User (Mismatch) === */}
           {currentUser && !isEmailMatch && (
             <div className="space-y-4">
-              <div className="p-3 bg-yellow-500/10 border border-yellow-500/20 rounded text-sm text-yellow-200">
+              <div role="alert" className="p-3 bg-pl-warning-bg border border-pl-warning/40 rounded text-sm text-pl-warning-text break-words">
                 You are currently logged in as <strong>{currentUser.email}</strong>, but this invite is for <strong>{invite.email}</strong>.
               </div>
-              <Button onClick={handleLogout} variant="outline" className="w-full border-[#3a3a5a] hover:bg-[#252541] text-white">
+              <Button onClick={handleLogout} variant="outline" className="w-full">
                 <LogOut className="mr-2 h-4 w-4" /> Log out to accept
               </Button>
             </div>
@@ -273,11 +268,11 @@ export default function InvitationAcceptance() {
           {/* === SCENARIO 2: Logged In User (Match) === */}
           {currentUser && isEmailMatch && (
             <div className="space-y-4">
-              <p className="text-center text-sm text-[#b0b0c0]">
+              <p className="text-center text-sm text-pl-muted">
                 You are logged in with the correct account. Click below to join.
               </p>
               <Button 
-                className="w-full petrolord-button h-11 text-base font-semibold" 
+                className="w-full h-11 text-base font-semibold" 
                 onClick={handleExistingUserAccept}
                 disabled={processing}
               >
@@ -292,17 +287,17 @@ export default function InvitationAcceptance() {
             <form onSubmit={handleCreateAccountAndAccept} className="space-y-4">
               <div className="space-y-3">
                 <div className="text-center mb-2">
-                  <h3 className="text-lg font-semibold text-white">Set up your account</h3>
-                  <p className="text-xs text-[#b0b0c0]">Create a password to access your workspace</p>
+                  <h3 className="text-lg font-semibold text-pl-text">Set up your account</h3>
+                  <p className="text-xs text-pl-muted">Create a password to access your workspace</p>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-[#b0b0c0]">Email</Label>
+                  <Label htmlFor="email">Email</Label>
                   <Input 
                     id="email" 
                     value={invite.email} 
                     disabled 
-                    className="bg-[#151525] border-[#3a3a5a] text-[#7a7a9a] cursor-not-allowed" 
+                    className="cursor-not-allowed" 
                   />
                 </div>
 
@@ -314,14 +309,15 @@ export default function InvitationAcceptance() {
                       type={showPassword ? "text" : "password"}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="bg-[#151525] border-[#3a3a5a] text-white pr-10 focus:ring-[#FFC107]"
+                      className="pr-10"
                       placeholder="Min. 8 characters"
                       required
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-3 text-[#7a7a9a] hover:text-white"
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                      className="absolute right-3 top-3 rounded-sm text-pl-muted hover:text-pl-text"
                     >
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
@@ -335,7 +331,7 @@ export default function InvitationAcceptance() {
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="bg-[#151525] border-[#3a3a5a] text-white focus:ring-[#FFC107]"
+                    
                     placeholder="Re-enter password"
                     required
                   />
@@ -345,14 +341,14 @@ export default function InvitationAcceptance() {
               <div className="pt-2">
                 <Button 
                   type="submit"
-                  className="w-full petrolord-button h-11 text-base font-semibold" 
+                  className="w-full h-11 text-base font-semibold" 
                   disabled={processing}
                 >
                   {processing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ArrowRight className="mr-2 h-4 w-4" />}
                   Create Account & Join
                 </Button>
-                <p className="text-center text-xs text-[#7a7a9a] mt-3">
-                  Already have an account? <span onClick={() => navigate('/login')} className="text-[#FFC107] hover:underline cursor-pointer">Log in</span>
+                <p className="text-center text-xs text-pl-muted mt-3">
+                  Already have an account? <span onClick={() => navigate('/login')} className={`cursor-pointer ${TEXT_LINK}`}>Log in</span>
                 </p>
               </div>
             </form>
@@ -365,7 +361,7 @@ export default function InvitationAcceptance() {
              <Button 
               variant="ghost" 
               size="sm"
-              className="text-[#7a7a9a] hover:text-red-400 hover:bg-red-900/10 h-8 text-xs"
+              className="text-pl-muted hover:text-pl-danger-text hover:bg-pl-danger-bg h-8 text-xs"
               onClick={() => setShowDeclineDialog(true)}
               disabled={processing}
             >
@@ -376,20 +372,20 @@ export default function InvitationAcceptance() {
       </Card>
 
       <AlertDialog open={showDeclineDialog} onOpenChange={setShowDeclineDialog}>
-        <AlertDialogContent className="bg-[#1a1a2e] border-[#3a3a5a] text-white">
+        <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Decline Invitation?</AlertDialogTitle>
-            <AlertDialogDescription className="text-[#b0b0c0]">
+            <AlertDialogDescription>
               Are you sure you want to decline this invitation? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="border-[#3a3a5a] text-[#b0b0c0] hover:text-white hover:bg-[#3a3a5a]">
+            <AlertDialogCancel>
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleDecline}
-              className="bg-red-600 hover:bg-red-700 text-white"
+              className="bg-pl-danger text-pl-danger-fg hover:bg-pl-danger/90"
             >
               Decline
             </AlertDialogAction>
@@ -397,5 +393,14 @@ export default function InvitationAcceptance() {
         </AlertDialogContent>
       </AlertDialog>
     </div>
+  );
+}
+
+// Batch 3B: the page wraps itself in the public frame (always light, ink brand bar).
+export default function InvitationAcceptancePage() {
+  return (
+    <PublicPage testId="accept-invite-theme-scope">
+      <InvitationAcceptance />
+    </PublicPage>
   );
 }

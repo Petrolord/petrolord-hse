@@ -29,9 +29,9 @@ export default function ColorSection({ settings, setSettings }) {
 
   const ColorInput = ({ label, value, onChange, description }) => (
     <div className="space-y-2">
-      <Label className="text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">{label}</Label>
+      <Label className="text-xs font-medium uppercase tracking-wider text-pl-muted">{label}</Label>
       <div className="flex gap-3 items-center">
-        <div className="relative h-10 w-12 rounded-md overflow-hidden border border-[var(--border-color)] shadow-sm">
+        <div className="relative h-10 w-12 shrink-0 rounded-md overflow-hidden border border-pl-border-strong shadow-sm">
           <Input 
             type="color" 
             value={value || '#000000'}
@@ -42,29 +42,29 @@ export default function ColorSection({ settings, setSettings }) {
         <Input 
            value={value || ''}
            onChange={(e) => onChange(e.target.value)}
-           className="font-mono uppercase bg-[var(--bg-app)] border-[var(--border-color)] h-10"
+           className="font-pl-mono uppercase h-10"
            placeholder="#000000"
         />
       </div>
-      {description && <p className="text-[10px] text-[var(--text-muted)]">{description}</p>}
+      {description && <p className="text-[10px] text-pl-muted">{description}</p>}
     </div>
   );
 
   const colors = settings.branding_config?.colors || {};
 
   return (
-    <Card className="bg-[var(--bg-card)] border-[var(--border-color)]">
+    <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2"><Palette className="h-5 w-5 text-[var(--accent)]"/> Color Palette</CardTitle>
+        <CardTitle className="flex items-center gap-2"><Palette className="h-5 w-5 text-pl-muted" aria-hidden="true"/> Color Palette</CardTitle>
         <CardDescription>Define your brand identity and interface colors.</CardDescription>
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="brand" className="w-full">
-          <TabsList className="bg-[var(--bg-app)] border border-[var(--border-color)] w-full justify-start h-auto p-1 mb-6">
-            <TabsTrigger value="brand" className="data-[state=active]:bg-[var(--bg-card)] py-2">Brand Colors</TabsTrigger>
-            <TabsTrigger value="status" className="data-[state=active]:bg-[var(--bg-card)] py-2">Status & Alerts</TabsTrigger>
-            <TabsTrigger value="light" className="data-[state=active]:bg-[var(--bg-card)] py-2"><Sun className="w-3 h-3 mr-2"/>Light Mode</TabsTrigger>
-            <TabsTrigger value="dark" className="data-[state=active]:bg-[var(--bg-card)] py-2"><Moon className="w-3 h-3 mr-2"/>Dark Mode</TabsTrigger>
+          <TabsList className="w-full justify-start h-auto p-1 mb-6 flex-wrap">
+            <TabsTrigger value="brand" className="py-2">Brand Colors</TabsTrigger>
+            <TabsTrigger value="status" className="py-2">Status & Alerts</TabsTrigger>
+            <TabsTrigger value="light" className="py-2"><Sun className="w-3 h-3 mr-2" aria-hidden="true"/>Light Mode</TabsTrigger>
+            <TabsTrigger value="dark" className="py-2"><Moon className="w-3 h-3 mr-2" aria-hidden="true"/>Dark Mode</TabsTrigger>
           </TabsList>
 
           <TabsContent value="brand" className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-in fade-in-50">

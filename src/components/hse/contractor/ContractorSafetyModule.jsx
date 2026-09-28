@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useHSE } from '@/context/HSEContext';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { moduleTabTriggerClass } from '@/components/petrolord/common/ui';
 import { 
   LayoutDashboard, Users, FileCheck, ClipboardList, AlertTriangle, 
   GraduationCap, Award, Shield, Briefcase 
@@ -23,23 +24,23 @@ export default function ContractorSafetyModule() {
   if (!currentOrganization) return null;
 
   return (
-    <div className="flex flex-col h-[calc(100vh-64px)] bg-[var(--bg-app)] overflow-hidden">
+    <div className="flex flex-col h-[calc(100vh-64px)] bg-pl-bg text-pl-text overflow-hidden">
       {/* Module Header & Navigation */}
-      <div className="bg-[#1a1a2e] border-b border-[#3a3a5a] pt-4 px-6 flex-shrink-0">
+      <div className="bg-pl-surface border-b border-pl-border pt-4 px-4 sm:px-6 flex-shrink-0">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-              <Shield className="h-6 w-6 text-blue-500" />
+            <h1 className="font-pl-display text-2xl font-semibold text-pl-text flex items-center gap-2">
+              <Shield className="h-6 w-6 text-pl-muted shrink-0" aria-hidden="true" />
               Contractor Safety Management
             </h1>
-            <p className="text-sm text-[#7a7a9a]">
+            <p className="text-sm text-pl-muted">
               Manage contractor compliance, inductions, and performance.
             </p>
           </div>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="bg-transparent border-b-0 h-auto p-0 space-x-6 w-full overflow-x-auto justify-start no-scrollbar">
+          <TabsList className="h-auto justify-start gap-6 rounded-none border-0 bg-transparent p-0 w-full overflow-x-auto flex-nowrap no-scrollbar">
             <TabItem value="dashboard" icon={LayoutDashboard} label="Dashboard" />
             <TabItem value="contractors" icon={Users} label="Contractors" />
             <TabItem value="inductions" icon={FileCheck} label="Inductions" />
@@ -71,9 +72,9 @@ function TabItem({ value, icon: Icon, label }) {
   return (
     <TabsTrigger 
       value={value} 
-      className="data-[state=active]:border-b-2 data-[state=active]:border-blue-500 data-[state=active]:text-blue-400 rounded-none bg-transparent px-2 py-3 text-[#7a7a9a] hover:text-white transition-all flex items-center gap-2 min-w-fit"
+      className={`${moduleTabTriggerClass} py-3 min-w-fit`}
     >
-      <Icon className="h-4 w-4" /> {label}
+      <Icon className="h-4 w-4" aria-hidden="true" /> {label}
     </TabsTrigger>
   );
 }

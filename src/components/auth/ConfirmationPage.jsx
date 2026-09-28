@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { PublicPage, AUTH_CARD, AUTH_COLUMN, AUTH_ICON_TILE, AUTH_TITLE } from '@/components/public/PublicPage';
 
 const ConfirmationPage = () => {
   const navigate = useNavigate();
@@ -27,26 +28,26 @@ const ConfirmationPage = () => {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen bg-[#1a1a2e] flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-[#252541]/90 rounded-lg p-8 shadow-xl text-center border border-emerald-500/30 animate-in fade-in zoom-in-95">
-        <div className="mx-auto w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mb-6">
-          <CheckCircle className="h-10 w-10 text-emerald-400" />
+    <div className={AUTH_COLUMN}>
+      <div className={`w-full max-w-md text-center animate-in fade-in zoom-in-95 ${AUTH_CARD}`}>
+        <div className={`${AUTH_ICON_TILE} bg-pl-success-bg`}>
+          <CheckCircle className="h-8 w-8 text-pl-success-text" aria-hidden="true" />
         </div>
-        
-        <h2 className="text-2xl font-bold text-white mb-2">Account Created!</h2>
-        <p className="text-[#b0b0c0] mb-6">
+
+        <h1 className={`${AUTH_TITLE} mb-2`}>Account Created!</h1>
+        <p className="text-pl-muted mb-6">
           Your organization has been set up. You can now sign in to the Petrolord Platform with your new password.
         </p>
-        
+
         <div className="space-y-4">
-          <div className="text-sm text-[#7a7a9a] flex items-center justify-center gap-2">
-            <Loader2 className="h-4 w-4 animate-spin text-[#FFC107]" />
-            Redirecting to login in {countdown} seconds...
+          <div className="text-sm text-pl-muted flex items-center justify-center gap-2" role="status">
+            <Loader2 className="h-4 w-4 animate-spin text-pl-primary-text" aria-hidden="true" />
+            <span>Redirecting to login in <span className="font-pl-mono tabular-nums">{countdown}</span> seconds...</span>
           </div>
-          
-          <Button 
+
+          <Button
             onClick={() => navigate('/login')}
-            className="w-full bg-[#FFC107] hover:bg-[#ffb300] text-black font-semibold"
+            className="w-full h-11 font-semibold"
           >
             Go to Login Now
           </Button>
@@ -56,4 +57,11 @@ const ConfirmationPage = () => {
   );
 };
 
-export default ConfirmationPage;
+// Batch 3B: the page wraps itself in the public frame (always light, ink brand bar).
+const ConfirmationPageFrame = () => (
+  <PublicPage testId="confirmation-theme-scope">
+    <ConfirmationPage />
+  </PublicPage>
+);
+
+export default ConfirmationPageFrame;

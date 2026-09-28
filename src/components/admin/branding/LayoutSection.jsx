@@ -24,9 +24,9 @@ export default function LayoutSection({ settings, setSettings }) {
   const layout = settings.branding_config?.layout || { borderRadius: 8, shadowIntensity: 0.5, spacingScale: 1.0 };
 
   return (
-    <Card className="bg-[var(--bg-card)] border-[var(--border-color)]">
+    <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2"><Layout className="h-5 w-5 text-[var(--accent)]"/> Layout & Components</CardTitle>
+        <CardTitle className="flex items-center gap-2"><Layout className="h-5 w-5 text-pl-muted" aria-hidden="true"/> Layout & Components</CardTitle>
         <CardDescription>Fine-tune component appearances and spacing.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-8">
@@ -35,7 +35,7 @@ export default function LayoutSection({ settings, setSettings }) {
         <div className="space-y-4">
           <div className="flex justify-between">
             <Label>Border Radius</Label>
-            <span className="text-xs font-mono text-[var(--text-muted)]">{layout.borderRadius}px</span>
+            <span className="text-xs font-pl-mono tabular-nums text-pl-muted">{layout.borderRadius}px</span>
           </div>
           <Slider 
             value={[layout.borderRadius || 8]} 
@@ -45,7 +45,7 @@ export default function LayoutSection({ settings, setSettings }) {
             onValueChange={(v) => updateLayout('borderRadius', v)} 
             className="py-2"
           />
-          <div className="flex justify-between text-[10px] text-[var(--text-muted)]">
+          <div className="flex justify-between text-[10px] text-pl-muted">
             <span>Square (0px)</span>
             <span>Round (30px)</span>
           </div>
@@ -55,7 +55,7 @@ export default function LayoutSection({ settings, setSettings }) {
         <div className="space-y-4">
           <div className="flex justify-between">
             <Label>Shadow Intensity</Label>
-            <span className="text-xs font-mono text-[var(--text-muted)]">{layout.shadowIntensity}</span>
+            <span className="text-xs font-pl-mono tabular-nums text-pl-muted">{layout.shadowIntensity}</span>
           </div>
           <Slider 
             value={[layout.shadowIntensity || 0.5]} 
@@ -65,7 +65,7 @@ export default function LayoutSection({ settings, setSettings }) {
             onValueChange={(v) => updateLayout('shadowIntensity', v)}
             className="py-2"
           />
-          <div className="flex justify-between text-[10px] text-[var(--text-muted)]">
+          <div className="flex justify-between text-[10px] text-pl-muted">
             <span>Flat</span>
             <span>Floating</span>
           </div>
@@ -75,7 +75,7 @@ export default function LayoutSection({ settings, setSettings }) {
         <div className="space-y-4">
           <div className="flex justify-between">
             <Label>Spacing Density</Label>
-            <span className="text-xs font-mono text-[var(--text-muted)]">{layout.spacingScale}x</span>
+            <span className="text-xs font-pl-mono tabular-nums text-pl-muted">{layout.spacingScale}x</span>
           </div>
           <Slider 
             value={[layout.spacingScale || 1.0]} 
@@ -85,7 +85,7 @@ export default function LayoutSection({ settings, setSettings }) {
             onValueChange={(v) => updateLayout('spacingScale', v)}
             className="py-2"
           />
-          <div className="flex justify-between text-[10px] text-[var(--text-muted)]">
+          <div className="flex justify-between text-[10px] text-pl-muted">
             <span>Compact (0.7x)</span>
             <span>Spacious (1.5x)</span>
           </div>

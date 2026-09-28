@@ -4,6 +4,8 @@ import { trainingService } from '@/services/trainingService';
 import { supabase } from '@/lib/customSupabaseClient';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { EMPTY, moduleTabTriggerClass, tableBodyClass, tableRowClass } from '@/components/petrolord/common/ui';
 import { Plus, BookOpen, Calendar, Award, CheckSquare, LayoutDashboard } from 'lucide-react';
 import TrainingProgramFilters from './TrainingProgramFilters';
 import NewTrainingProgramModal from './NewTrainingProgramModal';
@@ -11,18 +13,18 @@ import TrainingCompetencyDashboard from './TrainingCompetencyDashboard';
 
 // Inline simplified list components for immediate visibility
 const GenericTable = ({ data, columns, emptyMessage }) => (
-  <div className="flex-1 overflow-auto p-4">
-    <table className="w-full text-sm text-left border-collapse">
-      <thead className="bg-[#1a1a2e] text-[#7a7a9a] uppercase text-xs font-medium sticky top-0 z-10">
-        <tr>{columns.map((c, i) => <th key={i} className="px-6 py-4">{c.header}</th>)}</tr>
+  <div className="h-full overflow-auto p-4">
+    <table className="w-full min-w-[640px] text-sm text-left border-collapse bg-pl-surface border border-pl-border">
+      <thead className="bg-pl-sunken text-pl-muted uppercase text-xs font-medium sticky top-0 z-10">
+        <tr>{columns.map((c, i) => <th key={i} className="px-4 py-3">{c.header}</th>)}</tr>
       </thead>
-      <tbody className="divide-y divide-[#3a3a5a]">
+      <tbody className={tableBodyClass}>
         {data.map((row, i) => (
-          <tr key={row.id || i} className="hover:bg-[#2d2d4a]">
-            {columns.map((c, j) => <td key={j} className="px-6 py-4 text-[#e0e0e0]">{c.render ? c.render(row) : row[c.accessor]}</td>)}
+          <tr key={row.id || i} className={tableRowClass}>
+            {columns.map((c, j) => <td key={j} className="px-4 py-3 text-pl-text">{c.render ? c.render(row) : row[c.accessor]}</td>)}
           </tr>
         ))}
-        {data.length === 0 && <tr><td colSpan={columns.length} className="p-8 text-center text-[#7a7a9a]">{emptyMessage}</td></tr>}
+        {data.length === 0 && <tr><td colSpan={columns.length} className="p-8 text-center text-pl-muted">{emptyMessage}</td></tr>}
       </tbody>
     </table>
   </div>
@@ -60,26 +62,26 @@ export default function TrainingCompetencyModule() {
   useEffect(() => { fetchData(); }, [currentOrganization, activeTab, filters]);
 
   return (
-    <div className="flex h-[calc(100vh-64px)] overflow-hidden bg-[var(--bg-app)]">
+    <div className="flex flex-col md:flex-row h-[calc(100vh-64px)] overflow-hidden bg-pl-bg text-pl-text">
       {activeTab === 'programs' && <TrainingProgramFilters filters={filters} setFilters={setFilters} />}
       
       <div className="flex-1 flex flex-col min-w-0">
-        <div className="flex flex-col border-b border-[#3a3a5a] bg-[#1a1a2e]">
-          <div className="flex items-center justify-between p-4">
-            <h2 className="text-xl font-bold text-white flex items-center gap-2">
-              <BookOpen className="h-6 w-6 text-indigo-500" /> Training & Competency
+        <div className="flex flex-col border-b border-pl-border bg-pl-surface">
+          <div className="flex flex-wrap items-center justify-between gap-3 p-4">
+            <h2 className="font-pl-display text-xl font-semibold text-pl-text flex items-center gap-2">
+              <BookOpen className="h-6 w-6 text-pl-muted shrink-0" aria-hidden="true" /> Training & Competency
             </h2>
             <div className="flex items-center gap-2">
               {activeTab === 'programs' && (
-                <Button className="bg-indigo-600 hover:bg-indigo-700 text-white" size="sm" onClick={() => setModals({ ...modals, newProgram: true })}>
-                  <Plus className="mr-2 h-4 w-4" /> New Program
+                <Button size="sm" onClick={() => setModals({ ...modals, newProgram: true })}>
+                  <Plus className="mr-2 h-4 w-4" aria-hidden="true" /> New Program
                 </Button>
               )}
             </div>
           </div>
           <div className="px-4 pb-0 overflow-x-auto">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="bg-transparent border-b-0 h-auto p-0 space-x-6">
+              <TabsList className="h-auto justify-start gap-6 rounded-none border-0 bg-transparent p-0 flex-nowrap w-max">
                 <TabTrigger value="dashboard" icon={LayoutDashboard} label="Dashboard" />
                 <TabTrigger value="programs" icon={BookOpen} label="Programs" />
                 <TabTrigger value="schedule" icon={Calendar} label="Schedule" />
@@ -91,24 +93,24 @@ export default function TrainingCompetencyModule() {
           </div>
         </div>
 
-        <div className="flex-1 overflow-hidden bg-[var(--bg-app)]">
+        <div className="flex-1 overflow-hidden bg-pl-bg">
           {activeTab === 'dashboard' && <TrainingCompetencyDashboard stats={data.stats} />}
           {activeTab === 'programs' && <GenericTable 
             data={data.programs} 
             emptyMessage="No training programs found."
             columns={[
-              { header: 'ID', accessor: 'program_id' },
+              { header: 'ID', render: r => <span className="font-pl-mono tabular-nums whitespace-nowrap">{r.program_id}</span> },
               { header: 'Name', accessor: 'program_name' },
               { header: 'Category', accessor: 'category' },
-              { header: 'Duration (Hrs)', accessor: 'duration' },
-              { header: 'Status', render: r => <span className={`px-2 py-1 rounded text-xs ${r.status === 'Active' ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'}`}>{r.status}</span> }
+              { header: 'Duration (Hrs)', render: r => <span className="font-pl-mono tabular-nums">{r.duration}</span> },
+              { header: 'Status', render: r => <Badge variant={r.status === 'Active' ? 'success' : 'outline'}>{r.status}</Badge> }
             ]}
           />}
           {activeTab === 'schedule' && <GenericTable 
             data={data.schedule} 
             emptyMessage="No scheduled trainings."
             columns={[
-              { header: 'Date', render: r => new Date(r.scheduled_date).toLocaleDateString() },
+              { header: 'Date', render: r => <span className="font-pl-mono tabular-nums whitespace-nowrap">{new Date(r.scheduled_date).toLocaleDateString()}</span> },
               { header: 'Program', render: r => r.program?.program_name },
               { header: 'Location', render: r => r.location?.name || 'TBD' },
               { header: 'Trainer', render: r => r.trainer?.raw_user_meta_data?.full_name || 'TBD' },
@@ -119,18 +121,18 @@ export default function TrainingCompetencyModule() {
             data={data.records} 
             emptyMessage="No training records."
             columns={[
-              { header: 'Date', render: r => new Date(r.training_date).toLocaleDateString() },
+              { header: 'Date', render: r => <span className="font-pl-mono tabular-nums whitespace-nowrap">{new Date(r.training_date).toLocaleDateString()}</span> },
               { header: 'Employee', render: r => r.employee?.raw_user_meta_data?.full_name || 'Unknown' },
               { header: 'Program', render: r => r.program?.program_name },
               { header: 'Status', accessor: 'status' },
-              { header: 'Score', render: r => r.score ? `${r.score}%` : '-' }
+              { header: 'Score', render: r => r.score ? <span className="font-pl-mono tabular-nums">{r.score}%</span> : EMPTY }
             ]}
           />}
           {activeTab === 'competency' && <GenericTable 
             data={data.competencies} 
             emptyMessage="No competency framework defined."
             columns={[
-              { header: 'ID', accessor: 'competency_id' },
+              { header: 'ID', render: r => <span className="font-pl-mono tabular-nums whitespace-nowrap">{r.competency_id}</span> },
               { header: 'Name', accessor: 'competency_name' },
               { header: 'Category', accessor: 'category' },
               { header: 'Level', accessor: 'level' }
@@ -140,7 +142,7 @@ export default function TrainingCompetencyModule() {
             data={data.assessments} 
             emptyMessage="No assessments recorded."
             columns={[
-              { header: 'Date', render: r => new Date(r.assessment_date).toLocaleDateString() },
+              { header: 'Date', render: r => <span className="font-pl-mono tabular-nums whitespace-nowrap">{new Date(r.assessment_date).toLocaleDateString()}</span> },
               { header: 'Employee', render: r => r.employee?.raw_user_meta_data?.full_name },
               { header: 'Competency', render: r => r.competency?.competency_name },
               { header: 'Result', accessor: 'status' }
@@ -158,9 +160,9 @@ function TabTrigger({ value, icon: Icon, label }) {
   return (
     <TabsTrigger 
       value={value} 
-      className="data-[state=active]:border-b-2 data-[state=active]:border-indigo-500 data-[state=active]:text-indigo-400 rounded-none bg-transparent px-0 py-2 text-[#7a7a9a] hover:text-white transition-all flex items-center gap-2"
+      className={`${moduleTabTriggerClass} py-2 min-w-fit`}
     >
-      <Icon className="h-4 w-4" /> {label}
+      <Icon className="h-4 w-4" aria-hidden="true" /> {label}
     </TabsTrigger>
   );
 }

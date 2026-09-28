@@ -5,7 +5,8 @@ import { Input } from '@/components/ui/input';
 import { AlertCircle, Eye, EyeOff, Mail, Lock, Loader2 } from 'lucide-react';
 import { supabase } from '@/lib/customSupabaseClient';
 import { useToast } from '@/components/ui/use-toast';
-import { PETROLORD_BRANDING } from '@/components/branding/BrandingGuide';
+import { Label } from '@/components/ui/label';
+import { PublicPage, AUTH_CARD, AUTH_COLUMN, AUTH_TITLE, TEXT_LINK } from '@/components/public/PublicPage';
 
 const SignIn = () => {
   const navigate = useNavigate();
@@ -41,7 +42,6 @@ const SignIn = () => {
       toast({
         title: "Welcome back",
         description: "Successfully signed in",
-        className: "bg-green-600 text-white border-none"
       });
 
       // Navigate to dashboard
@@ -60,117 +60,110 @@ const SignIn = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#1a1a2e] flex items-center justify-center p-4">
+    <div className={AUTH_COLUMN}>
       <div className="w-full max-w-md">
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <img
-            src={PETROLORD_BRANDING.logoUrl}
-            alt={PETROLORD_BRANDING.companyName}
-            className="h-14 w-auto mx-auto mb-4 object-contain"
-          />
-          <h1 className="text-3xl font-bold text-white mb-2">Welcome Back</h1>
-          <p className="text-[#b0b0c0]">Sign in to your unified Petrolord account</p>
-        </div>
+        <div className={AUTH_CARD}>
+          <div className="text-center mb-8">
+            <h1 className={AUTH_TITLE}>Welcome back</h1>
+            <p className="text-pl-muted mt-2">Sign in to your unified Petrolord account</p>
+          </div>
 
-        {/* Login Form */}
-        <div className="bg-[#252541]/90 border border-[#3a3a5a] rounded-lg p-8 shadow-xl">
-            <form onSubmit={handleLogin} className="space-y-6">
+          <form onSubmit={handleLogin} className="space-y-6">
             {/* Error Message */}
             {error && (
-                <div className="p-4 bg-red-900/20 border border-red-700 rounded-lg flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
-                <p className="text-red-200 text-sm">{error}</p>
-                </div>
+              <div role="alert" className="p-4 bg-pl-danger-bg border border-pl-danger/40 rounded-lg flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-pl-danger-text flex-shrink-0 mt-0.5" aria-hidden="true" />
+                <p className="text-pl-danger-text text-sm">{error}</p>
+              </div>
             )}
 
             {/* Email Field */}
-            <div>
-                <label className="block text-sm font-medium text-[#e0e0e0] mb-2">Email Address</label>
-                <div className="relative">
-                <Mail className="absolute left-3 top-3 w-5 h-5 text-[#7a7a9a]" />
+            <div className="space-y-2">
+              <Label htmlFor="signin-email">Email Address</Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-pl-muted" aria-hidden="true" />
                 <Input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="name@company.com"
-                    className="pl-10 bg-white border-0 text-black focus:ring-2 focus:ring-[#FFC107]"
-                    disabled={loading}
-                    required
+                  id="signin-email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="name@company.com"
+                  className="pl-10 h-11"
+                  disabled={loading}
+                  required
                 />
-                </div>
+              </div>
             </div>
 
             {/* Password Field */}
-            <div>
-                <div className="flex items-center justify-between mb-2">
-                <label className="block text-sm font-medium text-[#e0e0e0]">Password</label>
-                <Link to="/forgot-password" className="text-sm text-[#FFC107] hover:text-[#ffb300]">
-                    Forgot password?
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="signin-password">Password</Label>
+                <Link to="/forgot-password" className={`text-sm ${TEXT_LINK}`}>
+                  Forgot password?
                 </Link>
-                </div>
-                <div className="relative">
-                <Lock className="absolute left-3 top-3 w-5 h-5 text-[#7a7a9a]" />
+              </div>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-pl-muted" aria-hidden="true" />
                 <Input
-                    type={showPassword ? 'text' : 'password'}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="pl-10 pr-10 bg-white border-0 text-black focus:ring-2 focus:ring-[#FFC107]"
-                    disabled={loading}
-                    required
+                  id="signin-password"
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="pl-10 pr-10 h-11"
+                  disabled={loading}
+                  required
                 />
                 <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-3 text-[#7a7a9a] hover:text-[#505068]"
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-sm text-pl-muted hover:text-pl-text"
                 >
-                    {showPassword ? (
+                  {showPassword ? (
                     <EyeOff className="w-5 h-5" />
-                    ) : (
+                  ) : (
                     <Eye className="w-5 h-5" />
-                    )}
+                  )}
                 </button>
-                </div>
+              </div>
             </div>
 
             {/* Sign In Button */}
             <Button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-[#FFC107] hover:bg-[#ffb300] text-[#1a1a2e] font-bold py-2 h-11"
+              type="submit"
+              disabled={loading}
+              className="w-full font-semibold h-11"
             >
-                {loading ? (
-                    <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Signing in...
-                    </>
-                ) : 'Sign In'}
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Signing in...
+                </>
+              ) : 'Sign In'}
             </Button>
-            </form>
+          </form>
 
-            {/* Sign Up Link */}
-            <div className="mt-6 text-center space-y-3 pt-6 border-t border-[#3a3a5a]">
-            <p className="text-[#b0b0c0]">
-                Don't have an account?{' '}
-                <Link
-                to="/signup"
-                className="text-[#FFC107] hover:text-[#ffb300] font-semibold transition-colors"
-                >
+          {/* Sign Up Link */}
+          <div className="mt-6 text-center space-y-3 pt-6 border-t border-pl-border">
+            <p className="text-pl-muted">
+              Don't have an account?{' '}
+              <Link to="/signup" className={TEXT_LINK}>
                 Sign up for HSE
-                </Link>
+              </Link>
             </p>
-            <p className="text-sm text-[#7a7a9a]">
-                Looking for Petrolord Suite?{' '}
-                <a href="https://petrolord.com" className="text-[#b0b0c0] hover:text-white transition-colors">
+            <p className="text-sm text-pl-muted">
+              Looking for Petrolord Suite?{' '}
+              <a href="https://petrolord.com" className={TEXT_LINK}>
                 Go to Corporate Site
-                </a>
+              </a>
             </p>
-            </div>
+          </div>
         </div>
 
         {/* Footer */}
-        <div className="mt-8 text-center text-xs text-[#7a7a9a]">
+        <div className="mt-8 text-center text-xs text-pl-muted">
           © 2025 Lordsway Energy. Secure Unified Login.
         </div>
       </div>
@@ -178,4 +171,11 @@ const SignIn = () => {
   );
 };
 
-export default SignIn;
+// Batch 3B: the page wraps itself in the public frame (always light, ink brand bar).
+const SignInPage = () => (
+  <PublicPage testId="signin-theme-scope">
+    <SignIn />
+  </PublicPage>
+);
+
+export default SignInPage;

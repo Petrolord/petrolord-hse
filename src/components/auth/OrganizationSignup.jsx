@@ -31,6 +31,7 @@ import {
 } from 'lucide-react';
 import { Helmet } from 'react-helmet';
 import { supabase } from '@/lib/customSupabaseClient';
+import { PublicPage, AUTH_TITLE, TEXT_LINK } from '@/components/public/PublicPage';
 
 const BLOCKED_DOMAINS = [
   'gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'aol.com', 'icloud.com',
@@ -183,7 +184,7 @@ const OrganizationSignup = () => {
         title: 'Account Created Successfully!',
         description: "We've sent a confirmation email to verify your account.",
         duration: 6000,
-        className: 'bg-green-600 border-green-700 text-white'
+        variant: 'success'
       });
 
       navigate('/auth/confirm', { state: { email: formData.email } });
@@ -207,12 +208,12 @@ const OrganizationSignup = () => {
         <meta name="description" content="Register as an Organization Admin for Petrolord HSE." />
       </Helmet>
 
-      <div className="min-h-screen flex flex-col lg:flex-row bg-slate-950 font-sans text-slate-100">
+      <div className="flex flex-1 flex-col lg:flex-row">
 
-        <div className="w-full lg:w-1/2 flex flex-col p-6 lg:p-12 relative overflow-y-auto h-full min-h-screen order-2 lg:order-1">
+        <div className="w-full lg:w-1/2 flex flex-col px-4 py-6 sm:p-6 lg:p-12 relative order-2 lg:order-1">
           <Link
             to="/"
-            className="inline-flex items-center text-slate-400 hover:text-[#FCD34D] transition-colors mb-8 w-fit group"
+            className="inline-flex items-center rounded-sm text-pl-muted hover:text-pl-primary-text transition-colors mb-8 w-fit group"
           >
             <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
             Back to Home
@@ -226,10 +227,10 @@ const OrganizationSignup = () => {
               transition={{ duration: 0.5 }}
               className="mb-8"
             >
-              <h1 className="text-3xl lg:text-4xl font-bold text-white mb-3 tracking-tight">
+              <h1 className={`${AUTH_TITLE} mb-3`}>
                 Create Your HSE Account
               </h1>
-              <p className="text-slate-400 text-lg">
+              <p className="text-pl-muted text-lg">
                 Register your organization for Petrolord HSE
               </p>
             </motion.div>
@@ -238,17 +239,17 @@ const OrganizationSignup = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="bg-[#FCD34D]/5 border border-[#FCD34D]/20 rounded-xl p-5 mb-8"
+              className="bg-pl-accent/10 border border-pl-accent/40 rounded-xl p-5 mb-8"
             >
               <ul className="space-y-3">
                 {[
-                  'HSE is free — no credit card required',
+                  'HSE is free, with no credit card required',
                   'You are registering as an Organization Admin',
                   'Use a valid company email address',
                   'Upgrade to Petrolord Suite anytime from your dashboard'
                 ].map((item, index) => (
-                  <li key={index} className="flex items-start text-sm text-slate-300">
-                    <CheckCircle2 className="w-5 h-5 text-green-400 mr-3 flex-shrink-0 mt-0.5" />
+                  <li key={index} className="flex items-start text-sm text-pl-text">
+                    <CheckCircle2 className="w-5 h-5 text-pl-primary-text mr-3 flex-shrink-0 mt-0.5" aria-hidden="true" />
                     <span>{item}</span>
                   </li>
                 ))}
@@ -258,9 +259,9 @@ const OrganizationSignup = () => {
             <form onSubmit={handleSubmit} className="space-y-5" noValidate>
 
               <div className="space-y-2">
-                <Label htmlFor="orgName" className="text-slate-200">Organization Name <span className="text-red-400">*</span></Label>
+                <Label htmlFor="orgName">Organization Name <span className="text-pl-danger-text">*</span></Label>
                 <div className="relative group">
-                  <Building2 className="absolute left-3 top-3 w-5 h-5 text-slate-500 group-focus-within:text-[#FCD34D] transition-colors" />
+                  <Building2 className="absolute left-3 top-3 w-5 h-5 text-pl-muted group-focus-within:text-pl-primary-text transition-colors" />
                   <Input
                     id="orgName"
                     name="orgName"
@@ -268,12 +269,12 @@ const OrganizationSignup = () => {
                     value={formData.orgName}
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    className={`pl-10 bg-slate-900 border-slate-700 text-white placeholder:text-slate-600 focus:border-[#FCD34D] focus:ring-1 focus:ring-[#FCD34D] h-11 transition-all ${errors.orgName && touched.orgName ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
+                    className={`pl-10 h-11 transition-all ${errors.orgName && touched.orgName ? 'border-pl-danger focus-visible:ring-pl-danger' : ''}`}
                   />
                 </div>
                 <AnimatePresence>
                   {errors.orgName && touched.orgName && (
-                    <motion.p initial={{opacity:0, height:0}} animate={{opacity:1, height:'auto'}} exit={{opacity:0, height:0}} className="text-red-400 text-xs flex items-center mt-1">
+                    <motion.p initial={{opacity:0, height:0}} animate={{opacity:1, height:'auto'}} exit={{opacity:0, height:0}} className="text-pl-danger-text text-xs flex items-center mt-1">
                       <AlertCircle className="w-3 h-3 mr-1" /> {errors.orgName}
                     </motion.p>
                   )}
@@ -281,9 +282,9 @@ const OrganizationSignup = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="fullName" className="text-slate-200">Full Name <span className="text-red-400">*</span></Label>
+                <Label htmlFor="fullName">Full Name <span className="text-pl-danger-text">*</span></Label>
                 <div className="relative group">
-                  <User className="absolute left-3 top-3 w-5 h-5 text-slate-500 group-focus-within:text-[#FCD34D] transition-colors" />
+                  <User className="absolute left-3 top-3 w-5 h-5 text-pl-muted group-focus-within:text-pl-primary-text transition-colors" />
                   <Input
                     id="fullName"
                     name="fullName"
@@ -291,12 +292,12 @@ const OrganizationSignup = () => {
                     value={formData.fullName}
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    className={`pl-10 bg-slate-900 border-slate-700 text-white placeholder:text-slate-600 focus:border-[#FCD34D] focus:ring-1 focus:ring-[#FCD34D] h-11 transition-all ${errors.fullName && touched.fullName ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
+                    className={`pl-10 h-11 transition-all ${errors.fullName && touched.fullName ? 'border-pl-danger focus-visible:ring-pl-danger' : ''}`}
                   />
                 </div>
                 <AnimatePresence>
                   {errors.fullName && touched.fullName && (
-                    <motion.p initial={{opacity:0, height:0}} animate={{opacity:1, height:'auto'}} exit={{opacity:0, height:0}} className="text-red-400 text-xs flex items-center mt-1">
+                    <motion.p initial={{opacity:0, height:0}} animate={{opacity:1, height:'auto'}} exit={{opacity:0, height:0}} className="text-pl-danger-text text-xs flex items-center mt-1">
                       <AlertCircle className="w-3 h-3 mr-1" /> {errors.fullName}
                     </motion.p>
                   )}
@@ -304,9 +305,9 @@ const OrganizationSignup = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-slate-200">Company Email <span className="text-red-400">*</span></Label>
+                <Label htmlFor="email">Company Email <span className="text-pl-danger-text">*</span></Label>
                 <div className="relative group">
-                  <Mail className="absolute left-3 top-3 w-5 h-5 text-slate-500 group-focus-within:text-[#FCD34D] transition-colors" />
+                  <Mail className="absolute left-3 top-3 w-5 h-5 text-pl-muted group-focus-within:text-pl-primary-text transition-colors" />
                   <Input
                     id="email"
                     name="email"
@@ -315,12 +316,12 @@ const OrganizationSignup = () => {
                     value={formData.email}
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    className={`pl-10 bg-slate-900 border-slate-700 text-white placeholder:text-slate-600 focus:border-[#FCD34D] focus:ring-1 focus:ring-[#FCD34D] h-11 transition-all ${errors.email && touched.email ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
+                    className={`pl-10 h-11 transition-all ${errors.email && touched.email ? 'border-pl-danger focus-visible:ring-pl-danger' : ''}`}
                   />
                 </div>
                 <AnimatePresence>
                   {errors.email && touched.email && (
-                    <motion.p initial={{opacity:0, height:0}} animate={{opacity:1, height:'auto'}} exit={{opacity:0, height:0}} className="text-red-400 text-xs flex items-center mt-1">
+                    <motion.p initial={{opacity:0, height:0}} animate={{opacity:1, height:'auto'}} exit={{opacity:0, height:0}} className="text-pl-danger-text text-xs flex items-center mt-1">
                       <AlertCircle className="w-3 h-3 mr-1" /> {errors.email}
                     </motion.p>
                   )}
@@ -328,9 +329,9 @@ const OrganizationSignup = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="phone" className="text-slate-200">Phone Number <span className="text-red-400">*</span></Label>
+                <Label htmlFor="phone">Phone Number <span className="text-pl-danger-text">*</span></Label>
                 <div className="relative group">
-                  <Phone className="absolute left-3 top-3 w-5 h-5 text-slate-500 group-focus-within:text-[#FCD34D] transition-colors" />
+                  <Phone className="absolute left-3 top-3 w-5 h-5 text-pl-muted group-focus-within:text-pl-primary-text transition-colors" />
                   <Input
                     id="phone"
                     name="phone"
@@ -339,12 +340,12 @@ const OrganizationSignup = () => {
                     value={formData.phone}
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    className={`pl-10 bg-slate-900 border-slate-700 text-white placeholder:text-slate-600 focus:border-[#FCD34D] focus:ring-1 focus:ring-[#FCD34D] h-11 transition-all ${errors.phone && touched.phone ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
+                    className={`pl-10 h-11 transition-all ${errors.phone && touched.phone ? 'border-pl-danger focus-visible:ring-pl-danger' : ''}`}
                   />
                 </div>
                 <AnimatePresence>
                   {errors.phone && touched.phone && (
-                    <motion.p initial={{opacity:0, height:0}} animate={{opacity:1, height:'auto'}} exit={{opacity:0, height:0}} className="text-red-400 text-xs flex items-center mt-1">
+                    <motion.p initial={{opacity:0, height:0}} animate={{opacity:1, height:'auto'}} exit={{opacity:0, height:0}} className="text-pl-danger-text text-xs flex items-center mt-1">
                       <AlertCircle className="w-3 h-3 mr-1" /> {errors.phone}
                     </motion.p>
                   )}
@@ -352,9 +353,9 @@ const OrganizationSignup = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-slate-200">Password <span className="text-red-400">*</span></Label>
+                <Label htmlFor="password">Password <span className="text-pl-danger-text">*</span></Label>
                 <div className="relative group">
-                  <Lock className="absolute left-3 top-3 w-5 h-5 text-slate-500 group-focus-within:text-[#FCD34D] transition-colors" />
+                  <Lock className="absolute left-3 top-3 w-5 h-5 text-pl-muted group-focus-within:text-pl-primary-text transition-colors" />
                   <Input
                     id="password"
                     name="password"
@@ -363,12 +364,12 @@ const OrganizationSignup = () => {
                     value={formData.password}
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    className={`pl-10 pr-10 bg-slate-900 border-slate-700 text-white placeholder:text-slate-600 focus:border-[#FCD34D] focus:ring-1 focus:ring-[#FCD34D] h-11 transition-all ${errors.password && touched.password ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
+                    className={`pl-10 pr-10 h-11 transition-all ${errors.password && touched.password ? 'border-pl-danger focus-visible:ring-pl-danger' : ''}`}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-3 text-slate-500 hover:text-white transition-colors"
+                    className="absolute right-3 top-3 rounded-sm text-pl-muted hover:text-pl-text transition-colors"
                     tabIndex={-1}
                   >
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
@@ -379,21 +380,21 @@ const OrganizationSignup = () => {
                   {[1, 2, 3, 4].map((level) => (
                     <div
                       key={level}
-                      className={`flex-1 rounded-full transition-all duration-300 ${passwordStrength >= level ? passwordStrength <= 2 ? 'bg-red-500' : passwordStrength === 3 ? 'bg-yellow-500' : 'bg-green-500' : 'bg-slate-800'}`}
+                      className={`flex-1 rounded-full transition-all duration-300 ${passwordStrength >= level ? passwordStrength <= 2 ? 'bg-pl-danger' : passwordStrength === 3 ? 'bg-pl-warning' : 'bg-pl-success' : 'bg-pl-sunken'}`}
                     />
                   ))}
                 </div>
-                <div className="text-xs text-slate-500 mt-1 flex justify-between items-center">
+                <div className="text-xs text-pl-muted mt-1 flex justify-between items-center">
                   <span>Min 8 chars, uppercase, number, special char</span>
                   {passwordStrength > 0 && (
-                    <span className={`font-medium ${passwordStrength <= 2 ? 'text-red-400' : passwordStrength === 3 ? 'text-yellow-400' : 'text-green-400'}`}>
+                    <span className={`font-medium ${passwordStrength <= 2 ? 'text-pl-danger-text' : passwordStrength === 3 ? 'text-pl-warning-text' : 'text-pl-success-text'}`}>
                       {passwordStrength <= 2 ? 'Weak' : passwordStrength === 3 ? 'Medium' : 'Strong'}
                     </span>
                   )}
                 </div>
                 <AnimatePresence>
                   {errors.password && touched.password && (
-                    <motion.p initial={{opacity:0, height:0}} animate={{opacity:1, height:'auto'}} exit={{opacity:0, height:0}} className="text-red-400 text-xs flex items-center mt-1">
+                    <motion.p initial={{opacity:0, height:0}} animate={{opacity:1, height:'auto'}} exit={{opacity:0, height:0}} className="text-pl-danger-text text-xs flex items-center mt-1">
                       <AlertCircle className="w-3 h-3 mr-1" /> {errors.password}
                     </motion.p>
                   )}
@@ -401,9 +402,9 @@ const OrganizationSignup = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="text-slate-200">Confirm Password <span className="text-red-400">*</span></Label>
+                <Label htmlFor="confirmPassword">Confirm Password <span className="text-pl-danger-text">*</span></Label>
                 <div className="relative group">
-                  <ShieldCheck className="absolute left-3 top-3 w-5 h-5 text-slate-500 group-focus-within:text-[#FCD34D] transition-colors" />
+                  <ShieldCheck className="absolute left-3 top-3 w-5 h-5 text-pl-muted group-focus-within:text-pl-primary-text transition-colors" />
                   <Input
                     id="confirmPassword"
                     name="confirmPassword"
@@ -412,12 +413,12 @@ const OrganizationSignup = () => {
                     value={formData.confirmPassword}
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    className={`pl-10 pr-10 bg-slate-900 border-slate-700 text-white placeholder:text-slate-600 focus:border-[#FCD34D] focus:ring-1 focus:ring-[#FCD34D] h-11 transition-all ${errors.confirmPassword && touched.confirmPassword ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
+                    className={`pl-10 pr-10 h-11 transition-all ${errors.confirmPassword && touched.confirmPassword ? 'border-pl-danger focus-visible:ring-pl-danger' : ''}`}
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-3 text-slate-500 hover:text-white transition-colors"
+                    className="absolute right-3 top-3 rounded-sm text-pl-muted hover:text-pl-text transition-colors"
                     tabIndex={-1}
                   >
                     {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
@@ -425,7 +426,7 @@ const OrganizationSignup = () => {
                 </div>
                 <AnimatePresence>
                   {errors.confirmPassword && touched.confirmPassword && (
-                    <motion.p initial={{opacity:0, height:0}} animate={{opacity:1, height:'auto'}} exit={{opacity:0, height:0}} className="text-red-400 text-xs flex items-center mt-1">
+                    <motion.p initial={{opacity:0, height:0}} animate={{opacity:1, height:'auto'}} exit={{opacity:0, height:0}} className="text-pl-danger-text text-xs flex items-center mt-1">
                       <XCircle className="w-3 h-3 mr-1" /> {errors.confirmPassword}
                     </motion.p>
                   )}
@@ -435,7 +436,7 @@ const OrganizationSignup = () => {
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-[#FCD34D] hover:bg-yellow-500 text-slate-900 font-bold h-12 text-base shadow-lg shadow-yellow-500/10 hover:shadow-yellow-500/20 transition-all duration-300 mt-6"
+                className="w-full font-semibold h-12 text-base mt-6"
               >
                 {loading ? (
                   <>
@@ -447,9 +448,9 @@ const OrganizationSignup = () => {
                 )}
               </Button>
 
-              <p className="text-center text-slate-400 text-sm mt-6">
+              <p className="text-center text-pl-muted text-sm mt-6">
                 Already have an account?{' '}
-                <Link to="/login" className="text-[#FCD34D] hover:text-yellow-400 font-medium hover:underline transition-colors">
+                <Link to="/login" className={TEXT_LINK}>
                   Login here
                 </Link>
               </p>
@@ -458,24 +459,23 @@ const OrganizationSignup = () => {
           </div>
         </div>
 
-        <div className="hidden lg:block w-1/2 relative bg-slate-900 order-1 lg:order-2 h-full min-h-screen">
+        <div data-pl-theme="dark" className="hidden lg:block w-1/2 relative bg-pl-bg text-pl-text order-1 lg:order-2 min-h-[calc(100vh-4rem)]">
           <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1629787155650-9ce3697dcb38')] bg-cover bg-center"></div>
-          <div className="absolute inset-0 bg-slate-950/40 mix-blend-multiply"></div>
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-transparent to-transparent"></div>
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent"></div>
+          {/* Ink overlay for text contrast */}
+          <div className="absolute inset-0 bg-pl-bg/60"></div>
 
           <div className="absolute bottom-16 left-12 right-12 z-10">
             <motion.blockquote
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
-              className="border-l-4 border-[#FCD34D] pl-6 py-2 backdrop-blur-sm bg-slate-900/30 rounded-r-lg p-4"
+              className="border-l-4 border-pl-accent pl-6 py-2 backdrop-blur-sm bg-pl-surface/40 rounded-r-lg p-4"
             >
-              <p className="text-2xl font-light text-white italic mb-4 leading-relaxed">
+              <p className="font-pl-display text-3xl italic text-pl-text mb-4 leading-snug">
                 "Cutting incident reporting time in half let our supervisors focus on prevention. The audit trail alone justified the platform."
               </p>
-              <footer className="text-slate-200 font-medium flex items-center gap-2">
-                <span className="w-8 h-[1px] bg-[#FCD34D]"></span>
+              <footer className="text-pl-muted font-medium flex items-center gap-2">
+                <span className="w-8 h-[1px] bg-pl-accent"></span>
                 HSE Manager, West African Operator
               </footer>
             </motion.blockquote>
@@ -487,4 +487,11 @@ const OrganizationSignup = () => {
   );
 };
 
-export default OrganizationSignup;
+// Batch 3B: the page wraps itself in the public frame (always light, ink brand bar).
+const OrganizationSignupPage = () => (
+  <PublicPage testId="signup-theme-scope">
+    <OrganizationSignup />
+  </PublicPage>
+);
+
+export default OrganizationSignupPage;

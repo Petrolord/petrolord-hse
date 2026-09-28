@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Users } from 'lucide-react';
 import { useHSE } from '@/context/HSEContext';
 import { contractorService } from '@/services/contractorService';
+import { EMPTY, tableHeadClass, tableBodyClass, tableRowClass } from '@/components/petrolord/common/ui';
 
 // Lists the induction records stored in hse.safety_inductions. The previous
 // version was static: a hardcoded "12 Contractors waiting" count, buttons with
@@ -26,49 +27,49 @@ export default function InductionManagement() {
   const pending = inductions.filter(i => (i.status || '').toLowerCase() === 'pending').length;
 
   return (
-    <div className="p-6 h-full flex flex-col space-y-6">
+    <div className="p-4 sm:p-6 h-full flex flex-col space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold text-white">Induction Management</h2>
+        <h2 className="text-xl font-semibold text-pl-text">Induction Management</h2>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="bg-[#252541] border-[#3a3a5a]">
+        <Card>
           <CardContent className="p-6 flex flex-col items-center text-center">
-            <div className="p-4 rounded-full bg-green-500/10 mb-4"><Users className="h-8 w-8 text-green-400" /></div>
-            <h3 className="text-lg font-bold text-white">Pending Inductions</h3>
-            <p className="text-sm text-[#7a7a9a] mt-2">
-              {loading || error ? '--' : `${pending} of ${inductions.length} induction records pending.`}
+            <div className="p-4 rounded-full bg-pl-sunken border border-pl-border mb-4"><Users className="h-8 w-8 text-pl-muted" aria-hidden="true" /></div>
+            <h3 className="text-lg font-semibold text-pl-text">Pending Inductions</h3>
+            <p className="text-sm text-pl-muted mt-2">
+              {loading || error ? EMPTY : `${pending} of ${inductions.length} induction records pending.`}
             </p>
           </CardContent>
         </Card>
       </div>
 
-      <div className="flex-1 bg-[#252541] border border-[#3a3a5a] rounded-lg p-4 overflow-auto">
+      <div className="flex-1 bg-pl-surface border border-pl-border rounded-lg overflow-auto">
         {loading ? (
-          <p className="text-center text-[#7a7a9a] py-8">Loading induction records...</p>
+          <p className="text-center text-pl-muted py-8">Loading induction records...</p>
         ) : error ? (
-          <p className="text-center text-[#7a7a9a] py-8">Could not load induction records.</p>
+          <p className="text-center text-pl-muted py-8">Could not load induction records.</p>
         ) : inductions.length === 0 ? (
-          <p className="text-center text-[#7a7a9a] py-8">No induction records yet.</p>
+          <p className="text-center text-pl-muted py-8">No induction records yet.</p>
         ) : (
           <table className="w-full text-sm text-left">
-            <thead className="text-[#7a7a9a] text-xs uppercase">
+            <thead className={tableHeadClass}>
               <tr>
-                <th className="py-2 pr-4">Date</th>
-                <th className="py-2 pr-4">Contractor</th>
-                <th className="py-2 pr-4">Type</th>
-                <th className="py-2 pr-4">Status</th>
-                <th className="py-2">Score</th>
+                <th className="px-4 py-2">Date</th>
+                <th className="px-4 py-2">Contractor</th>
+                <th className="px-4 py-2">Type</th>
+                <th className="px-4 py-2">Status</th>
+                <th className="px-4 py-2">Score</th>
               </tr>
             </thead>
-            <tbody className="text-white">
+            <tbody className={`${tableBodyClass} text-pl-text`}>
               {inductions.map((i) => (
-                <tr key={i.id} className="border-t border-[#3a3a5a]">
-                  <td className="py-2 pr-4">{i.date ? new Date(i.date).toLocaleDateString() : '--'}</td>
-                  <td className="py-2 pr-4">{i.contractor?.company_name || '--'}</td>
-                  <td className="py-2 pr-4">{i.type || '--'}</td>
-                  <td className="py-2 pr-4">{i.status || '--'}</td>
-                  <td className="py-2">{i.score ?? '--'}</td>
+                <tr key={i.id} className={tableRowClass}>
+                  <td className="px-4 py-2 font-pl-mono tabular-nums">{i.date ? new Date(i.date).toLocaleDateString() : EMPTY}</td>
+                  <td className="px-4 py-2">{i.contractor?.company_name || EMPTY}</td>
+                  <td className="px-4 py-2">{i.type || EMPTY}</td>
+                  <td className="px-4 py-2">{i.status || EMPTY}</td>
+                  <td className="px-4 py-2 font-pl-mono tabular-nums">{i.score ?? EMPTY}</td>
                 </tr>
               ))}
             </tbody>

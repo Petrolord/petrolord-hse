@@ -22,15 +22,15 @@ export default function AdvancedCSSEditor({ settings, setSettings }) {
   const customCss = settings.branding_config?.advanced?.customCss || '';
 
   return (
-    <Card className="bg-[var(--bg-card)] border-[var(--border-color)]">
+    <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2"><Code className="h-5 w-5 text-[var(--accent)]"/> Custom CSS</CardTitle>
+        <CardTitle className="flex items-center gap-2"><Code className="h-5 w-5 text-pl-muted" aria-hidden="true"/> Custom CSS</CardTitle>
         <CardDescription>Inject custom styles to override default platform styling. Use with caution.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         
-        <Alert variant="destructive" className="bg-red-900/10 border-red-900/30 text-red-200">
-          <AlertTriangle className="h-4 w-4" />
+        <Alert variant="warning">
+          <AlertTriangle className="h-4 w-4" aria-hidden="true" />
           <AlertTitle>Warning</AlertTitle>
           <AlertDescription className="text-xs">
             Changes here can break the layout or accessibility of the platform. Test thoroughly. CSS is injected globally.
@@ -40,7 +40,7 @@ export default function AdvancedCSSEditor({ settings, setSettings }) {
         <div className="space-y-2">
           <Label>CSS Editor</Label>
           <Textarea 
-            className="font-mono text-xs min-h-[300px] bg-[#1e1e1e] text-[#d4d4d4] border-gray-700"
+            className="font-pl-mono text-xs min-h-[300px] bg-pl-sunken"
             placeholder="/* Example: */
 .sidebar { background: #000; }
 .card { border-radius: 0; }"
@@ -49,9 +49,9 @@ export default function AdvancedCSSEditor({ settings, setSettings }) {
           />
         </div>
 
-        <div className="text-xs text-[var(--text-muted)]">
+        <div className="text-xs text-pl-muted">
           <p className="font-semibold mb-1">Available CSS Variables:</p>
-          <div className="grid grid-cols-2 gap-2 font-mono">
+          <div className="grid grid-cols-2 gap-2 font-pl-mono">
             <span>--primary</span>
             <span>--secondary</span>
             <span>--accent</span>
