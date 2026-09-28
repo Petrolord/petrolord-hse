@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Check, Crown, CreditCard, Landmark, Loader2, ShieldCheck } from 'lucide-react';
+import { Check, Crown, CreditCard, Landmark, Loader2, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
@@ -9,9 +8,9 @@ import { useHSE } from '@/context/HSEContext';
 import { useHSEAccess } from '@/hooks/useHSEAccess';
 import { BILLING_BANDS, startProfessionalCheckout } from '@/services/billingService';
 import { cn } from '@/lib/utils';
+import { AccountScope, AccountPage, AccountHeader, accountCallout } from '@/components/account/accountChrome';
 
 export default function UpgradePage() {
-  const navigate = useNavigate();
   const { toast } = useToast();
   const { currentOrganization } = useHSE();
   const { isOrgAdmin, isPremium } = useHSEAccess();
@@ -46,40 +45,47 @@ export default function UpgradePage() {
     }
   };
 
+  // /dashboard/upgrade sits outside the signed-in layout, so it opens its
+  // own design-system scope (AccountScope) with the light/dark toggle in its
+  // header (docs/scope/DesignSystem-Rollout.md section 4.2, batch 3A).
+  const panel = 'rounded-xl border border-pl-border bg-pl-surface p-6 shadow-pl-sm';
+  const choice = (selected) => cn(
+    'border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pl-focus',
+    selected
+      ? 'border-pl-primary bg-pl-primary/10 text-pl-primary-text'
+      : 'border-pl-border-strong bg-pl-surface text-pl-muted hover:border-pl-primary/60 hover:text-pl-text',
+  );
+  const link = 'text-pl-primary-text hover:underline';
+
   return (
-    <div className="min-h-screen bg-[#1a1a2e] text-white px-4 py-8">
+    <AccountScope testId="upgrade-theme-scope" className="text-pl-text">
       <Helmet><title>Upgrade to Professional - Petrolord HSE</title></Helmet>
 
-      <div className="max-w-3xl mx-auto">
-        <button onClick={() => navigate('/dashboard')} className="flex items-center gap-2 text-[#b0b0c0] hover:text-white text-sm mb-6">
-          <ArrowLeft className="h-4 w-4" /> Back to dashboard
-        </button>
-
-        <div className="flex items-center gap-3 mb-2">
-          <div className="p-2 bg-[#FFC107]/10 rounded-lg border border-[#FFC107]/20">
-            <Crown className="h-6 w-6 text-[#FFC107]" />
-          </div>
-          <h1 className="text-3xl font-bold">Upgrade to HSE Professional</h1>
-        </div>
-        <p className="text-[#b0b0c0] mb-8">
-          Unlimited reports and incidents, unlimited sites, email notifications, 100GB storage, custom branding and priority support for {currentOrganization?.name || 'your organization'}.
-        </p>
+      <AccountPage width="max-w-3xl">
+        <AccountHeader
+          eyebrow="Billing"
+          icon={Crown}
+          title="Upgrade to HSE Professional"
+          description={`Unlimited reports and incidents, unlimited sites, email notifications, 100GB storage, custom branding and priority support for ${currentOrganization?.name || 'your organization'}.`}
+          backTo="/dashboard"
+          backLabel="Back to dashboard"
+        />
 
         {isPremium && (
-          <div className="mb-6 p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-sm">
+          <div className={accountCallout('success')}>
             Your organization already has Professional access. Paying again extends your term from today.
           </div>
         )}
 
         {!isOrgAdmin ? (
-          <div className="p-6 rounded-xl bg-[#1f1f35] border border-[#3a3a5a] text-[#b0b0c0]">
+          <div className={cn(panel, 'text-pl-muted')}>
             Only an organization admin can upgrade the plan. Ask your admin to visit this page, or contact
-            {' '}<a className="text-[#FFC107] hover:underline" href="mailto:support@petrolord.com">support@petrolord.com</a>.
+            {' '}<a className={link} href="mailto:support@petrolord.com">support@petrolord.com</a>.
           </div>
         ) : (
           <div className="space-y-6">
             {/* Term */}
-            <div className="p-6 rounded-xl bg-[#1f1f35] border border-[#3a3a5a]">
+            <div className={panel}>
               <p className="font-semibold mb-3">Billing term</p>
               <div className="grid grid-cols-2 gap-2 max-w-md">
                 {[
@@ -89,23 +95,21 @@ export default function UpgradePage() {
                   <button
                     key={t.id}
                     type="button"
+                    aria-pressed={term === t.id}
                     onClick={() => setTerm(t.id)}
-                    className={cn(
-                      'py-3 px-4 rounded-lg border text-left transition-colors',
-                      term === t.id ? 'bg-[#FFC107] text-[#1a1a2e] border-[#FFC107]' : 'bg-[#151525] text-[#b0b0c0] border-[#3a3a5a] hover:border-[#FFC107]/60'
-                    )}
+                    className={cn('py-3 px-4 rounded-lg text-left', choice(term === t.id))}
                   >
-                    <span className="block font-bold">{t.label}</span>
-                    <span className={cn('block text-xs', term === t.id ? 'text-[#1a1a2e]/70' : 'text-[#7a7a9a]')}>{t.hint}</span>
+                    <span className="block font-semibold">{t.label}</span>
+                    <span className="block text-xs text-pl-muted">{t.hint}</span>
                   </button>
                 ))}
               </div>
             </div>
 
             {/* Band */}
-            <div className="p-6 rounded-xl bg-[#1f1f35] border border-[#3a3a5a]">
+            <div className={panel}>
               <p className="font-semibold mb-1">How many people are on your team?</p>
-              <p className="text-xs text-[#7a7a9a] mb-4">Everyone in your organization, including field staff. More than 5,000? Email <a className="text-[#FFC107] hover:underline" href="mailto:support@petrolord.com">support@petrolord.com</a>.</p>
+              <p className="text-xs text-pl-muted mb-4">Everyone in your organization, including field staff. More than 5,000? Email <a className={link} href="mailto:support@petrolord.com">support@petrolord.com</a>.</p>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2" role="radiogroup" aria-label="Team size">
                 {BILLING_BANDS.map((b, i) => (
                   <button
@@ -114,10 +118,7 @@ export default function UpgradePage() {
                     role="radio"
                     aria-checked={i === bandIndex}
                     onClick={() => setBandIndex(i)}
-                    className={cn(
-                      'py-2.5 px-2 rounded-md text-xs font-semibold border transition-colors text-center',
-                      i === bandIndex ? 'bg-[#FFC107] text-[#1a1a2e] border-[#FFC107]' : 'bg-[#151525] text-[#b0b0c0] border-[#3a3a5a] hover:border-[#FFC107]/60 hover:text-white'
-                    )}
+                    className={cn('py-2.5 px-2 rounded-md text-xs font-semibold text-center tabular-nums', choice(i === bandIndex))}
                   >
                     {b.label} users
                   </button>
@@ -126,17 +127,17 @@ export default function UpgradePage() {
             </div>
 
             {/* Summary + promo + pay */}
-            <div className="p-6 rounded-xl bg-[#1f1f35] border border-[#FFC107]/40">
+            <div className={cn(panel, 'border-pl-primary/40')}>
               <div className="flex items-end justify-between flex-wrap gap-3 mb-4">
                 <div>
-                  <p className="text-sm text-[#b0b0c0]">HSE Professional, {band.label} users, {term}</p>
-                  <p className="text-4xl font-extrabold">${perMonth.toLocaleString()}<span className="text-base font-normal text-[#7a7a9a]">/mo</span></p>
-                  <p className="text-xs text-[#7a7a9a]">
+                  <p className="text-sm text-pl-muted">HSE Professional, {band.label} users, {term}</p>
+                  <p className="text-4xl font-semibold font-pl-mono tabular-nums text-pl-text">${perMonth.toLocaleString()}<span className="text-base font-normal text-pl-muted">/mo</span></p>
+                  <p className="text-xs text-pl-muted">
                     {term === 'annual' ? `Billed $${total.toLocaleString()} today for 12 months.` : 'Billed monthly. Renew each month to keep access.'}
                   </p>
                 </div>
-                <div className="flex items-center gap-2 text-emerald-400 text-xs">
-                  <ShieldCheck className="h-4 w-4" /> Secure checkout via Paystack or Stripe
+                <div className="flex items-center gap-2 text-pl-success-text text-xs">
+                  <ShieldCheck className="h-4 w-4" aria-hidden="true" /> Secure checkout via Paystack or Stripe
                 </div>
               </div>
 
@@ -145,7 +146,7 @@ export default function UpgradePage() {
                   value={promoCode}
                   onChange={(e) => setPromoCode(e.target.value)}
                   placeholder="Promo code (optional)"
-                  className="bg-[#151525] border-[#3a3a5a] text-white placeholder:text-[#5a5a7a]"
+                  aria-label="Promo code"
                 />
               </div>
 
@@ -153,7 +154,7 @@ export default function UpgradePage() {
                 <Button
                   onClick={() => pay('paystack')}
                   disabled={!!payingWith}
-                  className="flex-1 h-12 bg-[#FFC107] hover:bg-[#FFD54F] text-[#1a1a2e] font-bold"
+                  className="flex-1 h-12 font-semibold"
                 >
                   {payingWith === 'paystack' ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Landmark className="h-4 w-4 mr-2" />}
                   Pay in Naira (Paystack)
@@ -161,27 +162,28 @@ export default function UpgradePage() {
                 <Button
                   onClick={() => pay('stripe')}
                   disabled={!!payingWith}
-                  className="flex-1 h-12 bg-[#252541] hover:bg-[#2f2f4d] text-white border border-[#3a3a5a] font-semibold"
+                  variant="outline"
+                  className="flex-1 h-12 font-semibold"
                 >
                   {payingWith === 'stripe' ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <CreditCard className="h-4 w-4 mr-2" />}
                   Pay in USD (Stripe)
                 </Button>
               </div>
-              <p className="text-[11px] text-[#7a7a9a] mt-3">
+              <p className="text-[11px] text-pl-muted mt-3">
                 Paystack charges the Naira equivalent of the USD price at our current rate; the exact amount is shown on the payment page before you pay. Access activates automatically the moment payment is confirmed.
               </p>
             </div>
 
-            <div className="grid sm:grid-cols-2 gap-2 text-sm text-[#b0b0c0]">
+            <ul className="grid sm:grid-cols-2 gap-2 text-sm text-pl-muted">
               {['Unlimited reports and incidents', 'Unlimited sites and locations', '1,000 emails per month', '100GB storage', 'Custom branding', '24/7 priority support'].map((f) => (
-                <div key={f} className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-emerald-400 flex-shrink-0" /> {f}
-                </div>
+                <li key={f} className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-pl-success-text flex-shrink-0" aria-hidden="true" /> {f}
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
         )}
-      </div>
-    </div>
+      </AccountPage>
+    </AccountScope>
   );
 }

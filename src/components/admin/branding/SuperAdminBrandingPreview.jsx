@@ -13,18 +13,20 @@ export default function SuperAdminBrandingPreview({ settings }) {
   const radius = settings.border_radius === 'full' ? '999px' : settings.border_radius === 'none' ? '0px' : settings.border_radius === 'lg' ? '12px' : settings.border_radius === 'sm' ? '4px' : '8px';
 
   return (
-    <Card className="h-full flex flex-col bg-[#1a1a2e] border-[#3a3a5a] overflow-hidden">
-      <CardHeader className="border-b border-[#3a3a5a] py-3">
+    <Card className="h-full flex flex-col overflow-hidden rounded-none border-0 shadow-none">
+      <CardHeader className="border-b border-pl-border py-3">
         <div className="flex justify-between items-center">
-          <CardTitle className="text-sm font-medium text-gray-400 uppercase tracking-wider">Live Preview</CardTitle>
-          <div className="flex gap-2">
-            <Sun className="h-4 w-4 text-gray-500" />
-            <Moon className="h-4 w-4 text-blue-400" />
+          <CardTitle className="text-sm font-medium text-pl-muted uppercase tracking-wider">Live Preview</CardTitle>
+          <div className="flex gap-2 text-pl-muted" aria-hidden="true">
+            <Sun className="h-4 w-4" />
+            <Moon className="h-4 w-4" />
           </div>
         </div>
       </CardHeader>
       
-      <div className="flex-1 p-6 relative overflow-hidden flex items-center justify-center bg-black/20">
+      {/* The mock app paints the organisation's own colours from the
+          settings, whatever the manager's theme: a document canvas. */}
+      <div className="flex-1 p-6 relative overflow-hidden flex items-center justify-center bg-pl-sunken" data-canvas="document">
         {/* Mock Application Interface */}
         <div 
           className="w-full max-w-md aspect-[9/16] md:aspect-[4/3] rounded-xl overflow-hidden shadow-2xl flex flex-col relative transition-all duration-300"

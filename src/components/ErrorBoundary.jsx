@@ -1,6 +1,15 @@
 import React from 'react';
 import { AlertCircle, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { ThemedApp, readLastTheme } from '@/design/ThemeProvider';
+import { DEFAULT_THEME } from '@/design/tokens';
+
+// The root boundary wraps the whole app, above the router and the auth
+// provider, so its panel sits outside every scope and opens its own
+// (docs/scope/DesignSystem-Rollout.md section 4.2, batch 3A). The signed-in
+// user is not known up here, so the panel paints the theme this device
+// last resolved (petrolord.theme.v1.last), light when there is none: a dark
+// user does not get a light flash when a page fails.
 
 export class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -39,24 +48,28 @@ export class ErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center p-4">
+        <ThemedApp
+          defaultTheme={readLastTheme() || DEFAULT_THEME}
+          data-testid="error-boundary-panel"
+          className="min-h-screen flex items-center justify-center p-4 text-pl-text"
+        >
           <div className="max-w-md w-full">
-            <div className="bg-gray-800 border border-red-700 rounded-lg p-6 shadow-xl">
+            <div className="bg-pl-raised border border-pl-danger/40 rounded-lg p-6 shadow-pl-lg">
               <div className="flex items-center gap-3 mb-4">
-                <AlertCircle className="w-8 h-8 text-red-500" />
-                <h1 className="text-2xl font-bold">Something went wrong</h1>
+                <AlertCircle className="w-8 h-8 text-pl-danger-text" aria-hidden="true" />
+                <h1 className="font-pl-display text-2xl font-semibold text-pl-text">Something went wrong</h1>
               </div>
 
-              <div className="bg-gray-950 rounded p-4 mb-6 max-h-48 overflow-auto border border-gray-700">
-                <p className="text-sm text-red-300 font-mono font-medium">
+              <div className="bg-pl-sunken rounded p-4 mb-6 max-h-48 overflow-auto border border-pl-border">
+                <p className="text-sm text-pl-danger-text font-pl-mono font-medium break-words">
                   {this.state.error?.toString()}
                 </p>
                 {this.state.errorInfo && (
-                  <details className="mt-4 text-xs text-gray-400">
-                    <summary className="cursor-pointer font-semibold mb-2 hover:text-gray-300">
+                  <details className="mt-4 text-xs text-pl-muted">
+                    <summary className="cursor-pointer font-semibold mb-2 hover:text-pl-text">
                       View Stack Trace
                     </summary>
-                    <pre className="whitespace-pre-wrap break-words opacity-75">
+                    <pre className="whitespace-pre-wrap break-words font-pl-mono">
                       {this.state.errorInfo.componentStack}
                     </pre>
                   </details>
@@ -66,26 +79,26 @@ export class ErrorBoundary extends React.Component {
               <div className="space-y-3">
                 <Button
                   onClick={this.handleReset}
-                  className="w-full bg-blue-600 hover:bg-blue-700 flex items-center justify-center gap-2"
+                  className="w-full flex items-center justify-center gap-2"
                 >
-                  <RefreshCw className="w-4 h-4" />
+                  <RefreshCw className="w-4 h-4" aria-hidden="true" />
                   Reload Application
                 </Button>
                 <Button
                   onClick={() => window.location.href = '/login'}
                   variant="outline"
-                  className="w-full border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white"
+                  className="w-full"
                 >
                   Return to Login
                 </Button>
               </div>
 
-              <p className="text-xs text-gray-500 mt-4 text-center">
+              <p className="text-xs text-pl-muted mt-4 text-center">
                 If the issue persists, please contact support.
               </p>
             </div>
           </div>
-        </div>
+        </ThemedApp>
       );
     }
 

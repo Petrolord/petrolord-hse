@@ -7,9 +7,9 @@ export default function SuperAdminColorCustomizer({ settings, onChange }) {
   
   const ColorInput = ({ label, propKey, description }) => (
     <div className="space-y-2">
-      <Label className="text-gray-300">{label}</Label>
+      <Label>{label}</Label>
       <div className="flex gap-3">
-        <div className="relative h-10 w-12 rounded overflow-hidden border border-[#3a3a5a]">
+        <div className="relative h-10 w-12 shrink-0 rounded overflow-hidden border border-pl-border-strong">
           <input 
             type="color" 
             value={settings[propKey] || '#000000'}
@@ -20,18 +20,19 @@ export default function SuperAdminColorCustomizer({ settings, onChange }) {
         <Input 
           value={settings[propKey] || ''}
           onChange={(e) => onChange(propKey, e.target.value)}
-          className="bg-[#111827] border-[#3a3a5a] text-white font-mono"
+          aria-label={`${label} hex value`}
+          className="font-pl-mono"
         />
       </div>
-      {description && <p className="text-xs text-gray-500">{description}</p>}
+      {description && <p className="text-xs text-pl-muted">{description}</p>}
     </div>
   );
 
   return (
     <div className="space-y-6">
-      <Card className="bg-[#1a1a2e] border-[#3a3a5a]">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-white text-base">Brand Colors</CardTitle>
+          <CardTitle className="text-base">Brand Colors</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           <ColorInput 
@@ -52,9 +53,9 @@ export default function SuperAdminColorCustomizer({ settings, onChange }) {
         </CardContent>
       </Card>
 
-      <Card className="bg-[#1a1a2e] border-[#3a3a5a]">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-white text-base">Interface Colors</CardTitle>
+          <CardTitle className="text-base">Interface Colors</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           <ColorInput 

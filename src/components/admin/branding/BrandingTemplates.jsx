@@ -52,11 +52,11 @@ export default function BrandingTemplates({ onApply, currentSettings }) {
     <>
       <Dialog open={saveOpen} onOpenChange={setSaveOpen}>
         <DialogTrigger asChild>
-          <Button variant="outline" className="border-[#3a3a5a] text-gray-300">
+          <Button variant="outline">
             <Save className="mr-2 h-4 w-4" /> Save Template
           </Button>
         </DialogTrigger>
-        <DialogContent className="bg-[#1a1a2e] border-[#3a3a5a] text-white">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>Save Branding Template</DialogTitle>
           </DialogHeader>
@@ -66,34 +66,33 @@ export default function BrandingTemplates({ onApply, currentSettings }) {
               <Input 
                 value={newTemplateName} 
                 onChange={(e) => setNewTemplateName(e.target.value)}
-                className="bg-[#111827] border-[#3a3a5a] text-white"
               />
             </div>
-            <Button onClick={handleSaveTemplate} className="w-full petrolord-button">Save</Button>
+            <Button onClick={handleSaveTemplate} className="w-full">Save</Button>
           </div>
         </DialogContent>
       </Dialog>
 
       <Dialog open={loadOpen} onOpenChange={setLoadOpen}>
         <DialogTrigger asChild>
-          <Button variant="outline" className="border-[#3a3a5a] text-gray-300">
+          <Button variant="outline">
             <FolderOpen className="mr-2 h-4 w-4" /> Load Template
           </Button>
         </DialogTrigger>
-        <DialogContent className="bg-[#1a1a2e] border-[#3a3a5a] text-white">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>Load Template</DialogTitle>
           </DialogHeader>
           <div className="space-y-2 py-4">
             {templates.length === 0 ? (
-              <p className="text-gray-500 text-center">No templates found.</p>
+              <p className="text-pl-muted text-center">No templates found.</p>
             ) : (
               <div className="grid gap-2">
                 {templates.map(t => (
                   <Button 
                     key={t.id} 
                     variant="ghost" 
-                    className="justify-start hover:bg-[#252541]"
+                    className="justify-start"
                     onClick={() => handleApply(t)}
                   >
                     {t.name}
