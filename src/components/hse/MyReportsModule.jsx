@@ -8,6 +8,8 @@ import MyReportsList from './my-reports/MyReportsList';
 import ReportDetailSheet from './my-reports/ReportDetailSheet';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
+// My Reports renders inside the design-system scope (batch 1A,
+// src/design/rollout/w1a.js), so it is on the roles only.
 export default function MyReportsModule() {
   const { currentUser, currentOrganization } = useHSE();
   const [reports, setReports] = useState([]);
@@ -39,35 +41,36 @@ export default function MyReportsModule() {
   );
 
   return (
-    <div className="flex flex-col h-[calc(100vh-64px)] bg-[var(--bg-app)]">
+    <div className="flex flex-col h-[calc(100vh-64px)] bg-pl-bg text-pl-text">
       {/* Header */}
-      <div className="border-b border-[#3a3a5a] bg-[#1a1a2e] p-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="bg-slate-700/50 p-2 rounded-lg">
-            <ClipboardList className="h-6 w-6 text-slate-300" />
+      <div className="border-b border-pl-border bg-pl-surface p-4 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="bg-pl-sunken border border-pl-border p-2 rounded-lg">
+            <ClipboardList className="h-6 w-6 text-pl-muted" aria-hidden="true" />
           </div>
-          <div>
-            <h2 className="text-xl font-bold text-white">My Reports</h2>
-            <p className="text-xs text-gray-400">Track status of your submitted observations</p>
+          <div className="min-w-0">
+            <h2 className="font-pl-display text-xl font-semibold text-pl-text">My Reports</h2>
+            <p className="text-xs text-pl-muted">Track status of your submitted observations</p>
           </div>
         </div>
         
         <div className="flex items-center gap-3">
           <div className="relative w-64 hidden md:block">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-pl-muted" aria-hidden="true" />
             <Input 
               placeholder="Search reports..." 
-              className="pl-9 bg-[#252541] border-[#3a3a5a] h-9 text-white"
+              aria-label="Search reports"
+              className="pl-9 h-9"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-[140px] bg-[#252541] border-[#3a3a5a] text-white h-9">
+            <SelectTrigger className="w-[168px] h-9" aria-label="Filter by status">
               <Filter className="w-3 h-3 mr-2" />
               <SelectValue placeholder="Filter Status" />
             </SelectTrigger>
-            <SelectContent className="bg-[#1a1a2e] border-[#3a3a5a] text-white">
+            <SelectContent>
               <SelectItem value="all">All Status</SelectItem>
               <SelectItem value="submitted">Submitted</SelectItem>
               <SelectItem value="acknowledged">Acknowledged</SelectItem>
@@ -81,14 +84,14 @@ export default function MyReportsModule() {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-hidden p-6">
+      <div className="flex-1 overflow-auto p-4 sm:p-6">
         {loading ? (
-          <div className="flex items-center justify-center h-full text-white">
-            <Loader2 className="h-8 w-8 animate-spin text-blue-500 mr-2" /> Loading reports...
+          <div className="flex items-center justify-center h-full text-pl-muted">
+            <Loader2 className="h-8 w-8 animate-spin text-pl-primary-text mr-2" /> Loading reports...
           </div>
         ) : filteredReports.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-gray-500">
-            <ClipboardList className="h-12 w-12 mb-4 opacity-20" />
+          <div className="flex flex-col items-center justify-center h-full text-pl-muted">
+            <ClipboardList className="h-12 w-12 mb-4 opacity-40" aria-hidden="true" />
             <p>No reports found.</p>
           </div>
         ) : (

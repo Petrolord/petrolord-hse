@@ -4,6 +4,13 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Button } from '@/components/ui/button';
 import { Layers, Plus, Navigation, MapPin } from 'lucide-react';
+import { useThemeClass } from '@/design/themeClass';
+
+// Scope-aware (its only user is the Report Wizard). Inside a design-system
+// scope the map frame is a light canvas (data-canvas="light"): the tiles,
+// the Leaflet controls and the overlay buttons keep their own look in both
+// themes. Outside a scope it renders as before
+// (src/components/hse/__tests__/reportingLegacyDom.test.jsx).
 
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
@@ -101,6 +108,7 @@ export default function InteractiveMap({
 }) {
   const [mapType, setMapType] = useState('street'); 
   const [tempMarker, setTempMarker] = useState(null);
+  const tc = useThemeClass();
   
   const layers = {
     street: "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
@@ -172,12 +180,12 @@ export default function InteractiveMap({
   }, [sites, locations, selectedSiteId, defaultCenter, tempMarker]);
 
   return (
-    <div className="relative w-full rounded-lg overflow-hidden border border-[#3a3a5a] group" style={{ height }}>
+    <div data-canvas={tc(undefined, 'light')} className={tc('relative w-full rounded-lg overflow-hidden border border-[#3a3a5a] group', 'relative w-full rounded-lg overflow-hidden border border-pl-border group')} style={{ height }}>
       <MapContainer 
         center={defaultCenter} 
         zoom={12} 
         style={{ height: '100%', width: '100%' }}
-        className="z-0 bg-[#1a1a2e]"
+        className={tc('z-0 bg-[#1a1a2e]', 'z-0')}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
