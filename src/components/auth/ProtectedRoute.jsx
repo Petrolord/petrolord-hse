@@ -4,7 +4,7 @@ import { useHSE } from '@/context/HSEContext';
 import { useAppState } from '@/context/AppStateContext';
 import { Loader2, ShieldAlert } from 'lucide-react';
 import { AccountScope } from '@/components/account/accountChrome';
-import { readLastTheme } from '@/design/ThemeProvider';
+import { ThemedApp, readLastTheme } from '@/design/ThemeProvider';
 import { DEFAULT_THEME } from '@/design/tokens';
 import { isThemedModule } from '@/design/rollout';
 
@@ -50,17 +50,19 @@ export const ProtectedRoute = ({ requiredRole, requirePremium = false }) => {
     const theme = protectedLoaderTheme(location.pathname, activeModule?.id || persistedModule?.id);
     if (theme) {
       return (
-        <div
-          data-pl-theme={theme}
-          data-pl-root=""
+        // A scope of its own (not a bare themed div), so the root pieces
+        // that follow the scope on screen (the toaster, the offline pill)
+        // match the loader. The user's stored choice wins once known.
+        <ThemedApp
+          defaultTheme={theme}
           data-testid="protected-route-loader"
           role="status"
           aria-live="polite"
-          className="h-screen w-full flex items-center justify-center bg-pl-bg text-pl-text"
+          className="h-screen w-full flex items-center justify-center text-pl-text"
         >
           <Loader2 className="h-8 w-8 animate-spin text-pl-primary-text" aria-hidden="true" />
           <span className="ml-2 text-pl-muted">Verifying access...</span>
-        </div>
+        </ThemedApp>
       );
     }
     return (

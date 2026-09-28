@@ -118,7 +118,7 @@ export default function UpgradePage() {
                     role="radio"
                     aria-checked={i === bandIndex}
                     onClick={() => setBandIndex(i)}
-                    className={cn('py-2.5 px-2 rounded-md text-xs font-semibold text-center font-pl-mono tabular-nums', choice(i === bandIndex))}
+                    className={cn('py-2.5 px-2 rounded-md text-xs font-semibold text-center tabular-nums', choice(i === bandIndex))}
                   >
                     {b.label} users
                   </button>

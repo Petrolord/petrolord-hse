@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { CheckCircle2, XCircle, RefreshCw, AlertTriangle, FileText, ChevronDown, ChevronUp } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { AccountScope, AccountPage, AccountHeader } from '@/components/account/accountChrome';
@@ -97,7 +96,9 @@ export default function SafetyContentAuditor() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <ScrollArea className="h-[600px] rounded-md border border-pl-border">
+            {/* A plain scroll box: the table scrolls sideways on a phone (the
+                Radix ScrollArea only scrolled down and clipped the columns). */}
+            <div className="h-[600px] overflow-auto rounded-md border border-pl-border">
               <Table>
                 <TableHeader className="bg-pl-sunken sticky top-0 z-10">
                   <TableRow className="hover:bg-pl-sunken">
@@ -233,7 +234,7 @@ export default function SafetyContentAuditor() {
                   })}
                 </TableBody>
               </Table>
-            </ScrollArea>
+            </div>
           </CardContent>
         </Card>
       </AccountPage>

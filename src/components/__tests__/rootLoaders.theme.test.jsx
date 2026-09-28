@@ -81,6 +81,8 @@ describe('ProtectedRoute loader and denied panels (batch 3A)', () => {
     let loader = screen.getByTestId('protected-route-loader');
     expect(loader).toHaveAttribute('data-pl-theme', 'light');
     expect(loader).toHaveTextContent('Verifying access...');
+    // it is a scope of its own, so the root pieces follow it
+    expect(document.documentElement).toHaveAttribute('data-pl-active-theme', 'light');
     expectNoLegacyChrome();
     expectNegativeControl(loader);
     cleanup();
