@@ -10,10 +10,13 @@ import SupportContact from './SupportContact';
 import HelpSearchResults from './HelpSearchResults';
 import { searchHelp } from '@/data/helpContent/searchHelp';
 
+// Design family (batch 2C): the Help Centre renders inside the signed-in scope
+// (src/design/rollout/w2c.js) on the theme roles. The guides are code-driven
+// (src/data/helpContent); GuideViewer renders their blocks on the roles.
 export default function HelpCenter() {
   const [activeTab, setActiveTab] = useState('start');
   const [query, setQuery] = useState('');
-  // {id, token} — bumping token re-opens the same guide from a fresh search.
+  // {id, token}: bumping token re-opens the same guide from a fresh search.
   const [guideRequest, setGuideRequest] = useState({ id: null, token: 0 });
 
   const searching = query.trim().length > 0;
@@ -26,15 +29,14 @@ export default function HelpCenter() {
   };
 
   return (
-    <div className="min-h-screen bg-[#1a1a2e] text-white flex flex-col">
+    <div className="min-h-screen bg-pl-bg text-pl-text flex flex-col">
       {/* Hero Section */}
-      <div className="bg-gradient-to-b from-[#1f1f35] to-[#1a1a2e] border-b border-[#2a2a40] py-16 px-6 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-[#FFC107] opacity-5 blur-[120px] rounded-full pointer-events-none" />
-        <div className="max-w-7xl mx-auto text-center relative z-10">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6 text-white tracking-tight">
-            Petrolord HSE <span className="text-[#FFC107]">Help Center</span>
+      <div className="bg-pl-surface border-b border-pl-border py-10 sm:py-16 px-4 sm:px-6">
+        <div className="max-w-7xl mx-auto text-center">
+          <h1 className="font-pl-display text-3xl sm:text-4xl md:text-5xl font-semibold mb-4 sm:mb-6 text-pl-text tracking-tight">
+            Petrolord HSE Help Center
           </h1>
-          <p className="text-xl text-[#b0b0c0] mb-10 max-w-2xl mx-auto">
+          <p className="text-lg sm:text-xl text-pl-muted mb-8 sm:mb-10 max-w-2xl mx-auto">
             Find guides, documentation, and support for all your HSE management needs.
           </p>
           <SearchBar value={query} onChange={setQuery} />
@@ -42,7 +44,7 @@ export default function HelpCenter() {
       </div>
 
       {/* Main content: search results when searching, otherwise the tabs */}
-      <div className="flex-1 max-w-7xl mx-auto w-full px-6 py-10">
+      <div className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 py-8 sm:py-10">
         {searching ? (
           <HelpSearchResults
             query={query}
@@ -53,7 +55,7 @@ export default function HelpCenter() {
           />
         ) : (
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
-            <TabsList className="bg-[#252541] border border-[#3a3a5a] p-1.5 h-auto rounded-xl flex-wrap justify-start sm:justify-center">
+            <TabsList className="flex h-auto w-full flex-wrap justify-start gap-1 p-1.5 rounded-xl sm:justify-center">
               <HelpTabTrigger value="start" icon={Rocket} label="Getting Started" />
               <HelpTabTrigger value="modules" icon={LayoutGrid} label="Module Guides" />
               <HelpTabTrigger value="workflows" icon={GitBranch} label="Features & Workflows" />
@@ -93,13 +95,9 @@ function HelpTabTrigger({ value, icon: Icon, label }) {
   return (
     <TabsTrigger 
       value={value}
-      className="
-        flex items-center gap-2 px-6 py-3 rounded-lg text-sm font-medium transition-all
-        data-[state=active]:bg-[#FFC107] data-[state=active]:text-black
-        data-[state=inactive]:text-gray-400 data-[state=inactive]:hover:text-white data-[state=inactive]:hover:bg-[#2d2d4a]
-      "
+      className="flex items-center gap-2 px-3 py-2 sm:px-6 sm:py-3 rounded-lg"
     >
-      <Icon className="h-4 w-4" />
+      <Icon className="h-4 w-4" aria-hidden="true" />
       {label}
     </TabsTrigger>
   );

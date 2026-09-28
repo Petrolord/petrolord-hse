@@ -37,7 +37,7 @@ describe('rollout lists', () => {
 
   it('leaves every other module legacy', () => {
     // 'legacy-probe' is an id no batch lists (batch 1B migrated 'permits').
-    for (const id of ['legacy-probe', 'help', 'settings']) expect(isThemedModule(id)).toBe(false);
+    for (const id of ['legacy-probe', 'settings']) expect(isThemedModule(id)).toBe(false);
   });
 
   it('lists each module once, only real MainContent module ids, one file per batch', () => {

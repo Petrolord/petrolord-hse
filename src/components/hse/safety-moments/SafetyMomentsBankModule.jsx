@@ -12,6 +12,11 @@ import { Button } from '@/components/ui/button';
 import { useToast } from "@/components/ui/use-toast";
 import { safetyMomentsData } from '@/data/safetyMomentsData';
 
+// Design family (batch 2C): Safety Moments renders inside the signed-in scope
+// (src/design/rollout/w2c.js), so it uses the theme roles directly. The tabs
+// keep their underline look on the roles.
+const tabTriggerClass = 'gap-2 rounded-none border-b-2 border-transparent bg-transparent px-0 py-3 text-pl-muted shadow-none hover:text-pl-text data-[state=active]:border-pl-primary data-[state=active]:bg-transparent data-[state=active]:text-pl-primary-text data-[state=active]:shadow-none';
+
 export default function SafetyMomentsBankModule() {
   const { currentUser, currentOrganization } = useHSE(); // assuming role check here
   const { toast } = useToast();
@@ -81,7 +86,7 @@ export default function SafetyMomentsBankModule() {
       toast({
         title: "Library Updated",
         description: `Successfully added ${result.count} rich safety moments to the library.`,
-        className: "bg-emerald-600 text-white border-none"
+        variant: "success"
       });
       loadMoments();
     } catch (e) {
@@ -93,53 +98,42 @@ export default function SafetyMomentsBankModule() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-[var(--bg-app)]">
+    <div className="flex flex-col h-full bg-pl-bg text-pl-text">
       {/* Header */}
-      <div className="border-b border-[#3a3a5a] bg-[#1a1a2e]">
-        <div className="p-6 pb-0">
-          <div className="flex justify-between items-center mb-6">
-            <div>
-              <h1 className="text-2xl font-bold text-white">Safety Moments Bank</h1>
-              <p className="text-[#b0b0c0] text-sm mt-1">Access curated safety topics for your team briefings.</p>
+      <div className="border-b border-pl-border bg-pl-surface">
+        <div className="p-4 sm:p-6 pb-0 sm:pb-0">
+          <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6">
+            <div className="min-w-0">
+              <h1 className="font-pl-display text-2xl font-semibold text-pl-text">Safety Moments Bank</h1>
+              <p className="text-pl-muted text-sm mt-1">Access curated safety topics for your team briefings.</p>
             </div>
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
               {/* Only show Seed button if library is empty or for admin/testing */}
               <Button 
                 onClick={handleSeed}
                 disabled={seeding}
                 variant="outline"
-                className="border-emerald-600 text-emerald-500 hover:bg-emerald-600 hover:text-white"
               >
-                <Database className="mr-2 h-4 w-4" /> {seeding ? "Populating..." : "Restock Library"}
+                <Database className="mr-2 h-4 w-4" aria-hidden="true" /> {seeding ? "Populating..." : "Restock Library"}
               </Button>
               <Button 
                 onClick={() => setIsCreateModalOpen(true)}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white"
               >
-                <Plus className="mr-2 h-4 w-4" /> Create Moment
+                <Plus className="mr-2 h-4 w-4" aria-hidden="true" /> Create Moment
               </Button>
             </div>
           </div>
           
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="bg-transparent h-auto p-0 space-x-6 border-b-0">
-              <TabsTrigger 
-                value="library" 
-                className="data-[state=active]:border-b-2 data-[state=active]:border-emerald-500 data-[state=active]:text-emerald-400 rounded-none bg-transparent px-0 py-3 text-[#7a7a9a] hover:text-white border-b-2 border-transparent transition-all flex items-center gap-2"
-              >
-                <Library className="h-4 w-4" /> Library
+            <TabsList className="h-auto justify-start gap-6 rounded-none border-0 bg-transparent p-0">
+              <TabsTrigger value="library" className={tabTriggerClass}>
+                <Library className="h-4 w-4" aria-hidden="true" /> Library
               </TabsTrigger>
-              <TabsTrigger 
-                value="dashboard" 
-                className="data-[state=active]:border-b-2 data-[state=active]:border-emerald-500 data-[state=active]:text-emerald-400 rounded-none bg-transparent px-0 py-3 text-[#7a7a9a] hover:text-white border-b-2 border-transparent transition-all flex items-center gap-2"
-              >
-                <LayoutDashboard className="h-4 w-4" /> Overview
+              <TabsTrigger value="dashboard" className={tabTriggerClass}>
+                <LayoutDashboard className="h-4 w-4" aria-hidden="true" /> Overview
               </TabsTrigger>
-              <TabsTrigger 
-                value="saved" 
-                className="data-[state=active]:border-b-2 data-[state=active]:border-emerald-500 data-[state=active]:text-emerald-400 rounded-none bg-transparent px-0 py-3 text-[#7a7a9a] hover:text-white border-b-2 border-transparent transition-all flex items-center gap-2"
-              >
-                <Bookmark className="h-4 w-4" /> Saved
+              <TabsTrigger value="saved" className={tabTriggerClass}>
+                <Bookmark className="h-4 w-4" aria-hidden="true" /> Saved
               </TabsTrigger>
             </TabsList>
           </Tabs>
