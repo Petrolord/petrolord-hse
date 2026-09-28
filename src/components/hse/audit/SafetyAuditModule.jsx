@@ -50,31 +50,33 @@ export default function SafetyAuditModule() {
   }, [currentOrganization, activeTab, filters]);
 
   return (
-    <div className="flex h-[calc(100vh-64px)] overflow-hidden bg-[var(--bg-app)]">
+    <div className="flex flex-col md:flex-row h-[calc(100vh-64px)] overflow-hidden bg-pl-bg text-pl-text">
       {activeTab === 'schedule' && <AuditFilters filters={filters} setFilters={setFilters} />}
       
       <div className="flex-1 flex flex-col min-w-0">
-        <div className="flex items-center justify-between p-4 border-b border-[#3a3a5a] bg-[#1a1a2e]">
-          <h2 className="text-xl font-bold text-white">Safety Audit Management</h2>
-          <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 p-4 border-b border-pl-border bg-pl-surface">
+          <h2 className="font-pl-display text-xl font-semibold text-pl-text">Safety Audit Management</h2>
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4 min-w-0">
+            <div className="max-w-full overflow-x-auto">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-auto">
-              <TabsList className="bg-[#252541] border border-[#3a3a5a]">
+              <TabsList>
                 <TabsTrigger value="schedule">Schedule</TabsTrigger>
                 <TabsTrigger value="internal">Internal Audits</TabsTrigger>
                 <TabsTrigger value="findings">Findings</TabsTrigger>
                 <TabsTrigger value="reports">Reporting</TabsTrigger>
               </TabsList>
             </Tabs>
-            <Button className="bg-purple-600 hover:bg-purple-700 text-white" onClick={() => setIsModalOpen(true)}>
-              <Plus className="mr-2 h-4 w-4" /> Schedule Audit
+            </div>
+            <Button onClick={() => setIsModalOpen(true)}>
+              <Plus className="mr-2 h-4 w-4" aria-hidden="true" /> Schedule Audit
             </Button>
           </div>
         </div>
 
-        <div className="flex-1 overflow-hidden bg-[var(--bg-app)]">
+        <div className="flex-1 overflow-hidden bg-pl-bg">
           {activeTab === 'schedule' && <AuditSchedule audits={audits} />}
           {activeTab !== 'schedule' && (
-            <div className="flex items-center justify-center h-full text-[#7a7a9a]">
+            <div className="flex items-center justify-center h-full p-6 text-center text-pl-muted">
               Module section {activeTab} coming soon...
             </div>
           )}

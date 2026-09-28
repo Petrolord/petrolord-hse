@@ -68,28 +68,28 @@ const PRESETS = {
 
 export default function ThemePresets({ currentPreset, onApplyPreset }) {
   return (
-    <Card className="bg-[var(--bg-card)] border-[var(--border-color)] mb-6">
+    <Card className="mb-6">
       <CardContent className="pt-6">
-        <Label className="mb-4 block text-sm font-semibold uppercase text-[var(--text-muted)]">Quick Theme Presets</Label>
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+        <Label className="mb-4 block text-sm font-semibold uppercase text-pl-muted">Quick Theme Presets</Label>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
           {Object.entries(PRESETS).map(([key, preset]) => (
             <button
               key={key}
               onClick={() => onApplyPreset(preset.branding_config)}
               className={`
                 relative p-3 rounded-xl border text-left transition-all group overflow-hidden
-                ${currentPreset === key ? 'border-[var(--accent)] ring-1 ring-[var(--accent)] bg-[var(--accent)]/5' : 'border-[var(--border-color)] hover:border-[var(--text-secondary)] bg-[var(--bg-app)]'}
+                ${currentPreset === key ? 'border-pl-primary ring-1 ring-pl-primary bg-pl-sunken' : 'border-pl-border hover:border-pl-border-strong bg-pl-sunken'}
               `}
             >
               <div className="flex gap-1.5 mb-2">
-                <div className="w-4 h-4 rounded-full shadow-sm" style={{ background: preset.branding_config.colors.brand.primary }} />
-                <div className="w-4 h-4 rounded-full shadow-sm" style={{ background: preset.branding_config.colors.dark.background }} />
+                <div className="w-4 h-4 rounded-full shadow-sm border border-pl-border" style={{ background: preset.branding_config.colors.brand.primary }} />
+                <div className="w-4 h-4 rounded-full shadow-sm border border-pl-border" style={{ background: preset.branding_config.colors.dark.background }} />
               </div>
-              <span className="text-xs font-medium block truncate text-[var(--text-primary)]">{preset.label}</span>
+              <span className="text-xs font-medium block truncate text-pl-text">{preset.label}</span>
               
               {/* Optional: Checkmark for active state if we tracked preset ID explicitly
               {currentPreset === key && (
-                <div className="absolute top-2 right-2 text-[var(--accent)]">
+                <div className="absolute top-2 right-2 text-pl-primary-text">
                   <Check className="h-3 w-3" />
                 </div>
               )} */}

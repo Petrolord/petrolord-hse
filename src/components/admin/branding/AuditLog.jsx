@@ -24,39 +24,39 @@ export default function AuditLog({ orgId }) {
     }
   };
 
-  if (loading) return <div className="text-sm text-center py-4 text-gray-500">Loading audit history...</div>;
+  if (loading) return <div className="text-sm text-center py-4 text-pl-muted">Loading audit history...</div>;
 
   return (
-    <Card className="bg-[var(--bg-card)] border-[var(--border-color)]">
+    <Card>
       <CardHeader className="pb-3">
         <CardTitle className="text-sm font-medium flex items-center gap-2">
-          <History className="h-4 w-4" /> Change History
+          <History className="h-4 w-4 text-pl-muted" aria-hidden="true" /> Change History
         </CardTitle>
       </CardHeader>
       <CardContent>
         <ScrollArea className="h-[250px] pr-4">
           <div className="space-y-4">
             {logs.length === 0 ? (
-              <p className="text-xs text-gray-500 text-center py-8">No changes recorded yet.</p>
+              <p className="text-xs text-pl-muted text-center py-8">No changes recorded yet.</p>
             ) : (
               logs.map((log) => (
-                <div key={log.id} className="flex gap-3 text-sm border-b border-gray-800 pb-3 last:border-0">
-                  <div className="bg-blue-900/20 p-2 rounded-full h-fit">
-                    <User className="h-3 w-3 text-blue-400" />
+                <div key={log.id} className="flex gap-3 text-sm border-b border-pl-border pb-3 last:border-0">
+                  <div className="bg-pl-sunken border border-pl-border p-2 rounded-full h-fit text-pl-muted">
+                    <User className="h-3 w-3" aria-hidden="true" />
                   </div>
-                  <div className="flex-1">
-                    <div className="flex justify-between items-start">
-                      <p className="font-medium text-gray-200">{formatAction(log.action)}</p>
-                      <span className="text-[10px] text-gray-500 flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap justify-between items-start gap-1">
+                      <p className="font-medium text-pl-text">{formatAction(log.action)}</p>
+                      <span className="text-[10px] text-pl-muted flex items-center gap-1 font-pl-mono tabular-nums">
+                        <Clock className="h-3 w-3" aria-hidden="true" />
                         {format(new Date(log.timestamp), 'MMM d, h:mm a')}
                       </span>
                     </div>
-                    <p className="text-xs text-gray-400 mt-0.5">
+                    <p className="text-xs text-pl-muted mt-0.5">
                       by {log.performer?.email || 'Unknown User'}
                     </p>
                     {log.changes && (
-                      <pre className="text-[10px] bg-black/20 p-1.5 rounded mt-2 overflow-x-auto text-gray-500">
+                      <pre className="text-[10px] font-pl-mono bg-pl-sunken border border-pl-border p-1.5 rounded mt-2 overflow-x-auto text-pl-muted">
                         {JSON.stringify(log.changes, null, 2)}
                       </pre>
                     )}

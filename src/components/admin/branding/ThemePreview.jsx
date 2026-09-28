@@ -57,29 +57,34 @@ export default function ThemePreview({ settings }) {
   };
 
   return (
-    <Card className="bg-[var(--bg-card)] border-[var(--border-color)] sticky top-6 overflow-hidden">
-      <CardHeader className="border-b border-[var(--border-color)] pb-3 bg-[var(--bg-card)]">
+    <Card className="lg:sticky lg:top-6 overflow-hidden">
+      <CardHeader className="border-b border-pl-border pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-sm uppercase tracking-wider text-[var(--text-muted)]">Live Preview</CardTitle>
-          <div className="flex bg-[var(--bg-app)] rounded-lg p-1 border border-[var(--border-color)]">
+          <CardTitle className="text-sm uppercase tracking-wider text-pl-muted">Live Preview</CardTitle>
+          <div className="flex bg-pl-sunken rounded-lg p-1 border border-pl-border" role="group" aria-label="Preview mode">
             <button 
               onClick={() => setPreviewMode('light')}
-              className={`p-1.5 rounded ${previewMode === 'light' ? 'bg-[var(--bg-card)] shadow-sm' : 'opacity-50 hover:opacity-100'}`}
+              aria-label="Light preview"
+              aria-pressed={previewMode === 'light'}
+              className={`p-1.5 rounded text-pl-text ${previewMode === 'light' ? 'bg-pl-surface shadow-pl-sm' : 'opacity-50 hover:opacity-100'}`}
             >
-              <Sun className="h-3 w-3" />
+              <Sun className="h-3 w-3" aria-hidden="true" />
             </button>
             <button 
               onClick={() => setPreviewMode('dark')}
-              className={`p-1.5 rounded ${previewMode === 'dark' ? 'bg-[var(--bg-card)] shadow-sm' : 'opacity-50 hover:opacity-100'}`}
+              aria-label="Dark preview"
+              aria-pressed={previewMode === 'dark'}
+              className={`p-1.5 rounded text-pl-text ${previewMode === 'dark' ? 'bg-pl-surface shadow-pl-sm' : 'opacity-50 hover:opacity-100'}`}
             >
-              <Moon className="h-3 w-3" />
+              <Moon className="h-3 w-3" aria-hidden="true" />
             </button>
           </div>
         </div>
       </CardHeader>
       
-      {/* The isolated preview area */}
-      <div className="min-h-[400px]" style={{ ...containerStyle, padding: `${24 * spacingMultiplier}px` }}>
+      {/* The isolated preview area: it paints the organisation's own
+          colours inline, so it keeps them in both family themes. */}
+      <div className="min-h-[400px]" data-canvas="document" style={{ ...containerStyle, padding: `${24 * spacingMultiplier}px` }}>
         
         {/* Mock Navigation */}
         <div className="flex items-center justify-between mb-6 pb-4 border-b" style={{ borderColor }}>
@@ -93,7 +98,7 @@ export default function ThemePreview({ settings }) {
           </div>
           <div className="flex gap-3">
              <Bell className="h-5 w-5 opacity-70" />
-             <div className="h-8 w-8 rounded-full bg-gray-400" />
+             <div className="h-8 w-8 rounded-full" style={{ backgroundColor: borderColor }} />
           </div>
         </div>
 

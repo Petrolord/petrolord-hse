@@ -45,52 +45,52 @@ export default function NewAuditModal({ isOpen, onClose, onSuccess, sites, users
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px] bg-[#1a1a2e] border-[#3a3a5a] text-white">
+      <DialogContent className="sm:max-w-[600px]">
         <DialogHeader><DialogTitle>Schedule New Audit</DialogTitle></DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-[#b0b0c0]">Audit Type</Label>
+              <Label>Audit Type</Label>
               <Select value={formData.audit_type} onValueChange={v => setFormData({...formData, audit_type: v})}>
-                <SelectTrigger className="bg-[#252541] border-[#3a3a5a] text-white"><SelectValue /></SelectTrigger>
-                <SelectContent className="bg-[#252541] border-[#3a3a5a] text-white">
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
                   {['Internal','Contractor','Site','System'].map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <Label className="text-[#b0b0c0]">Scheduled Date</Label>
-              <Input type="date" value={formData.scheduled_date} onChange={e => setFormData({...formData, scheduled_date: e.target.value})} className="bg-[#252541] border-[#3a3a5a] text-white" required />
+              <Label>Scheduled Date</Label>
+              <Input type="date" value={formData.scheduled_date} onChange={e => setFormData({...formData, scheduled_date: e.target.value})} required />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-[#b0b0c0]">Location</Label>
+              <Label>Location</Label>
               <Select value={formData.location_id} onValueChange={v => setFormData({...formData, location_id: v})}>
-                <SelectTrigger className="bg-[#252541] border-[#3a3a5a] text-white"><SelectValue placeholder="Select Location" /></SelectTrigger>
-                <SelectContent className="bg-[#252541] border-[#3a3a5a] text-white">
+                <SelectTrigger><SelectValue placeholder="Select Location" /></SelectTrigger>
+                <SelectContent>
                   {sites.map(s => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <Label className="text-[#b0b0c0]">Auditor</Label>
+              <Label>Auditor</Label>
               <Select value={formData.auditor_id} onValueChange={v => setFormData({...formData, auditor_id: v})}>
-                <SelectTrigger className="bg-[#252541] border-[#3a3a5a] text-white"><SelectValue placeholder="Select Auditor" /></SelectTrigger>
-                <SelectContent className="bg-[#252541] border-[#3a3a5a] text-white">
+                <SelectTrigger><SelectValue placeholder="Select Auditor" /></SelectTrigger>
+                <SelectContent>
                   {users.map(u => <SelectItem key={u.id} value={u.id}>{u.raw_user_meta_data?.full_name || u.email}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
           </div>
           <div className="space-y-2">
-            <Label className="text-[#b0b0c0]">Scope / Notes</Label>
-            <Input value={formData.scope} onChange={e => setFormData({...formData, scope: e.target.value})} className="bg-[#252541] border-[#3a3a5a] text-white" />
+            <Label>Scope / Notes</Label>
+            <Input value={formData.scope} onChange={e => setFormData({...formData, scope: e.target.value})} />
           </div>
           <DialogFooter>
-            <Button type="button" variant="ghost" onClick={onClose} className="text-[#b0b0c0]">Cancel</Button>
-            <Button type="submit" disabled={loading} className="bg-purple-600 hover:bg-purple-700 text-white">
-              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Schedule
+            <Button type="button" variant="ghost" onClick={onClose}>Cancel</Button>
+            <Button type="submit" disabled={loading}>
+              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />} Schedule
             </Button>
           </DialogFooter>
         </form>
