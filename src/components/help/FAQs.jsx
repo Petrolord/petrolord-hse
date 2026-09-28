@@ -3,6 +3,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
 import { faqs } from '@/data/helpContent';
+import { accountEmpty } from '@/components/account/accountChrome';
 
 export default function FAQs() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -19,14 +20,15 @@ export default function FAQs() {
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h2 className="text-3xl font-bold mb-2">Frequently Asked Questions</h2>
-          <p className="text-[#b0b0c0]">Quick answers to common questions.</p>
+          <h2 className="font-pl-display text-2xl sm:text-3xl font-semibold text-pl-text mb-2">Frequently Asked Questions</h2>
+          <p className="text-pl-muted">Quick answers to common questions.</p>
         </div>
         <div className="relative w-full md:w-64">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-pl-muted" aria-hidden="true" />
           <Input 
             placeholder="Search FAQs..." 
-            className="pl-9 bg-[#252541] border-[#3a3a5a] text-white focus:border-[#FFC107]"
+            className="pl-9"
+            aria-label="Search FAQs"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -36,15 +38,15 @@ export default function FAQs() {
       <div className="space-y-6">
         {filteredFaqs.length > 0 ? (
           filteredFaqs.map((category, idx) => (
-            <div key={idx} className="bg-[#252541] border border-[#3a3a5a] rounded-xl p-6">
-              <h3 className="text-xl font-bold text-[#FFC107] mb-4">{category.category}</h3>
+            <div key={idx} className="bg-pl-surface border border-pl-border shadow-pl-sm rounded-xl p-4 sm:p-6">
+              <h3 className="text-xl font-semibold text-pl-text mb-4">{category.category}</h3>
               <Accordion type="single" collapsible className="w-full">
                 {category.questions.map((faq, fIdx) => (
-                  <AccordionItem key={fIdx} value={`item-${idx}-${fIdx}`} className="border-b-[#3a3a5a]">
-                    <AccordionTrigger className="text-white hover:text-[#FFC107] text-left">
+                  <AccordionItem key={fIdx} value={`item-${idx}-${fIdx}`}>
+                    <AccordionTrigger className="text-left hover:text-pl-primary-text">
                       {faq.q}
                     </AccordionTrigger>
-                    <AccordionContent className="text-gray-400 leading-relaxed">
+                    <AccordionContent className="text-pl-muted leading-relaxed">
                       {faq.a}
                     </AccordionContent>
                   </AccordionItem>
@@ -53,7 +55,7 @@ export default function FAQs() {
             </div>
           ))
         ) : (
-          <div className="text-center py-12 text-gray-500">
+          <div className={accountEmpty}>
             No questions found matching your search.
           </div>
         )}

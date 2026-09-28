@@ -3,12 +3,14 @@ import { Medal, Star, Zap, ShieldCheck } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const BADGES = {
-  first_report: { icon: Star, color: 'text-yellow-400', label: 'First Report', desc: 'Submitted your first safety report' },
-  quality_champion: { icon: ShieldCheck, color: 'text-green-400', label: 'Quality Champion', desc: 'Maintained >90% quality score' },
-  prolific_reporter: { icon: Zap, color: 'text-blue-400', label: 'Prolific', desc: 'Submitted 10+ reports' },
-  century_club: { icon: Medal, color: 'text-purple-400', label: 'Century Club', desc: 'Earned 100+ points' }
+  first_report: { icon: Star, label: 'First Report', desc: 'Submitted your first safety report' },
+  quality_champion: { icon: ShieldCheck, label: 'Quality Champion', desc: 'Maintained >90% quality score' },
+  prolific_reporter: { icon: Zap, label: 'Prolific', desc: 'Submitted 10+ reports' },
+  century_club: { icon: Medal, label: 'Century Club', desc: 'Earned 100+ points' }
 };
 
+// Design family (batch 2C): badge chips on the theme roles; the label names
+// each one (tooltip and screen reader), so no colour carries the meaning.
 export default function BadgeDisplay({ userBadges = [] }) {
   if (!userBadges.length) return null;
 
@@ -23,13 +25,14 @@ export default function BadgeDisplay({ userBadges = [] }) {
           return (
             <Tooltip key={idx}>
               <TooltipTrigger>
-                <div className={`p-1 rounded-full bg-white/5 border border-white/10 ${def.color}`}>
-                  <Icon className="h-3 w-3" />
+                <div className="p-1 rounded-full bg-pl-sunken border border-pl-border text-pl-primary-text">
+                  <Icon className="h-3 w-3" aria-hidden="true" />
+                  <span className="sr-only">{def.label}</span>
                 </div>
               </TooltipTrigger>
-              <TooltipContent className="bg-[#1a1a2e] border-[#3a3a5a] text-white">
+              <TooltipContent>
                 <p className="font-bold text-xs">{def.label}</p>
-                <p className="text-[10px] text-gray-400">{def.desc}</p>
+                <p className="text-[10px] text-pl-muted">{def.desc}</p>
               </TooltipContent>
             </Tooltip>
           );
