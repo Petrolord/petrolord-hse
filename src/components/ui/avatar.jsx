@@ -2,7 +2,6 @@ import * as React from "react"
 import * as AvatarPrimitive from "@radix-ui/react-avatar"
 
 import { cn } from "@/lib/utils"
-import { useThemeClass } from "@/design/themeClass"
 
 const Avatar = React.forwardRef(({ className, ...props }, ref) => (
   <AvatarPrimitive.Root
@@ -27,12 +26,11 @@ AvatarImage.displayName = AvatarPrimitive.Image.displayName
 
 // Inside a design-system scope: the Suite's sunken fallback.
 const AvatarFallback = React.forwardRef(({ className, ...props }, ref) => {
-  const tc = useThemeClass()
   return (
     <AvatarPrimitive.Fallback
       ref={ref}
       className={cn(
-        tc("flex h-full w-full items-center justify-center rounded-full bg-muted", "flex h-full w-full items-center justify-center rounded-full bg-pl-sunken text-pl-muted font-medium"),
+        "flex h-full w-full items-center justify-center rounded-full bg-pl-sunken text-pl-muted font-medium",
         className
       )}
       {...props}

@@ -9,7 +9,7 @@ import ReportDetailSheet from './my-reports/ReportDetailSheet';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 // My Reports renders inside the design-system scope (batch 1A,
-// src/design/rollout/w1a.js), so it is on the roles only.
+// src/design/SignedInScope.jsx), so it is on the roles only.
 export default function MyReportsModule() {
   const { currentUser, currentOrganization } = useHSE();
   const [reports, setReports] = useState([]);

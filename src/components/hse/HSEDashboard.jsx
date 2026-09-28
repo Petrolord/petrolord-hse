@@ -28,7 +28,7 @@ import { auditService } from '../../services/auditService';
 import { trainingService } from '../../services/trainingService';
 
 // Design system (wave 0 pilot): the HSE dashboard renders inside the
-// signed-in scope (src/design/rollout/w0.js), so it uses the theme roles
+// signed-in scope (src/design/SignedInScope.jsx), so it uses the theme roles
 // directly. KPI icons are neutral; colour is kept for status.
 export default function HSEDashboard() {
   const { setActiveModule, currentOrganization } = useHSE();

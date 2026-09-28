@@ -7,7 +7,7 @@ import { CHART_SERIES } from '@/utils/chartTheme';
 import { controlClass, Notice, Pick } from '../safety-stats/common';
 
 // Design family (batch 2B): Occupational Hygiene renders inside the signed-in
-// scope (src/design/rollout/w2b.js), so these pieces use the theme roles.
+// scope (src/design/SignedInScope.jsx), so these pieces use the theme roles.
 
 export { Notice, Pick, controlClass };
 

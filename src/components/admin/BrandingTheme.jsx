@@ -6,20 +6,23 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Loader2, Save, RefreshCcw, CheckCircle, Lock, Info } from 'lucide-react';
+import { Loader2, Save, RefreshCcw, Info } from 'lucide-react';
 
 // Subcomponents
 import PremiumFeatureLock from './branding/PremiumFeatureLock';
-import ThemePresets from './branding/ThemePresets';
 import LogoSection from './branding/LogoSection';
-import ColorSection from './branding/ColorSection';
-import TypographySection from './branding/TypographySection';
 import LayoutSection from './branding/LayoutSection';
-import ThemePreview from './branding/ThemePreview';
 import LoginPageCustomizer from './branding/LoginPageCustomizer';
 import FooterCustomizer from './branding/FooterCustomizer';
-import AdvancedCSSEditor from './branding/AdvancedCSSEditor';
 import AuditLog from './branding/AuditLog';
+
+// Design family end state (batch 4A, lead decision 6): inside the app the
+// Petrolord family look wins over an organisation's theme, colours, fonts
+// and custom CSS, and each user picks light or dark from the header toggle.
+// So the editor no longer shows the controls for them: the Quick Theme
+// Presets, the Colors and Typography tabs, the Custom CSS editor and the
+// colour preview are hidden. The saved values are untouched (a save writes
+// back what it loaded) and no column changes.
 
 const DEFAULT_CONFIG = {
   branding_config: {
@@ -108,17 +111,6 @@ export default function BrandingTheme() {
     }
   };
 
-  const applyPreset = (newConfig) => {
-    setSettings(prev => ({
-      ...prev,
-      branding_config: { ...prev.branding_config, ...newConfig },
-      primary_color: newConfig.colors.brand.primary,
-      secondary_color: newConfig.colors.brand.secondary,
-      accent_color: newConfig.colors.brand.accent,
-    }));
-    toast({ title: "Preset Selected", description: "Click Save to apply changes." });
-  };
-
   const handleFileUpload = async (e, type) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -155,8 +147,8 @@ export default function BrandingTheme() {
       <PremiumFeatureLock>
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
           <div>
-            <h2 className="text-2xl font-semibold text-pl-text">Branding & Theme</h2>
-            <p className="text-pl-muted">Customize the look and feel of your workspace.</p>
+            <h2 className="text-2xl font-semibold text-pl-text">Branding</h2>
+            <p className="text-pl-muted">Your organization's logo, login page and footer.</p>
           </div>
           <div className="flex flex-wrap gap-3">
             <Button variant="ghost" onClick={() => loadSettings()}>
@@ -172,8 +164,6 @@ export default function BrandingTheme() {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="w-full justify-start h-auto p-1 mb-6 flex-wrap">
             <TabsTrigger value="general" className="py-2 px-4">General</TabsTrigger>
-            <TabsTrigger value="colors" className="py-2 px-4">Colors</TabsTrigger>
-            <TabsTrigger value="typography" className="py-2 px-4">Typography</TabsTrigger>
             <TabsTrigger value="login" className="py-2 px-4">Login Page</TabsTrigger>
             <TabsTrigger value="footer" className="py-2 px-4">Footer</TabsTrigger>
             <TabsTrigger value="advanced" className="py-2 px-4">Advanced</TabsTrigger>
@@ -183,17 +173,8 @@ export default function BrandingTheme() {
             <div className="lg:col-span-2 space-y-6">
               
               <TabsContent value="general" className="space-y-6 mt-0">
-                <ThemePresets currentPreset={settings.theme_preset} onApplyPreset={applyPreset} />
                 <LogoSection settings={settings} setSettings={setSettings} onUpload={handleFileUpload} onDelete={handleDeleteLogo} />
                 <LayoutSection settings={settings} setSettings={setSettings} />
-              </TabsContent>
-
-              <TabsContent value="colors" className="mt-0">
-                <ColorSection settings={settings} setSettings={setSettings} />
-              </TabsContent>
-
-              <TabsContent value="typography" className="mt-0">
-                <TypographySection settings={settings} setSettings={setSettings} />
               </TabsContent>
 
               <TabsContent value="login" className="mt-0">
@@ -205,18 +186,16 @@ export default function BrandingTheme() {
               </TabsContent>
 
               <TabsContent value="advanced" className="space-y-6 mt-0">
-                <AdvancedCSSEditor settings={settings} setSettings={setSettings} />
                 <AuditLog orgId={currentOrganization.id} />
               </TabsContent>
 
             </div>
 
             <div className="space-y-6">
-              <ThemePreview settings={settings} />
               <Alert variant="info">
                 <Info className="h-4 w-4" aria-hidden="true" />
-                <AlertTitle>Preview Mode</AlertTitle>
-                <AlertDescription>This preview shows a generic layout. Your actual dashboard may vary based on content.</AlertDescription>
+                <AlertTitle>Colors and theme</AlertTitle>
+                <AlertDescription>The workspace uses the Petrolord design family. Each person chooses light or dark from the header toggle.</AlertDescription>
               </Alert>
             </div>
           </div>

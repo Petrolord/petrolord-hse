@@ -4,9 +4,8 @@
 // layout dialog, the Upgrade modal) inside the design-system scope, in light
 // and dark (docs/scope/DesignSystem-Rollout.md sections 3.3 and 8.2).
 //
-// Outside a scope the same dialogs are pinned byte for byte by
-// reportingLegacyDom.test.jsx; the walk-throughs are shared
-// (reportingFixtures.jsx). Only the data layer is stubbed.
+// The walk-throughs live in reportingFixtures.jsx. Only the data layer is
+// stubbed.
 import React from 'react';
 import { render, screen, fireEvent, within, cleanup } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';

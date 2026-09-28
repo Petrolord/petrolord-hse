@@ -3,8 +3,8 @@
 // hairline rule marked below).
 //
 // Every selector is scoped under [data-pl-theme], so the stylesheet is inert
-// for every screen that has not migrated: the global :root/.dark variables
-// in src/index.css keep driving the legacy HSE screens untouched.
+// outside a scope (the homepage keeps its own look under .hse-home; the
+// global :root in src/index.css holds the light shadcn values since 4A).
 import {
   THEMES, SHADOWS, FONTS, SHADCN_ALIASES, CHART_SERIES, CHART_SURFACE, CANVAS_RADIUS,
   hexToHslTriplet, hexToRgbChannels,
@@ -76,8 +76,7 @@ export function renderThemeCss() {
     ':where([data-pl-theme] [data-canvas="chart"]) {',
     '  background-color: rgb(var(--pl-chart-surface));',
     '}',
-    '/* HSE: index.css paints every border with the legacy var(--border-color);',
-    '   inside a scope a plain `border` takes the hairline role (zero',
+    '/* HSE: inside a scope a plain `border` takes the hairline role (zero',
     '   specificity, so any border colour utility still wins) */',
     ':where([data-pl-theme] *) {',
     '  border-color: rgb(var(--pl-border));',

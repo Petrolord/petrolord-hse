@@ -28,11 +28,8 @@ import { useOrganizationData } from '@/hooks/useOrganizationData';
 // PETROLORD QUICK REPORT PREVIEW v1 (2026-05-09): empty-state hints to admin pages
 import { useHSE } from '@/context/HSEContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useThemeClass } from '@/design/themeClass';
 
-// Scope-aware: outside a design-system scope every class is the legacy string
-// (pinned by src/components/hse/__tests__/reportingLegacyDom.test.jsx); inside
-// one the report sits on the surface roles and the severity is a status chip
+// The report sits on the surface roles and the severity is a status chip
 // with its word.
 
 const THEMED_SEVERITY = {
@@ -68,7 +65,6 @@ export default function QuickReportPreview({ reportData, onEdit, onSubmit, onCan
   const [editedData, setEditedData] = useState(reportData);
   const { getDepartments, getSites } = useOrganizationData();
   const { setActiveModule } = useHSE();
-  const tc = useThemeClass();
   
   const [departments, setDepartments] = useState([]);
   const [sites, setSites] = useState([]);
@@ -106,15 +102,6 @@ export default function QuickReportPreview({ reportData, onEdit, onSubmit, onCan
 
   const handleSaveEdit = () => {
     setIsEditing(false);
-  };
-
-  const getSeverityColor = (severity) => {
-    switch(severity?.toLowerCase()) {
-      case 'critical': return 'text-red-600 bg-red-100 border-red-200';
-      case 'high': return 'text-orange-600 bg-orange-100 border-orange-200';
-      case 'medium': return 'text-yellow-600 bg-yellow-100 border-yellow-200';
-      default: return 'text-green-600 bg-green-100 border-green-200';
-    }
   };
 
   const addWitness = () => {
@@ -162,39 +149,39 @@ export default function QuickReportPreview({ reportData, onEdit, onSubmit, onCan
   const RenderContent = () => (
     <div className="space-y-6">
       {/* Header */}
-      <div className={tc('flex items-start justify-between border-b pb-6', 'flex flex-wrap items-start justify-between gap-4 border-b border-pl-border pb-6')}>
-        <div className={tc('flex items-center gap-4', 'flex flex-wrap items-center gap-x-4 gap-y-2 min-w-0')}>
-          <img src={PETROLORD_BRANDING.logoUrl} alt="Petrolord" className={tc('h-12 w-auto', 'h-10 w-auto')} />
+      <div className="flex flex-wrap items-start justify-between gap-4 border-b border-pl-border pb-6">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 min-w-0">
+          <img src={PETROLORD_BRANDING.logoUrl} alt="Petrolord" className="h-10 w-auto" />
           <div>
-            <h2 className={tc('text-2xl font-bold text-slate-900 leading-none', 'text-xl sm:text-2xl font-semibold text-pl-text leading-none')}>Safety Observation</h2>
-            <p className={tc('text-sm text-slate-500 mt-1', 'text-sm text-pl-muted mt-1')}>Generated via Quick Report AI</p>
+            <h2 className="text-xl sm:text-2xl font-semibold text-pl-text leading-none">Safety Observation</h2>
+            <p className="text-sm text-pl-muted mt-1">Generated via Quick Report AI</p>
           </div>
         </div>
         <div className="text-right">
-          <div className={tc('inline-flex items-center gap-2 px-3 py-1 bg-slate-100 rounded-full text-xs font-mono text-slate-600 mb-1', 'inline-flex items-center gap-2 px-3 py-1 bg-pl-sunken border border-pl-border rounded-full text-xs font-pl-mono tabular-nums text-pl-text mb-1')}>
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-pl-sunken border border-pl-border rounded-full text-xs font-pl-mono tabular-nums text-pl-text mb-1">
             {editedData.reportId}
           </div>
-          <div className={tc('text-xs text-slate-500', 'text-xs text-pl-muted')}>
+          <div className="text-xs text-pl-muted">
             {format(new Date(editedData.timestamp), 'PPpp')}
           </div>
         </div>
       </div>
 
       {/* Details Grid */}
-      <div className={tc('grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50 p-4 rounded-lg border border-slate-200', 'grid grid-cols-1 md:grid-cols-2 gap-6 bg-pl-sunken p-4 rounded-lg border border-pl-border')}>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-pl-sunken p-4 rounded-lg border border-pl-border">
         <div className="space-y-1">
-          <div className={tc('flex items-center gap-2 text-xs font-semibold text-slate-500 uppercase tracking-wider', 'flex items-center gap-2 text-xs font-semibold text-pl-muted uppercase tracking-wider')}>
+          <div className="flex items-center gap-2 text-xs font-semibold text-pl-muted uppercase tracking-wider">
             <User className="h-3 w-3" /> Submitted By
           </div>
-          <p className={tc('text-sm font-medium text-slate-900', 'text-sm font-medium text-pl-text')}>
+          <p className="text-sm font-medium text-pl-text">
             {options.isAnonymous ? 'Anonymous User' : 'Current User'}
           </p>
         </div>
         <div className="space-y-1">
-          <div className={tc('flex items-center gap-2 text-xs font-semibold text-slate-500 uppercase tracking-wider', 'flex items-center gap-2 text-xs font-semibold text-pl-muted uppercase tracking-wider')}>
+          <div className="flex items-center gap-2 text-xs font-semibold text-pl-muted uppercase tracking-wider">
             <MapPin className="h-3 w-3" /> Location
           </div>
-          <p className={tc('text-sm font-medium text-slate-900 truncate', 'text-sm font-medium text-pl-text truncate')}>
+          <p className="text-sm font-medium text-pl-text truncate">
             {editedData.location || 'Not set'}
           </p>
         </div>
@@ -203,33 +190,33 @@ export default function QuickReportPreview({ reportData, onEdit, onSubmit, onCan
       {/* Main Observation */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className={tc('text-lg font-bold text-slate-800', 'text-lg font-semibold text-pl-text')}>Observation Summary</h3>
-          <div className={tc(`px-3 py-1 rounded-full text-xs font-bold border ${getSeverityColor(editedData.severity)}`, `px-3 py-1 rounded-full text-xs font-semibold border ${THEMED_SEVERITY[editedData.severity?.toLowerCase()] || 'bg-pl-success-bg text-pl-success-text border-pl-success/40'}`)}>
+          <h3 className="text-lg font-semibold text-pl-text">Observation Summary</h3>
+          <div className={`px-3 py-1 rounded-full text-xs font-semibold border ${THEMED_SEVERITY[editedData.severity?.toLowerCase()] || 'bg-pl-success-bg text-pl-success-text border-pl-success/40'}`}>
             {editedData.severity?.toUpperCase()}
           </div>
         </div>
 
         <div className="grid grid-cols-1 gap-4">
-          <div className={tc('p-4 bg-white border border-slate-200 rounded-lg shadow-sm', 'p-4 bg-pl-surface border border-pl-border rounded-lg')}>
+          <div className="p-4 bg-pl-surface border border-pl-border rounded-lg">
             <div className="flex items-center justify-between mb-2">
-              <span className={tc('text-xs font-bold text-slate-500 uppercase', 'text-xs font-semibold text-pl-muted uppercase')}>Description</span>
-              <span className={tc('text-xs text-blue-600 font-medium flex items-center gap-1', 'text-xs text-pl-muted font-medium flex items-center gap-1')}>
+              <span className="text-xs font-semibold text-pl-muted uppercase">Description</span>
+              <span className="text-xs text-pl-muted font-medium flex items-center gap-1">
                 <Bot className="h-3 w-3" /> AI Generated
               </span>
             </div>
-            <p className={tc('text-slate-700 text-sm leading-relaxed', 'text-pl-text text-sm leading-relaxed')}>
+            <p className="text-pl-text text-sm leading-relaxed">
               {editedData.description}
             </p>
           </div>
         </div>
         
         {/* Dropdowns for Org Data */}
-        <div className={tc('grid grid-cols-2 gap-4 pt-2', 'grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2')}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
            <div className="space-y-1">
-              <Label className={tc('text-xs text-slate-500', 'text-xs text-pl-muted')}>Assign Department</Label>
+              <Label className="text-xs text-pl-muted">Assign Department</Label>
               <Select value={selectedDept} onValueChange={setSelectedDept}>
-                <SelectTrigger className={tc('bg-white border-slate-300 text-slate-900', undefined)}><SelectValue placeholder="Select Department" /></SelectTrigger>
-                <SelectContent className={tc('bg-white border-slate-300 text-slate-900', undefined)}>
+                <SelectTrigger><SelectValue placeholder="Select Department" /></SelectTrigger>
+                <SelectContent>
                   {departments.length > 0 ? (
                     departments.map(d => <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>)
                   ) : (
@@ -241,17 +228,17 @@ export default function QuickReportPreview({ reportData, onEdit, onSubmit, onCan
                 <button
                   type="button"
                   onClick={() => setActiveModule({ id: 'admin-departments', label: 'Departments' })}
-                  className={tc('text-xs text-blue-600 hover:text-blue-700 hover:underline mt-1', 'text-xs text-pl-primary-text hover:text-pl-primary-text-hover hover:underline mt-1')}
+                  className="text-xs text-pl-primary-text hover:text-pl-primary-text-hover hover:underline mt-1"
                 >
-                  Set up departments first{tc(' \u2192', '')}
+                  Set up departments first{''}
                 </button>
               )}
            </div>
            <div className="space-y-1">
-              <Label className={tc('text-xs text-slate-500', 'text-xs text-pl-muted')}>Assign Site</Label>
+              <Label className="text-xs text-pl-muted">Assign Site</Label>
               <Select value={selectedSite} onValueChange={setSelectedSite}>
-                <SelectTrigger className={tc('bg-white border-slate-300 text-slate-900', undefined)}><SelectValue placeholder="Select Site" /></SelectTrigger>
-                <SelectContent className={tc('bg-white border-slate-300 text-slate-900', undefined)}>
+                <SelectTrigger><SelectValue placeholder="Select Site" /></SelectTrigger>
+                <SelectContent>
                   {sites.length > 0 ? (
                     sites.map(s => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)
                   ) : (
@@ -263,9 +250,9 @@ export default function QuickReportPreview({ reportData, onEdit, onSubmit, onCan
                 <button
                   type="button"
                   onClick={() => setActiveModule({ id: 'admin-sites', label: 'Sites' })}
-                  className={tc('text-xs text-blue-600 hover:text-blue-700 hover:underline mt-1', 'text-xs text-pl-primary-text hover:text-pl-primary-text-hover hover:underline mt-1')}
+                  className="text-xs text-pl-primary-text hover:text-pl-primary-text-hover hover:underline mt-1"
                 >
-                  Set up sites first{tc(' \u2192', '')}
+                  Set up sites first{''}
                 </button>
               )}
            </div>
@@ -273,20 +260,20 @@ export default function QuickReportPreview({ reportData, onEdit, onSubmit, onCan
       </div>
 
       {/* Advanced Details Section - Expandable */}
-      <div className={tc('border rounded-lg bg-slate-50 overflow-hidden', 'border border-pl-border rounded-lg bg-pl-surface overflow-hidden')}>
+      <div className="border border-pl-border rounded-lg bg-pl-surface overflow-hidden">
         <button 
           onClick={() => setShowAdvanced(!showAdvanced)}
-          className={tc('w-full flex items-center justify-between p-4 bg-slate-100 hover:bg-slate-200 transition-colors', 'w-full flex items-center justify-between gap-2 p-4 bg-pl-sunken hover:bg-pl-border transition-colors text-left')}
+          className="w-full flex items-center justify-between gap-2 p-4 bg-pl-sunken hover:bg-pl-border transition-colors text-left"
         >
           <div className="flex items-center gap-2">
-            <span className={tc('font-semibold text-slate-700', 'font-semibold text-pl-text')}>Advanced Details (Optional)</span>
+            <span className="font-semibold text-pl-text">Advanced Details (Optional)</span>
             {filledCount > 0 && (
-              <span className={tc('text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full font-medium', 'text-xs px-2 py-0.5 bg-pl-surface border border-pl-border text-pl-text rounded-full font-medium')}>
+              <span className="text-xs px-2 py-0.5 bg-pl-surface border border-pl-border text-pl-text rounded-full font-medium">
                 {filledCount} fields filled
               </span>
             )}
           </div>
-          {showAdvanced ? <ChevronUp className={tc('h-4 w-4 text-slate-500', 'h-4 w-4 text-pl-muted')} /> : <ChevronDown className={tc('h-4 w-4 text-slate-500', 'h-4 w-4 text-pl-muted')} />}
+          {showAdvanced ? <ChevronUp className="h-4 w-4 text-pl-muted" /> : <ChevronDown className="h-4 w-4 text-pl-muted" />}
         </button>
         
         <AnimatePresence>
@@ -297,21 +284,21 @@ export default function QuickReportPreview({ reportData, onEdit, onSubmit, onCan
               exit={{ height: 0, opacity: 0 }}
               className="overflow-hidden"
             >
-              <div className={tc('p-4 space-y-4 border-t border-slate-200', 'p-4 space-y-4 border-t border-pl-border')}>
+              <div className="p-4 space-y-4 border-t border-pl-border">
                 {/* Category & Hazard Classification */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className={tc('text-xs text-slate-500', 'text-xs text-pl-muted')}>Category</Label>
+                    <Label className="text-xs text-pl-muted">Category</Label>
                     <Select onValueChange={(val) => setEditedData(prev => ({...prev, category: val}))} value={editedData.category}>
-                      <SelectTrigger className={tc('bg-white border-slate-300 text-slate-900 h-auto py-2', 'h-auto py-2')}>
+                      <SelectTrigger className="h-auto py-2">
                         <SelectValue placeholder="Select Category" />
                       </SelectTrigger>
                       <SelectContent className="max-h-[300px]">
                         {HAZARD_CATEGORIES.map(c => (
                           <SelectItem key={c.id} value={c.id} textValue={c.label}>
                             <div className="flex flex-col text-left py-1">
-                              <span className={tc('font-semibold text-slate-900', 'font-semibold text-pl-text')}>{c.label}</span>
-                              <span className={tc('text-[10px] text-slate-500 mt-0.5 leading-tight', 'text-[10px] text-pl-muted mt-0.5 leading-tight')}>{c.desc}</span>
+                              <span className="font-semibold text-pl-text">{c.label}</span>
+                              <span className="text-[10px] text-pl-muted mt-0.5 leading-tight">{c.desc}</span>
                             </div>
                           </SelectItem>
                         ))}
@@ -319,17 +306,17 @@ export default function QuickReportPreview({ reportData, onEdit, onSubmit, onCan
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label className={tc('text-xs text-slate-500', 'text-xs text-pl-muted')}>Hazard Classification</Label>
+                    <Label className="text-xs text-pl-muted">Hazard Classification</Label>
                     <Select onValueChange={(val) => setEditedData(prev => ({...prev, hazard_classification: val}))} value={editedData.hazard_classification}>
-                      <SelectTrigger className={tc('bg-white border-slate-300 text-slate-900 h-auto py-2', 'h-auto py-2')}>
+                      <SelectTrigger className="h-auto py-2">
                         <SelectValue placeholder="Select Risk Level" />
                       </SelectTrigger>
                       <SelectContent>
                         {RISK_LEVELS.map(r => (
                           <SelectItem key={r.id} value={r.id} textValue={r.label}>
                             <div className="flex flex-col text-left py-1">
-                              <span className={tc('font-semibold text-slate-900', 'font-semibold text-pl-text')}>{r.label}</span>
-                              <span className={tc('text-[10px] text-slate-500 mt-0.5 leading-tight', 'text-[10px] text-pl-muted mt-0.5 leading-tight')}>{r.desc}</span>
+                              <span className="font-semibold text-pl-text">{r.label}</span>
+                              <span className="text-[10px] text-pl-muted mt-0.5 leading-tight">{r.desc}</span>
                             </div>
                           </SelectItem>
                         ))}
@@ -340,18 +327,16 @@ export default function QuickReportPreview({ reportData, onEdit, onSubmit, onCan
 
                 {/* Immediate & Corrective Actions */}
                 <div className="space-y-2">
-                  <Label className={tc('text-xs text-slate-500', 'text-xs text-pl-muted')}>Immediate Actions Taken</Label>
-                  <Input 
-                    className={tc('bg-white border-slate-300 text-slate-900', undefined)}
+                  <Label className="text-xs text-pl-muted">Immediate Actions Taken</Label>
+                  <Input
                     placeholder="e.g. Stopped work, barricaded area..."
                     value={editedData.immediate_actions || ''}
                     onChange={(e) => setEditedData(prev => ({...prev, immediate_actions: e.target.value}))}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className={tc('text-xs text-slate-500', 'text-xs text-pl-muted')}>Suggested Corrective Actions</Label>
-                  <Input 
-                    className={tc('bg-white border-slate-300 text-slate-900', undefined)}
+                  <Label className="text-xs text-pl-muted">Suggested Corrective Actions</Label>
+                  <Input
                     placeholder="e.g. Repair guardrail, conduct training..."
                     value={editedData.corrective_actions || ''}
                     onChange={(e) => setEditedData(prev => ({...prev, corrective_actions: e.target.value}))}
@@ -360,10 +345,10 @@ export default function QuickReportPreview({ reportData, onEdit, onSubmit, onCan
 
                 {/* People Involved */}
                 <div className="space-y-2">
-                  <Label className={tc('text-xs text-slate-500 mb-1 block', 'text-xs text-pl-muted mb-1 block')}>People Involved</Label>
-                  <div className={tc('grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-3 rounded border border-slate-200', 'grid grid-cols-1 md:grid-cols-2 gap-4 bg-pl-surface p-3 rounded border border-pl-border')}>
+                  <Label className="text-xs text-pl-muted mb-1 block">People Involved</Label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-pl-surface p-3 rounded border border-pl-border">
                     <div>
-                      <span className={tc('text-xs font-semibold text-slate-700 block mb-2', 'text-xs font-semibold text-pl-text block mb-2')}>Witnesses</span>
+                      <span className="text-xs font-semibold text-pl-text block mb-2">Witnesses</span>
                       <div className="flex gap-2 mb-2">
                         <Input 
                           placeholder="Name" 
@@ -375,14 +360,14 @@ export default function QuickReportPreview({ reportData, onEdit, onSubmit, onCan
                       </div>
                       <div className="flex flex-wrap gap-1">
                         {editedData.witnesses?.map((w, i) => (
-                          <span key={i} className={tc('text-[10px] bg-slate-100 px-2 py-1 rounded-full flex items-center gap-1 border border-slate-200', 'text-[10px] bg-pl-sunken text-pl-text px-2 py-1 rounded-full flex items-center gap-1 border border-pl-border')}>
-                            {w.name} <Trash2 className={tc('h-3 w-3 cursor-pointer hover:text-red-500', 'h-3 w-3 cursor-pointer hover:text-pl-danger-text')} onClick={() => setEditedData(prev => ({...prev, witnesses: prev.witnesses.filter((_, idx) => idx !== i)}))} />
+                          <span key={i} className="text-[10px] bg-pl-sunken text-pl-text px-2 py-1 rounded-full flex items-center gap-1 border border-pl-border">
+                            {w.name} <Trash2 className="h-3 w-3 cursor-pointer hover:text-pl-danger-text" onClick={() => setEditedData(prev => ({...prev, witnesses: prev.witnesses.filter((_, idx) => idx !== i)}))} />
                           </span>
                         ))}
                       </div>
                     </div>
                     <div>
-                      <span className={tc('text-xs font-semibold text-slate-700 block mb-2', 'text-xs font-semibold text-pl-text block mb-2')}>Injured Persons</span>
+                      <span className="text-xs font-semibold text-pl-text block mb-2">Injured Persons</span>
                       <div className="flex gap-2 mb-2">
                         <Input 
                           placeholder="Name" 
@@ -394,8 +379,8 @@ export default function QuickReportPreview({ reportData, onEdit, onSubmit, onCan
                       </div>
                       <div className="flex flex-wrap gap-1">
                         {editedData.injured_persons?.map((p, i) => (
-                          <span key={i} className={tc('text-[10px] bg-red-50 px-2 py-1 rounded-full flex items-center gap-1 border border-red-100 text-red-700', 'text-[10px] bg-pl-sunken text-pl-text px-2 py-1 rounded-full flex items-center gap-1 border border-pl-border')}>
-                            {p.name} <Trash2 className={tc('h-3 w-3 cursor-pointer hover:text-red-500', 'h-3 w-3 cursor-pointer hover:text-pl-danger-text')} onClick={() => setEditedData(prev => ({...prev, injured_persons: prev.injured_persons.filter((_, idx) => idx !== i)}))} />
+                          <span key={i} className="text-[10px] bg-pl-sunken text-pl-text px-2 py-1 rounded-full flex items-center gap-1 border border-pl-border">
+                            {p.name} <Trash2 className="h-3 w-3 cursor-pointer hover:text-pl-danger-text" onClick={() => setEditedData(prev => ({...prev, injured_persons: prev.injured_persons.filter((_, idx) => idx !== i)}))} />
                           </span>
                         ))}
                       </div>
@@ -405,22 +390,22 @@ export default function QuickReportPreview({ reportData, onEdit, onSubmit, onCan
 
                 {/* Additional Media Upload */}
                 <div className="space-y-2">
-                  <Label className={tc('text-xs text-slate-500', 'text-xs text-pl-muted')}>Additional Media (Optional)</Label>
+                  <Label className="text-xs text-pl-muted">Additional Media (Optional)</Label>
                   <div className="flex items-center gap-2">
-                    <label className={tc('cursor-pointer bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 px-3 py-2 rounded-md text-xs font-medium flex items-center gap-2', 'cursor-pointer bg-pl-surface border border-pl-border-strong hover:bg-pl-sunken text-pl-text px-3 py-2 rounded-md text-xs font-medium flex items-center gap-2')}>
+                    <label className="cursor-pointer bg-pl-surface border border-pl-border-strong hover:bg-pl-sunken text-pl-text px-3 py-2 rounded-md text-xs font-medium flex items-center gap-2">
                       <Camera className="h-3 w-3" /> Add Photos/Videos
                       <input type="file" multiple accept="image/*,video/*" className="hidden" onChange={handleAdvancedMediaUpload} />
                     </label>
-                    <span className={tc('text-xs text-slate-400', 'text-xs text-pl-muted')}>
+                    <span className="text-xs text-pl-muted">
                       {advancedMedia.length} files selected
                     </span>
                   </div>
                   {advancedMedia.length > 0 && (
                     <div className="flex flex-wrap gap-2 mt-2">
                       {advancedMedia.map((file, idx) => (
-                        <div key={idx} className={tc('text-[10px] bg-blue-50 text-blue-700 px-2 py-1 rounded border border-blue-100 flex items-center gap-1', 'text-[10px] bg-pl-sunken text-pl-text px-2 py-1 rounded border border-pl-border flex items-center gap-1')}>
+                        <div key={idx} className="text-[10px] bg-pl-sunken text-pl-text px-2 py-1 rounded border border-pl-border flex items-center gap-1">
                           {file.name.substring(0, 15)}...
-                          <X className={tc('h-3 w-3 cursor-pointer hover:text-red-500', 'h-3 w-3 cursor-pointer hover:text-pl-danger-text')} onClick={() => setAdvancedMedia(prev => prev.filter((_, i) => i !== idx))} />
+                          <X className="h-3 w-3 cursor-pointer hover:text-pl-danger-text" onClick={() => setAdvancedMedia(prev => prev.filter((_, i) => i !== idx))} />
                         </div>
                       ))}
                     </div>
@@ -429,9 +414,9 @@ export default function QuickReportPreview({ reportData, onEdit, onSubmit, onCan
 
                 {/* Additional Notes */}
                 <div className="space-y-2">
-                  <Label className={tc('text-xs text-slate-500', 'text-xs text-pl-muted')}>Additional Notes</Label>
+                  <Label className="text-xs text-pl-muted">Additional Notes</Label>
                   <Textarea 
-                    className={tc('bg-white border-slate-300 text-slate-900 h-20 text-xs', 'h-20 text-xs')}
+                    className="h-20 text-xs"
                     placeholder="Any other details..."
                     value={editedData.additional_notes || ''}
                     onChange={(e) => setEditedData(prev => ({...prev, additional_notes: e.target.value}))}
@@ -447,11 +432,11 @@ export default function QuickReportPreview({ reportData, onEdit, onSubmit, onCan
       {/* Evidence Section (Original) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {editedData.photo && (
-          <div className={tc('border border-slate-200 rounded-lg overflow-hidden bg-slate-50', 'border border-pl-border rounded-lg overflow-hidden bg-pl-sunken')}>
-            <div className={tc('p-2 border-b border-slate-200 bg-white', 'p-2 border-b border-pl-border bg-pl-surface')}>
-              <p className={tc('text-xs font-bold text-slate-500', 'text-xs font-semibold text-pl-muted')}>Original Capture</p>
+          <div className="border border-pl-border rounded-lg overflow-hidden bg-pl-sunken">
+            <div className="p-2 border-b border-pl-border bg-pl-surface">
+              <p className="text-xs font-semibold text-pl-muted">Original Capture</p>
             </div>
-            <div className={tc('aspect-video relative bg-black', 'aspect-video relative bg-pl-sunken')}>
+            <div className="aspect-video relative bg-pl-sunken">
               <img 
                 src={URL.createObjectURL(editedData.photo)} 
                 alt="Evidence" 
@@ -462,23 +447,23 @@ export default function QuickReportPreview({ reportData, onEdit, onSubmit, onCan
         )}
         
         {editedData.transcription && (
-          <div className={tc('border border-slate-200 rounded-lg overflow-hidden bg-white h-full', 'border border-pl-border rounded-lg overflow-hidden bg-pl-surface h-full')}>
-            <div className={tc('p-2 border-b border-slate-200 bg-slate-50 flex justify-between items-center', 'p-2 border-b border-pl-border bg-pl-sunken flex justify-between items-center')}>
-              <p className={tc('text-xs font-bold text-slate-500', 'text-xs font-semibold text-pl-muted')}>Voice Note Transcription</p>
-              <Bot className={tc('h-3 w-3 text-blue-500', 'h-3 w-3 text-pl-muted')} />
+          <div className="border border-pl-border rounded-lg overflow-hidden bg-pl-surface h-full">
+            <div className="p-2 border-b border-pl-border bg-pl-sunken flex justify-between items-center">
+              <p className="text-xs font-semibold text-pl-muted">Voice Note Transcription</p>
+              <Bot className="h-3 w-3 text-pl-muted" />
             </div>
             <div className="p-3">
-              <p className={tc('text-xs text-slate-600 italic', 'text-xs text-pl-muted italic')}>"{editedData.transcription}"</p>
+              <p className="text-xs text-pl-muted italic">"{editedData.transcription}"</p>
             </div>
           </div>
         )}
       </div>
 
       {/* AI Metadata */}
-      <div className={tc('flex items-center gap-2 p-3 bg-blue-50 text-blue-700 rounded-lg border border-blue-100 text-xs', 'flex flex-wrap items-center gap-2 p-3 bg-pl-sunken text-pl-text rounded-lg border border-pl-border text-xs')}>
+      <div className="flex flex-wrap items-center gap-2 p-3 bg-pl-sunken text-pl-text rounded-lg border border-pl-border text-xs">
         <Bot className="h-4 w-4" />
         <span className="font-semibold">AI Analysis Confidence: {editedData.confidence}%</span>
-        <span className={tc('mx-2 text-blue-300', 'mx-2 text-pl-border-strong')}>|</span>
+        <span className="mx-2 text-pl-border-strong">|</span>
         <span>Categorized as: <strong>{editedData.category || 'Pending'}</strong></span>
       </div>
     </div>
@@ -487,12 +472,12 @@ export default function QuickReportPreview({ reportData, onEdit, onSubmit, onCan
   const EditForm = () => (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label className={tc('text-slate-700', undefined)}>Category</Label>
+        <Label>Category</Label>
         <Select 
           defaultValue={editedData.category} 
           onValueChange={(val) => setEditedData({...editedData, category: val})}
         >
-          <SelectTrigger className={tc('bg-white border-slate-300 text-slate-900', undefined)}><SelectValue /></SelectTrigger>
+          <SelectTrigger><SelectValue /></SelectTrigger>
           <SelectContent>
             {['Slip/Trip Hazard', 'PPE Violation', 'Unsafe Behavior', 'Fire Hazard', 'Spill', 'Other'].map(c => (
               <SelectItem key={c} value={c}>{c}</SelectItem>
@@ -502,12 +487,12 @@ export default function QuickReportPreview({ reportData, onEdit, onSubmit, onCan
       </div>
 
       <div className="space-y-2">
-        <Label className={tc('text-slate-700', undefined)}>Severity</Label>
+        <Label>Severity</Label>
         <Select 
           defaultValue={editedData.severity}
           onValueChange={(val) => setEditedData({...editedData, severity: val})}
         >
-          <SelectTrigger className={tc('bg-white border-slate-300 text-slate-900', undefined)}><SelectValue /></SelectTrigger>
+          <SelectTrigger><SelectValue /></SelectTrigger>
           <SelectContent>
             {['Low', 'Medium', 'High', 'Critical'].map(s => (
               <SelectItem key={s} value={s}>{s}</SelectItem>
@@ -517,26 +502,25 @@ export default function QuickReportPreview({ reportData, onEdit, onSubmit, onCan
       </div>
 
       <div className="space-y-2">
-        <Label className={tc('text-slate-700', undefined)}>Description</Label>
+        <Label>Description</Label>
         <Textarea 
           value={editedData.description} 
           onChange={(e) => setEditedData({...editedData, description: e.target.value})}
-          className={tc('min-h-[100px] bg-white border-slate-300 text-slate-900', 'min-h-[100px]')}
+          className="min-h-[100px]"
         />
       </div>
 
       <div className="space-y-2">
-        <Label className={tc('text-slate-700', undefined)}>Location</Label>
+        <Label>Location</Label>
         <Input 
           value={editedData.location}
           placeholder="Where did this happen?"
           onChange={(e) => setEditedData({...editedData, location: e.target.value})}
-          className={tc('bg-white border-slate-300 text-slate-900', undefined)}
         />
       </div>
 
       <div className="pt-4 flex gap-2">
-        <Button onClick={handleSaveEdit} className={tc('flex-1 bg-blue-600 hover:bg-blue-700 text-white', 'flex-1')}>Save Changes</Button>
+        <Button onClick={handleSaveEdit} className="flex-1">Save Changes</Button>
         <Button onClick={() => setIsEditing(false)} variant="outline" className="flex-1">Cancel</Button>
       </div>
     </div>
@@ -544,66 +528,66 @@ export default function QuickReportPreview({ reportData, onEdit, onSubmit, onCan
 
   return (
     <div className="max-w-4xl mx-auto">
-      <div className={tc('bg-white text-slate-900 rounded-xl shadow-2xl overflow-hidden border border-slate-200', 'bg-pl-surface text-pl-text rounded-xl overflow-hidden border border-pl-border')}>
+      <div className="bg-pl-surface text-pl-text rounded-xl overflow-hidden border border-pl-border">
         
         {/* Scrollable Content Area */}
         <div className="max-h-[70vh] overflow-y-auto">
-          <div className={tc('p-8', 'p-4 sm:p-8')}>
+          <div className="p-4 sm:p-8">
             {isEditing ? <EditForm /> : <RenderContent />}
           </div>
         </div>
 
         {/* Footer / Actions */}
         {!isEditing && (
-          <div className={tc('bg-slate-50 border-t border-slate-200 p-6', 'bg-pl-sunken border-t border-pl-border p-4 sm:p-6')}>
+          <div className="bg-pl-sunken border-t border-pl-border p-4 sm:p-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               
               {/* Left: Actions */}
               <div className="space-y-4">
-                <h4 className={tc('text-sm font-bold text-slate-700 uppercase tracking-wide', 'text-sm font-semibold text-pl-muted uppercase tracking-wide')}>Actions</h4>
+                <h4 className="text-sm font-semibold text-pl-muted uppercase tracking-wide">Actions</h4>
                 <div className="flex flex-wrap gap-2">
-                  <Button variant="outline" size="sm" onClick={() => setIsEditing(true)} className={tc('bg-white border-slate-300 text-slate-700 hover:bg-slate-50', undefined)}>
+                  <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
                     <Edit2 className="h-4 w-4 mr-2" /> Edit
                   </Button>
-                  <Button variant="outline" size="sm" className={tc('bg-white border-slate-300 text-slate-700 hover:bg-slate-50', undefined)}>
+                  <Button variant="outline" size="sm">
                     <Printer className="h-4 w-4 mr-2" /> Print
                   </Button>
-                  <Button variant="outline" size="sm" className={tc('bg-white border-slate-300 text-slate-700 hover:bg-slate-50', undefined)}>
+                  <Button variant="outline" size="sm">
                     <Download className="h-4 w-4 mr-2" /> PDF
                   </Button>
-                  <Button variant="outline" size="sm" className={tc('bg-white border-slate-300 text-slate-700 hover:bg-slate-50', undefined)}>
+                  <Button variant="outline" size="sm">
                     <Share2 className="h-4 w-4 mr-2" /> Share
                   </Button>
                 </div>
               </div>
 
               {/* Right: Submission Options */}
-              <div className={tc('space-y-4 border-l border-slate-200 pl-0 lg:pl-8', 'space-y-4 border-t lg:border-t-0 lg:border-l border-pl-border pt-4 lg:pt-0 pl-0 lg:pl-8')}>
-                <h4 className={tc('text-sm font-bold text-slate-700 uppercase tracking-wide', 'text-sm font-semibold text-pl-muted uppercase tracking-wide')}>Submission Options</h4>
+              <div className="space-y-4 border-t lg:border-t-0 lg:border-l border-pl-border pt-4 lg:pt-0 pl-0 lg:pl-8">
+                <h4 className="text-sm font-semibold text-pl-muted uppercase tracking-wide">Submission Options</h4>
                 
                 <div className="space-y-2">
                   <div className="flex items-center space-x-2">
                     <Checkbox id="anon" checked={options.isAnonymous} onCheckedChange={(c) => setOptions({...options, isAnonymous: c})} />
-                    <label htmlFor="anon" className={tc('text-sm text-slate-700 font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70', 'text-sm text-pl-text font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70')}>
+                    <label htmlFor="anon" className="text-sm text-pl-text font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                       Submit Anonymously
                     </label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Checkbox id="sup" checked={options.sendToSupervisor} onCheckedChange={(c) => setOptions({...options, sendToSupervisor: c})} />
-                    <label htmlFor="sup" className={tc('text-sm text-slate-700 font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70', 'text-sm text-pl-text font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70')}>
+                    <label htmlFor="sup" className="text-sm text-pl-text font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                       Send to Safety Supervisor
                     </label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Checkbox id="draft" checked={options.saveAsDraft} onCheckedChange={(c) => setOptions({...options, saveAsDraft: c})} />
-                    <label htmlFor="draft" className={tc('text-sm text-slate-700 font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70', 'text-sm text-pl-text font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70')}>
+                    <label htmlFor="draft" className="text-sm text-pl-text font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                       Save as Draft
                     </label>
                   </div>
                 </div>
 
                 <div className="pt-2 flex gap-3">
-                  <Button variant="ghost" onClick={onCancel} className={tc('flex-1 text-slate-500 hover:text-slate-900', 'flex-1')}>
+                  <Button variant="ghost" onClick={onCancel} className="flex-1">
                     Cancel
                   </Button>
                   <Button 
@@ -613,8 +597,8 @@ export default function QuickReportPreview({ reportData, onEdit, onSubmit, onCan
                       site_id: selectedSite,
                       advancedMedia: advancedMedia
                     }, options)} 
-                    variant={tc(undefined, 'accent')}
-                    className={tc('flex-[2] bg-[#FFC107] text-black font-bold hover:bg-[#FFD54F]', 'flex-[2] font-semibold')}
+                    variant="accent"
+                    className="flex-[2] font-semibold"
                   >
                     <CheckCircle2 className="h-4 w-4 mr-2" />
                     Submit Report

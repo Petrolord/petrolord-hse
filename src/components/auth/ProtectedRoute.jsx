@@ -1,17 +1,15 @@
 import React from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useHSE } from '@/context/HSEContext';
-import { useAppState } from '@/context/AppStateContext';
 import { Loader2, ShieldAlert } from 'lucide-react';
 import { AccountScope } from '@/components/account/accountChrome';
 import { ThemedApp, readLastTheme } from '@/design/ThemeProvider';
 import { DEFAULT_THEME } from '@/design/tokens';
-import { isThemedModule } from '@/design/rollout';
 
 // Design system (docs/scope/DesignSystem-Rollout.md sections 2.3 and 4.2,
 // batch 3A). The signed-in pages that sit outside the HSE layout open their
 // own scope through AccountScope; every other protected path is the layout
-// (PetrolordHSE), themed module by module.
+// (PetrolordHSE), whose SignedInScope themes every module.
 export const OUTSIDE_LAYOUT_PATHS = Object.freeze([
   '/dashboard/upgrade',
   '/dashboard/analytics/advanced',
@@ -31,45 +29,32 @@ export function isOutsideLayoutPath(pathname) {
 }
 
 /**
- * The theme the cold-load loader paints on `pathname`, or null for the
- * legacy loader: the pages outside the layout always open a scope, and on
- * the layout it follows the rollout for the module being restored. The
- * device's last theme stands in while the session restores.
+ * The theme the cold-load loader paints: every protected path opens a
+ * scope, so the device's last theme stands in while the session restores.
  */
-export function protectedLoaderTheme(pathname, moduleId) {
-  if (!isOutsideLayoutPath(pathname) && !isThemedModule(moduleId)) return null;
+export function protectedLoaderTheme() {
   return readLastTheme() || DEFAULT_THEME;
 }
 
 export const ProtectedRoute = ({ requiredRole, requirePremium = false }) => {
-  const { isAuthenticated, isLoading, role, accessLevel, checkPermission, activeModule } = useHSE();
-  const { persistedModule } = useAppState();
+  const { isAuthenticated, isLoading, role, accessLevel, checkPermission } = useHSE();
   const location = useLocation();
 
   if (isLoading) {
-    const theme = protectedLoaderTheme(location.pathname, activeModule?.id || persistedModule?.id);
-    if (theme) {
-      return (
-        // A scope of its own (not a bare themed div), so the root pieces
-        // that follow the scope on screen (the toaster, the offline pill)
-        // match the loader. The user's stored choice wins once known.
-        <ThemedApp
-          defaultTheme={theme}
-          data-testid="protected-route-loader"
-          role="status"
-          aria-live="polite"
-          className="h-screen w-full flex items-center justify-center text-pl-text"
-        >
-          <Loader2 className="h-8 w-8 animate-spin text-pl-primary-text" aria-hidden="true" />
-          <span className="ml-2 text-pl-muted">Verifying access...</span>
-        </ThemedApp>
-      );
-    }
     return (
-      <div className="h-screen w-full flex items-center justify-center bg-[#1a1a2e]">
-        <Loader2 className="h-8 w-8 animate-spin text-[#FFC107]" />
-        <span className="ml-2 text-[#b0b0c0]">Verifying access...</span>
-      </div>
+      // A scope of its own (not a bare themed div), so the root pieces
+      // that follow the scope on screen (the toaster, the offline pill)
+      // match the loader. The user's stored choice wins once known.
+      <ThemedApp
+        defaultTheme={protectedLoaderTheme()}
+        data-testid="protected-route-loader"
+        role="status"
+        aria-live="polite"
+        className="h-screen w-full flex items-center justify-center text-pl-text"
+      >
+        <Loader2 className="h-8 w-8 animate-spin text-pl-primary-text" aria-hidden="true" />
+        <span className="ml-2 text-pl-muted">Verifying access...</span>
+      </ThemedApp>
     );
   }
 

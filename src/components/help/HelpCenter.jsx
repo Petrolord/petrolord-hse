@@ -11,7 +11,7 @@ import HelpSearchResults from './HelpSearchResults';
 import { searchHelp } from '@/data/helpContent/searchHelp';
 
 // Design family (batch 2C): the Help Centre renders inside the signed-in scope
-// (src/design/rollout/w2c.js) on the theme roles. The guides are code-driven
+// (src/design/SignedInScope.jsx) on the theme roles. The guides are code-driven
 // (src/data/helpContent); GuideViewer renders their blocks on the roles.
 export default function HelpCenter() {
   const [activeTab, setActiveTab] = useState('start');

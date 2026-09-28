@@ -1,34 +1,12 @@
 import * as React from "react"
 import { cva } from "class-variance-authority"
 import { cn } from "@/lib/utils"
-import { useDsTheme } from "@/design/themeContext"
 
-// Legacy variants (outside a scope, byte for byte as before).
-const badgeVariants = cva(
-  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
-  {
-    variants: {
-      variant: {
-        default:
-          "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
-        secondary:
-          "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        destructive:
-          "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
-        outline: "text-foreground",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-    },
-  }
-)
-
-// Inside a scope: the Suite's roles. The status variants (success, warning,
+// The Suite's roles. The status variants (success, warning,
 // danger, info) are the one place colour carries meaning; use them for
 // status only. `neutral` is for counts and tags, `selected` for the chosen
 // chip in a set.
-const themedBadgeVariants = cva(
+const badgeVariants = cva(
   "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-pl-focus focus:ring-offset-2",
   {
     variants: {
@@ -53,10 +31,9 @@ const themedBadgeVariants = cva(
 )
 
 function Badge({ className, variant, ...props }) {
-  const variants = useDsTheme() ? themedBadgeVariants : badgeVariants
   return (
-    <div className={cn(variants({ variant }), className)} {...props} />
+    <div className={cn(badgeVariants({ variant }), className)} {...props} />
   )
 }
 
-export { Badge, badgeVariants, themedBadgeVariants }
+export { Badge, badgeVariants }

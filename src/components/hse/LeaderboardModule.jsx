@@ -8,7 +8,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from '@/lib/customSupabaseClient';
 
 // Design family (batch 2C): the Leaderboard renders inside the signed-in
-// scope (src/design/rollout/w2c.js) on the theme roles.
+// scope (src/design/SignedInScope.jsx) on the theme roles.
 export default function LeaderboardModule() {
   const { currentOrganization, currentUser } = useHSE();
   const [leaderboardData, setLeaderboardData] = useState([]);

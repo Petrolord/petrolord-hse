@@ -11,13 +11,12 @@ import { useActiveTheme } from '@/design/activeTheme';
 import { FixedTheme } from '@/design/ThemeProvider';
 import React from 'react';
 
-// The root toaster sits outside every scope. While a migrated screen is on
-// screen it takes that screen's theme (toasts match the page); elsewhere it
-// renders the legacy toasts exactly as before.
+// The root toaster sits outside every scope. It takes the theme of the
+// scope on screen (toasts match the page), and the light paper style where
+// no scope is mounted (the homepage), as the Suite's does.
 export function Toaster() {
-	const active = useActiveTheme();
-	const toaster = <ToasterInner />;
-	return active ? <FixedTheme theme={active}>{toaster}</FixedTheme> : toaster;
+	const active = useActiveTheme() || 'light';
+	return <FixedTheme theme={active}><ToasterInner /></FixedTheme>;
 }
 
 function ToasterInner() {

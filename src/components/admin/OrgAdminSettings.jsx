@@ -22,7 +22,7 @@ export default function OrgAdminSettings() {
       <Tabs defaultValue="branding" className="w-full">
         <TabsList className="mb-6 h-auto p-1 grid grid-cols-2 md:inline-flex md:w-auto">
           <TabsTrigger value="branding" className="py-2.5 px-4 flex gap-2">
-            <Palette className="w-4 h-4" /> <span className="hidden md:inline">Branding & Theme</span><span className="md:hidden">Branding</span>
+            <Palette className="w-4 h-4" aria-hidden="true" /> <span>Branding</span>
           </TabsTrigger>
           <TabsTrigger value="departments" className="py-2.5 px-4 flex gap-2">
             <Building2 className="w-4 h-4" /> Departments

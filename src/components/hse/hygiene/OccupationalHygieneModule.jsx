@@ -17,7 +17,7 @@ import RecordsTab from './RecordsTab';
 export const HYGIENE_ROLES = ['super_admin', 'org_admin', 'manager', 'supervisor', 'health_officer'];
 
 // Design family (batch 2B): the module renders inside the signed-in scope
-// (src/design/rollout/w2b.js), so it uses the theme roles directly. The tabs
+// (src/design/SignedInScope.jsx), so it uses the theme roles directly. The tabs
 // keep their underline look on the roles.
 const tabClass = 'gap-2 rounded-none border-b-2 border-transparent bg-transparent px-0 py-3 text-pl-muted shadow-none hover:text-pl-text data-[state=active]:border-pl-primary data-[state=active]:bg-transparent data-[state=active]:text-pl-primary-text data-[state=active]:shadow-none';
 

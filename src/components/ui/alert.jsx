@@ -2,28 +2,10 @@ import * as React from "react"
 import { cva } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
-import { useDsTheme } from "@/design/themeContext"
 
-// Legacy variants outside a scope (byte for byte).
-const alertVariants = cva(
-  "relative w-full rounded-lg border p-4 [&>svg~*]:pl-7 [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground",
-  {
-    variants: {
-      variant: {
-        default: "bg-background text-foreground",
-        destructive:
-          "border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-    },
-  }
-)
-
-// Inside a scope: the Suite's roles. The status variants carry meaning;
+// The Suite's roles. The status variants carry meaning;
 // pair them with a title or icon.
-const themedAlertVariants = cva(
+const alertVariants = cva(
   "relative w-full rounded-lg border p-4 [&>svg~*]:pl-7 [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4",
   {
     variants: {
@@ -43,12 +25,11 @@ const themedAlertVariants = cva(
 )
 
 const Alert = React.forwardRef(({ className, variant, ...props }, ref) => {
-  const variants = useDsTheme() ? themedAlertVariants : alertVariants
   return (
     <div
       ref={ref}
       role="alert"
-      className={cn(variants({ variant }), className)}
+      className={cn(alertVariants({ variant }), className)}
       {...props}
     />
   )

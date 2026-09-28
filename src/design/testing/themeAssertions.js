@@ -4,10 +4,11 @@
 // three HSE differences:
 //
 //   - a module is a MainContent module id (activeModule.id), not a route,
-//     and "registered" means it is in src/design/rollout (isThemedModule);
-//   - `dark:` variants are legacy here: HSE's GlobalThemeContext puts the
-//     `dark` class on <html>, so a dark: colour really paints inside a scope
-//     (the Suite never sets it and can ignore them);
+//     and "registered" means MainContent renders it (a `case` there; since
+//     batch 4A the layout scopes every module, so there is no rollout list);
+//   - `dark:` variants count as legacy here: HSE's GlobalThemeContext used
+//     to put the `dark` class on <html> (retired in 4A), and themed code
+//     keeps to the roles, so none may come back;
 //   - the legacy HSE palette variables (bg-[var(--bg-card)],
 //     text-[var(--text-primary)] ...) and the petrolord-card and
 //     petrolord-button component classes count as legacy chrome, because
@@ -20,13 +21,12 @@
 //   3. no legacy colour class is left under the scope outside data-canvas
 //      regions, with a planted negative control so a detector that finds
 //      nothing is not mistaken for a clean page;
-//   4. the module is in the rollout list.
+//   4. the module is a MainContent module.
 //
 // Uses the vitest globals (expect, describe, it); never import this file
 // from application code.
 import '@testing-library/jest-dom/vitest';
 import { fireEvent } from '@testing-library/react';
-import { isThemedModule } from '../rollout/index.js';
 import { themeStorageKey } from '../ThemeProvider.jsx';
 import { SIGNED_IN_SCOPE_TEST_ID } from '../SignedInScope.jsx';
 import { installDomShims } from './domShims.js';
@@ -87,7 +87,7 @@ export function legacyChromeClasses({ root = document.body, allow = [] } = {}) {
 export function getScopeRoot(scopeTestId = SIGNED_IN_SCOPE_TEST_ID) {
   let el = document.querySelector(`[data-testid="${scopeTestId}"]`) || document.querySelector('[data-pl-root]');
   if (el && !el.hasAttribute('data-pl-root')) el = el.closest('[data-pl-root]');
-  if (!el) throw new Error(`No design-system scope root found (data-testid="${scopeTestId}"): is the module in src/design/rollout?`);
+  if (!el) throw new Error(`No design-system scope root found (data-testid="${scopeTestId}"): does the layout render SignedInScope?`);
   return el;
 }
 
@@ -165,9 +165,17 @@ export function expectNegativeControl(scope = getScopeRoot(), { allow = [] } = {
   for (const cls of planted) expect(after).not.toContain(cls);
 }
 
-/** 4. The module is in the rollout list, so the layout opens the scope for it. */
-export function expectThemedModule(moduleId) {
-  expect({ moduleId, themed: isThemedModule(moduleId) }).toEqual({ moduleId, themed: true });
+/** The module ids MainContent renders (its `case` labels). */
+export async function mainContentModuleIds() {
+  const fs = await import('node:fs');
+  const path = await import('node:path');
+  const src = fs.readFileSync(path.resolve(__dirname, '../../components/MainContent.jsx'), 'utf8');
+  return [...src.matchAll(/case '([a-z-]+)':/g)].map((m) => m[1]);
+}
+
+/** 4. The module is one MainContent renders, so the layout's scope covers it. */
+export async function expectThemedModule(moduleId) {
+  expect(await mainContentModuleIds()).toContain(moduleId);
 }
 
 /**
@@ -217,8 +225,8 @@ export function describeModuleTheme({
       expectNegativeControl(scope, { allow });
     });
 
-    it(`lists ${moduleId} in the rollout`, () => {
-      expectThemedModule(moduleId);
+    it(`${moduleId} is a MainContent module, so the layout's scope covers it`, async () => {
+      await expectThemedModule(moduleId);
     });
   });
 }
