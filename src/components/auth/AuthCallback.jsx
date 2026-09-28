@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/customSupabaseClient';
 import { Loader2 } from 'lucide-react';
+import { PublicPage, AUTH_COLUMN } from '@/components/public/PublicPage';
 
 const AuthCallback = () => {
   const navigate = useNavigate();
@@ -43,14 +44,21 @@ const AuthCallback = () => {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen bg-[#1a1a2e] flex items-center justify-center">
-      <div className="text-center">
-        <Loader2 className="h-10 w-10 text-[#FFC107] animate-spin mx-auto mb-4" />
-        <h2 className="text-xl font-semibold text-white">Verifying...</h2>
-        <p className="text-[#b0b0c0]">Securing your connection to Petrolord...</p>
+    <div className={AUTH_COLUMN}>
+      <div className="text-center" role="status">
+        <Loader2 className="h-10 w-10 text-pl-primary-text animate-spin mx-auto mb-4" aria-hidden="true" />
+        <h1 className="text-xl font-semibold text-pl-text">Verifying...</h1>
+        <p className="text-pl-muted">Securing your connection to Petrolord...</p>
       </div>
     </div>
   );
 };
 
-export default AuthCallback;
+// Batch 3B: the page wraps itself in the public frame (always light, ink brand bar).
+const AuthCallbackPage = () => (
+  <PublicPage testId="auth-callback-theme-scope">
+    <AuthCallback />
+  </PublicPage>
+);
+
+export default AuthCallbackPage;
