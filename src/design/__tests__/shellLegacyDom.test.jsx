@@ -43,7 +43,8 @@ const mountShell = () => render(
   </MemoryRouter>,
 );
 
-const flush = () => act(async () => { await new Promise((r) => setTimeout(r, 0)); });
+// Past a couple of animation frames, so framer-motion has applied its end state.
+const flush = () => act(async () => { await new Promise((r) => setTimeout(r, 60)); });
 
 async function captureStates() {
   const out = {};

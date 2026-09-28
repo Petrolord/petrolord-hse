@@ -1,7 +1,12 @@
 // TEST-ONLY. The jsdom shims the HSE theme tests need: ResizeObserver,
 // DOMRect, matchMedia and the Radix pointer and scroll APIs jsdom lacks.
+// framer-motion animations are skipped, so a captured DOM holds the end
+// state of every transition (the shell's rail and chat panel animate).
 // Never import this file from application code.
+import { MotionGlobalConfig } from 'framer-motion';
+
 export function installDomShims() {
+  MotionGlobalConfig.skipAnimations = true;
   if (!global.ResizeObserver) {
     global.ResizeObserver = class { observe() {} unobserve() {} disconnect() {} };
   }
