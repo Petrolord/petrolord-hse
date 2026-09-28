@@ -1,8 +1,8 @@
 // TEST-ONLY. One render of every ui-kit primitive the routed HSE screens use,
-// with every portal open, so a test can capture the whole kit's DOM in one
-// go. uiLegacyDom.test.jsx pins this DOM outside a scope (the legacy look
-// must stay byte for byte until the rollout ends); uiThemed.test.jsx renders
-// the same scenes inside a scope and checks the theme roles.
+// with every portal open. uiThemed.test.jsx renders the scenes inside a
+// scope and checks the theme roles (the kit has no legacy branch since
+// batch 4A, so the uiLegacyDom pin that captured them outside a scope is
+// retired).
 import React from 'react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import {
@@ -148,11 +148,4 @@ export function PortalScene() {
       </ToastProvider>
     </div>
   );
-}
-
-/** Radix generates ids per render; blank them so the DOM compares. */
-export function normaliseDom(html) {
-  return html
-    .replace(/radix-:[a-z0-9]+:/gi, 'radix-ID')
-    .replace(/:r[a-z0-9]+:/gi, ':rID:');
 }

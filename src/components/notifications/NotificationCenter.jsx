@@ -6,17 +6,14 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useHSE } from '@/context/HSEContext';
 import { supabase } from '@/lib/customSupabaseClient';
 import { Badge } from "@/components/ui/badge";
-import { useThemeClass } from '@/design/themeClass';
 
-// Outside a design-system scope this renders exactly as before; inside one
-// it takes the theme roles, and unread items are marked with the danger role.
+// On the theme roles; unread items are marked with the danger role.
 
 export default function NotificationCenter() {
   const { currentUser } = useHSE();
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
-  const tc = useThemeClass();
 
   useEffect(() => {
     if (currentUser) {
@@ -85,28 +82,28 @@ export default function NotificationCenter() {
   return (
     <Popover open={isOpen} onOpenChange={(open) => { setIsOpen(open); if(open) markAsRead(); }}>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="icon" className={tc('relative text-gray-400 hover:text-white hover:bg-white/10', 'relative')} aria-label={tc(undefined, unreadCount > 0 ? `Notifications, ${unreadCount} unread` : 'Notifications')}>
+        <Button variant="ghost" size="icon" className="relative" aria-label={unreadCount > 0 ? `Notifications, ${unreadCount} unread` : 'Notifications'}>
           <Bell className="h-5 w-5" />
           {unreadCount > 0 && (
-            <span className={tc('absolute top-2 right-2 h-2 w-2 rounded-full bg-red-500 animate-pulse', 'absolute top-2 right-2 h-2 w-2 rounded-full bg-pl-danger')} />
+            <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-pl-danger" />
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className={tc('w-80 p-0 bg-[#1e1e30] border-[#2a2a40] text-white', 'w-80 p-0')} align="end">
-        <div className={tc('p-4 border-b border-[#2a2a40] flex justify-between items-center', 'p-4 border-b border-pl-border flex justify-between items-center')}>
+      <PopoverContent className="w-80 p-0" align="end">
+        <div className="p-4 border-b border-pl-border flex justify-between items-center">
           <h4 className="font-semibold">Notifications</h4>
-          {unreadCount > 0 && <Badge variant={tc('destructive', 'danger')} className="text-xs">{unreadCount} New</Badge>}
+          {unreadCount > 0 && <Badge variant="danger" className="text-xs">{unreadCount} New</Badge>}
         </div>
         <ScrollArea className="h-[300px]">
           {notifications.length === 0 ? (
-            <div className={tc('p-8 text-center text-gray-500 text-sm', 'p-8 text-center text-pl-muted text-sm')}>No notifications yet</div>
+            <div className="p-8 text-center text-pl-muted text-sm">No notifications yet</div>
           ) : (
-            <div className={tc('divide-y divide-[#2a2a40]', 'divide-y divide-pl-border')}>
+            <div className="divide-y divide-pl-border">
               {notifications.map((notif) => (
-                <div key={notif.id} className={tc(`p-4 hover:bg-[#25253e] transition-colors ${!notif.is_read ? 'bg-[#25253e]/50' : ''}`, `p-4 hover:bg-pl-sunken transition-colors ${!notif.is_read ? 'bg-pl-sunken/60' : ''}`)}>
-                  <h5 className={tc('text-sm font-medium text-white mb-1', 'text-sm font-medium text-pl-text mb-1')}>{notif.title}</h5>
-                  <p className={tc('text-xs text-gray-400', 'text-xs text-pl-muted')}>{notif.message}</p>
-                  <span className={tc('text-[10px] text-gray-500 mt-2 block', 'text-[10px] text-pl-muted mt-2 block')}>
+                <div key={notif.id} className={`p-4 hover:bg-pl-sunken transition-colors ${!notif.is_read ? 'bg-pl-sunken/60' : ''}`}>
+                  <h5 className="text-sm font-medium text-pl-text mb-1">{notif.title}</h5>
+                  <p className="text-xs text-pl-muted">{notif.message}</p>
+                  <span className="text-[10px] text-pl-muted mt-2 block">
                     {new Date(notif.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </span>
                 </div>

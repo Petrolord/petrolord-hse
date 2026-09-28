@@ -3,96 +3,47 @@
 @tailwind utilities;
 
 @layer base {
+  /* Design family end state (batch 4A, docs/scope/DesignSystem-Rollout.md
+     section 7). Every signed-in, auth and public page renders inside a
+     design-system scope (src/design/theme.css re-points these variables
+     there), and the homepage keeps its own look under .hse-home. So :root
+     holds the light scope's shadcn values, as in the Suite, for the few
+     frames no scope covers (the body behind a page, overscroll). The dark
+     class block and the legacy palette variables (--bg-app, --bg-card,
+     --text-primary, --border-color, --accent ...) are retired, and so are
+     the two shared component classes that read them.
+     tailwind.config.js wraps these in hsl(), so they MUST stay bare HSL
+     triplets. */
   :root {
-    --bg-app: #f8f9fa;
-    --bg-card: #ffffff;
-    --bg-hover: #f1f3f5;
-    --text-primary: #111827;
-    --text-secondary: #4b5563;
-    --text-muted: #9ca3af;
-    --border-color: #e5e7eb;
-    --accent: #FFC107;
-    --accent-hover: #e0a800;
-    --accent-foreground: #000000;
-    
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
-    /* UI-kit tokens (shadcn). tailwind.config.js wraps these in hsl(), so they
-       MUST stay bare HSL triplets. Brand amber lives in --accent above as hex
-       and is intentionally separate from the subtle --accent-ui hover surface. */
-    --background: 210 17% 98%;
-    --foreground: 221 39% 11%;
-    --card: 0 0% 100%;
-    --card-foreground: 221 39% 11%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 221 39% 11%;
-    --primary: 45 100% 51%;
-    --primary-foreground: 221 39% 11%;
-    --secondary: 210 17% 95%;
-    --secondary-foreground: 221 39% 11%;
-    --muted: 210 17% 95%;
-    --muted-foreground: 215 14% 34%;
-    --accent-ui: 210 17% 95%;
-    --accent-ui-foreground: 221 39% 11%;
-    --destructive: 0 72% 51%;
+    --background: 214.3 13.2% 89.6%;
+    --foreground: 148 27.3% 10.8%;
+    --card: 216 16.1% 93.9%;
+    --card-foreground: 148 27.3% 10.8%;
+    --popover: 210 16.7% 97.6%;
+    --popover-foreground: 148 27.3% 10.8%;
+    --primary: 145 39% 30.2%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 213.3 13% 86.5%;
+    --secondary-foreground: 148 27.3% 10.8%;
+    --muted: 213.3 13% 86.5%;
+    --muted-foreground: 210 11.5% 34.1%;
+    --accent-ui: 213.3 13% 86.5%;
+    --accent-ui-foreground: 148 27.3% 10.8%;
+    --destructive: 4.2 76.5% 40%;
     --destructive-foreground: 0 0% 100%;
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 45 100% 51%;
+    --border: 212.3 12.1% 79%;
+    --input: 211.4 8.7% 47.3%;
+    --ring: 42.1 63.3% 33.1%;
   }
 
-  .dark {
-    --bg-app: #0F1B2E;
-    --bg-card: #1a1a2e;
-    --bg-hover: #252541;
-    --text-primary: #f9fafb;
-    --text-secondary: #d1d5db;
-    --text-muted: #6b7280;
-    --border-color: #3a3a5a;
-    --accent: #FFC107;
-    --accent-hover: #ffcd38;
-    --accent-foreground: #000000;
-
-    --background: 217 51% 12%;
-    --foreground: 210 20% 98%;
-    --card: 240 28% 14%;
-    --card-foreground: 210 20% 98%;
-    --popover: 240 28% 14%;
-    --popover-foreground: 210 20% 98%;
-    --primary: 45 100% 51%;
-    --primary-foreground: 240 28% 14%;
-    --secondary: 240 27% 20%;
-    --secondary-foreground: 210 20% 98%;
-    --muted: 240 27% 20%;
-    --muted-foreground: 218 11% 65%;
-    --accent-ui: 240 27% 20%;
-    --accent-ui-foreground: 210 20% 98%;
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 240 22% 29%;
-    --input: 240 22% 29%;
-    --ring: 45 100% 51%;
-  }
-}
-
-/* Shared Petrolord component classes. Referenced across dashboards, admin
-   forms and auth pages; they were never defined, so cards and buttons rendered
-   transparent. Utilities on the same element still override these. */
-@layer components {
-  .petrolord-card {
-    @apply rounded-lg border border-[var(--border-color)] bg-[var(--bg-card)] text-[var(--text-primary)] shadow-sm;
-  }
-  .petrolord-button {
-    @apply inline-flex items-center justify-center gap-2 rounded-md bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--accent-foreground)] transition-colors hover:bg-[var(--accent-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] disabled:pointer-events-none disabled:opacity-50;
-  }
-}
-
-@layer base {
   * {
-    @apply border-[var(--border-color)];
+    border-color: hsl(var(--border));
   }
   body {
-    @apply bg-[var(--bg-app)] text-[var(--text-primary)];
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
   }
 }
 

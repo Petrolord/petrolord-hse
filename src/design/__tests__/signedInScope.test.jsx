@@ -1,9 +1,7 @@
 // @vitest-environment jsdom
-// The HSE scope plumbing: the rollout gate, the per-user storage key shared
-// with the Suite, the cold-load loader, the toggle's visibility rules and
-// the useThemeClass call shapes.
-import fs from 'node:fs';
-import path from 'node:path';
+// The HSE scope plumbing: the scope opens for every module (the rollout
+// gate is gone since batch 4A), the per-user storage key shared with the
+// Suite, the cold-load loader and the toggle's visibility rules.
 import React from 'react';
 import '@testing-library/jest-dom/vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
@@ -12,59 +10,39 @@ import {
   ThemedApp, FixedTheme, themeStorageKey, LAST_THEME_KEY,
 } from '@/design/ThemeProvider';
 import { SignedInScope, ThemedLoadingScreen, SIGNED_IN_SCOPE_TEST_ID } from '@/design/SignedInScope';
-import { isThemedModule, THEMED_MODULES, ROLLOUT_BATCHES, DEFAULT_MODULE } from '@/design/rollout';
-import { themeClassPicker } from '@/design/themeClass';
+import { useActiveTheme } from '@/design/activeTheme';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { installDomShims } from '@/design/testing/domShims';
+import { mainContentModuleIds } from '@/design/testing/themeAssertions';
 
 beforeAll(installDomShims);
 beforeEach(() => {
   try { window.localStorage.clear(); } catch { /* storage unavailable */ }
 });
 
-describe('rollout lists', () => {
-  it('wave 0 themes the dashboard and the AI Analytics module', () => {
-    expect(ROLLOUT_BATCHES.w0).toEqual(['dashboard', 'ai-analytics']);
-    expect(isThemedModule('dashboard')).toBe(true);
-    expect(isThemedModule('ai-analytics')).toBe(true);
+describe('every module is scoped', () => {
+  it('the rollout folder and the useThemeClass helper are gone', async () => {
+    const fs = await import('node:fs');
+    const path = await import('node:path');
+    const design = path.resolve(__dirname, '..');
+    expect(fs.existsSync(path.join(design, 'rollout'))).toBe(false);
+    expect(fs.existsSync(path.join(design, 'themeClass.js'))).toBe(false);
+    expect(fs.existsSync(path.join(design, 'index.js'))).toBe(true);
   });
 
-  it('treats no module as the default dashboard, as MainContent does', () => {
-    expect(DEFAULT_MODULE).toBe('dashboard');
-    expect(isThemedModule(undefined)).toBe(true);
-    expect(isThemedModule(null)).toBe(true);
-  });
-
-  it('leaves every other module legacy', () => {
-    // 'legacy-probe' is an id no batch lists (batch 1B migrated 'permits').
-    for (const id of ['legacy-probe']) expect(isThemedModule(id)).toBe(false);
-  });
-
-  it('lists each module once, only real MainContent module ids, one file per batch', () => {
-    const all = Object.values(ROLLOUT_BATCHES).flat();
-    expect(new Set(all).size).toBe(all.length);
-    const main = fs.readFileSync(path.resolve(__dirname, '../../components/MainContent.jsx'), 'utf8');
-    const ids = [...main.matchAll(/case '([a-z-]+)':/g)].map((m) => m[1]);
-    for (const id of THEMED_MODULES) expect(ids).toContain(id);
-    const files = fs.readdirSync(path.resolve(__dirname, '../rollout')).filter((f) => /^w\w+\.js$/.test(f));
-    expect(files.map((f) => f.replace('.js', '')).sort()).toEqual(Object.keys(ROLLOUT_BATCHES).sort());
-  });
-});
-
-describe('SignedInScope', () => {
-  it('renders an unmigrated module with no wrapper and no toggle', () => {
-    const { container } = render(
-      <SignedInScope moduleId="legacy-probe"><p className="legacy">legacy</p><ThemeToggle /></SignedInScope>,
-    );
-    expect(container.innerHTML).toBe('<p class="legacy">legacy</p>');
-  });
-
-  it('opens a light scope with the toggle on a migrated module', () => {
-    render(<SignedInScope moduleId="dashboard"><ThemeToggle /></SignedInScope>);
-    const scope = screen.getByTestId(SIGNED_IN_SCOPE_TEST_ID);
-    expect(scope).toHaveAttribute('data-pl-theme', 'light');
-    expect(scope).toHaveAttribute('data-pl-root');
-    expect(screen.getByTestId('theme-toggle')).toHaveAttribute('aria-pressed', 'false');
+  it('opens a light scope with the toggle whatever the module, known or not', async () => {
+    const ids = await mainContentModuleIds();
+    expect(ids.length).toBeGreaterThanOrEqual(24);
+    // 'legacy-probe' is the id the rollout-era tests used for an unmigrated
+    // module; SignedInScope no longer reads the module, so it is scoped too.
+    for (const id of [...ids, 'legacy-probe', undefined]) {
+      const { unmount } = render(<SignedInScope data-module={id}><ThemeToggle /></SignedInScope>);
+      const scope = screen.getByTestId(SIGNED_IN_SCOPE_TEST_ID);
+      expect(scope).toHaveAttribute('data-pl-theme', 'light');
+      expect(scope).toHaveAttribute('data-pl-root');
+      expect(screen.getByTestId('theme-toggle')).toHaveAttribute('aria-pressed', 'false');
+      unmount();
+    }
   });
 });
 
@@ -102,12 +80,25 @@ describe('per-user choice', () => {
 });
 
 describe('ThemedLoadingScreen', () => {
-  it('paints the last theme on a migrated module and nothing elsewhere', () => {
+  function ActiveProbe() {
+    return <span data-testid="active">{String(useActiveTheme())}</span>;
+  }
+
+  it('paints the device\'s last theme as a scope of its own and publishes it (cold load)', () => {
     window.localStorage.setItem(LAST_THEME_KEY, 'dark');
-    const { container, rerender } = render(<ThemedLoadingScreen moduleId="dashboard" label="Loading" />);
-    expect(screen.getByTestId('hse-themed-loader')).toHaveAttribute('data-pl-theme', 'dark');
-    rerender(<ThemedLoadingScreen moduleId="legacy-probe" label="Loading" />);
-    expect(container.innerHTML).toBe('');
+    render(<><ThemedLoadingScreen label="Loading" /><ActiveProbe /></>);
+    const loader = screen.getByTestId('hse-themed-loader');
+    expect(loader).toHaveAttribute('data-pl-theme', 'dark');
+    expect(loader).toHaveAttribute('data-pl-root');
+    expect(loader).toHaveAttribute('role', 'status');
+    // the root pieces (offline pill, toaster) read this
+    expect(screen.getByTestId('active')).toHaveTextContent('dark');
+  });
+
+  it('is light when the device has no last theme', () => {
+    render(<><ThemedLoadingScreen label="Loading" /><ActiveProbe /></>);
+    expect(screen.getByTestId('hse-themed-loader')).toHaveAttribute('data-pl-theme', 'light');
+    expect(screen.getByTestId('active')).toHaveTextContent('light');
   });
 });
 
@@ -117,22 +108,5 @@ describe('ThemeToggle', () => {
     expect(container.innerHTML).toBe('');
     render(<FixedTheme theme="dark"><span data-testid="rail"><ThemeToggle /></span></FixedTheme>);
     expect(screen.getByTestId('rail').innerHTML).toBe('');
-  });
-});
-
-describe('useThemeClass (themeClassPicker)', () => {
-  it('returns the legacy string unchanged outside a scope, whatever is passed', () => {
-    const tc = themeClassPicker(null);
-    expect(tc('bg-[#1a1a2e] text-white', 'bg-pl-surface')).toBe('bg-[#1a1a2e] text-white');
-    expect(tc('text-gray-400', undefined)).toBe('text-gray-400');
-    expect(tc(undefined, 'Label')).toBeUndefined();
-  });
-
-  it('inside a scope returns the themed argument, even undefined, else the table entry', () => {
-    const tc = themeClassPicker({ theme: 'light' }, { 'text-white': 'text-pl-text' });
-    expect(tc('bg-[#1a1a2e]', 'bg-pl-surface')).toBe('bg-pl-surface');
-    expect(tc('text-gray-400', undefined)).toBeUndefined();
-    expect(tc('text-white')).toBe('text-pl-text');
-    expect(tc('p-4')).toBe('p-4');
   });
 });

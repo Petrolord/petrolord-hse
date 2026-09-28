@@ -24,13 +24,10 @@ import { CheckCircle2, ChevronRight, ChevronLeft, Upload, AlertTriangle, Eye, Ac
 import InteractiveMap from '@/components/sites/InteractiveMap';
 import LocationAutocomplete from '@/components/sites/LocationAutocomplete';
 import ReportTemplates from '@/components/hse/ReportTemplates'; 
-import { useThemeClass } from '@/design/themeClass';
 
-// Scope-aware: the wizard opens in the layout's dialog on every module, so
-// outside a design-system scope every class is the legacy string (pinned by
-// src/components/hse/__tests__/reportingLegacyDom.test.jsx) and inside one
-// the themed string. Choices are marked with the primary role; severity
-// uses the status roles next to its word.
+// The wizard opens in the layout's dialog on every module, on the theme
+// roles. Choices are marked with the primary role; severity uses the status
+// roles next to its word.
 
 const THEMED_SEVERITY = {
   Critical: 'bg-pl-danger-bg border-pl-danger',
@@ -74,7 +71,6 @@ const HAZARD_CATEGORIES = [
 export default function ReportWizard({ onSuccess, onCancel, initialType = '' }) {
   const { currentOrganization, currentUser, isFeatureAvailable, isLoading: isHSELoading } = useHSE();
   const { toast } = useToast();
-  const tc = useThemeClass();
   
   // Use step 0 for template selection
   const [currentStep, setCurrentStep] = useState(0); 
@@ -351,7 +347,7 @@ export default function ReportWizard({ onSuccess, onCancel, initialType = '' }) 
             toast({ 
                 title: "Site Added Locally", 
                 description: "Site created in offline mode.",
-                ...tc({ className: "bg-yellow-600 text-white border-none" }, {})
+                ...{}
             });
         } else {
             toast({ title: "Site Created", description: `${newSite.name} added successfully.` });
@@ -497,7 +493,7 @@ export default function ReportWizard({ onSuccess, onCancel, initialType = '' }) 
           toast({ 
             title: "Submitted Successfully! 🎉", 
             description: `Reference: ${report.reference_code}.`,
-            ...tc({ className: "bg-green-600 text-white border-none" }, { variant: 'success' })
+            ...{ variant: 'success' }
           });
       } else {
           await offlineManager.saveIncident(reportPayload);
@@ -545,11 +541,11 @@ export default function ReportWizard({ onSuccess, onCancel, initialType = '' }) 
   return (
     <div className="max-w-5xl mx-auto py-2">
       {isContextMissing && (
-          <div className={tc('mb-4 bg-yellow-500/10 border border-yellow-500/30 p-3 rounded-lg flex items-center gap-3', 'mb-4 bg-pl-warning-bg border border-pl-warning/40 p-3 rounded-lg flex items-center gap-3')}>
-              <CloudOff className={tc('h-5 w-5 text-yellow-500', 'h-5 w-5 text-pl-warning-text')} />
+          <div className="mb-4 bg-pl-warning-bg border border-pl-warning/40 p-3 rounded-lg flex items-center gap-3">
+              <CloudOff className="h-5 w-5 text-pl-warning-text" />
               <div className="flex-1">
-                  <p className={tc('text-sm font-medium text-yellow-500', 'text-sm font-medium text-pl-warning-text')}>Offline / No Context Mode</p>
-                  <p className={tc('text-xs text-[#b0b0c0]', 'text-xs text-pl-muted')}>Organization data is unavailable. Reports will be saved locally and synced later.</p>
+                  <p className="text-sm font-medium text-pl-warning-text">Offline / No Context Mode</p>
+                  <p className="text-xs text-pl-muted">Organization data is unavailable. Reports will be saved locally and synced later.</p>
               </div>
           </div>
       )}
@@ -558,25 +554,25 @@ export default function ReportWizard({ onSuccess, onCancel, initialType = '' }) 
         <>
           <div className="mb-6 flex justify-between items-center">
             <div>
-              <h2 className={tc('text-2xl font-bold text-[#e0e0e0]', 'text-xl sm:text-2xl font-semibold text-pl-text')}>New HSE Report</h2>
-              <p className={tc('text-[#7a7a9a] text-sm', 'text-pl-muted text-sm')}>Step {currentStep} of 10: {STEPS[currentStep-1].title}</p>
+              <h2 className="text-xl sm:text-2xl font-semibold text-pl-text">New HSE Report</h2>
+              <p className="text-pl-muted text-sm">Step {currentStep} of 10: {STEPS[currentStep-1].title}</p>
             </div>
-            <div className={tc('flex items-center gap-3 text-xs text-[#7a7a9a]', 'flex items-center gap-3 text-xs text-pl-muted')}>
+            <div className="flex items-center gap-3 text-xs text-pl-muted">
               {lastSaved && <span className="flex items-center gap-1"><Save className="h-3 w-3"/> Draft saved {lastSaved.toLocaleTimeString()}</span>}
-              <Button variant="ghost" size="sm" onClick={onCancel} aria-label={tc(undefined, 'Close the wizard')}><X className="h-4 w-4"/></Button>
+              <Button variant="ghost" size="sm" onClick={onCancel} aria-label="Close the wizard"><X className="h-4 w-4"/></Button>
             </div>
           </div>
 
-          <div className={tc('w-full bg-[#3a3a5a] h-1.5 rounded-full mb-8 overflow-hidden', 'w-full bg-pl-border h-1.5 rounded-full mb-8 overflow-hidden')}>
+          <div className="w-full bg-pl-border h-1.5 rounded-full mb-8 overflow-hidden">
             <motion.div 
-              className={tc('h-full bg-[#FFC107]', 'h-full bg-pl-primary')}
+              className="h-full bg-pl-primary"
               initial={{ width: 0 }}
               animate={{ width: `${(currentStep / 10) * 100}%` }}
               transition={{ duration: 0.3 }}
             />
           </div>
 
-          <Card className={tc('bg-[#252541] border-[#3a3a5a] shadow-xl min-h-[500px] flex flex-col', 'min-h-[500px] flex flex-col')}>
+          <Card className="min-h-[500px] flex flex-col">
             <CardContent className="flex-1 py-6">
               <AnimatePresence mode="wait">
                 
@@ -587,20 +583,17 @@ export default function ReportWizard({ onSuccess, onCancel, initialType = '' }) 
                         <button
                           key={type.id}
                           onClick={() => updateField('report_type', type.id)}
-                          aria-pressed={tc(undefined, formData.report_type === type.id)}
-                          className={tc(`p-4 rounded-xl border-2 flex flex-col items-start gap-3 transition-all duration-200 group text-left
-                            ${formData.report_type === type.id 
-                              ? `border-[#FFC107] bg-[#FFC107]/10 shadow-lg` 
-                              : `border-[#3a3a5a] bg-[#1a1a2e] ${type.border}`}`, `p-4 rounded-xl border-2 flex flex-col items-start gap-3 transition-all duration-200 group text-left ${formData.report_type === type.id ? 'border-pl-primary bg-pl-primary/10' : 'border-pl-border bg-pl-surface hover:border-pl-border-strong'}`)}
+                          aria-pressed={formData.report_type === type.id}
+                          className={`p-4 rounded-xl border-2 flex flex-col items-start gap-3 transition-all duration-200 group text-left ${formData.report_type === type.id ? 'border-pl-primary bg-pl-primary/10' : 'border-pl-border bg-pl-surface hover:border-pl-border-strong'}`}
                         >
-                          <div className={tc(`p-2 rounded-full bg-[#252541]`, 'p-2 rounded-full bg-pl-sunken')}>
-                            {['Incident','Fire'].some(k => type.id.includes(k)) ? <AlertTriangle className={tc(`h-6 w-6 ${type.color}`, 'h-6 w-6 text-pl-muted')} /> : 
-                             ['Safe','Health'].some(k => type.id.includes(k)) ? <Activity className={tc(`h-6 w-6 ${type.color}`, 'h-6 w-6 text-pl-muted')} /> :
-                             <Eye className={tc(`h-6 w-6 ${type.color}`, 'h-6 w-6 text-pl-muted')} />}
+                          <div className="p-2 rounded-full bg-pl-sunken">
+                            {['Incident','Fire'].some(k => type.id.includes(k)) ? <AlertTriangle className="h-6 w-6 text-pl-muted" /> : 
+                             ['Safe','Health'].some(k => type.id.includes(k)) ? <Activity className="h-6 w-6 text-pl-muted" /> :
+                             <Eye className="h-6 w-6 text-pl-muted" />}
                           </div>
                           <div>
-                            <span className={tc('block font-bold text-[#e0e0e0] mb-1', 'block font-semibold text-pl-text mb-1')}>{type.label}</span>
-                            <span className={tc('text-xs text-[#7a7a9a]', 'text-xs text-pl-muted')}>{type.desc}</span>
+                            <span className="block font-semibold text-pl-text mb-1">{type.label}</span>
+                            <span className="text-xs text-pl-muted">{type.desc}</span>
                           </div>
                         </button>
                       ))}
@@ -612,14 +605,14 @@ export default function ReportWizard({ onSuccess, onCancel, initialType = '' }) 
                 {currentStep === 2 && (
                   <motion.div key="step2" className="space-y-6" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }}>
                     <div className="space-y-4">
-                        <Label className={tc('text-[#b0b0c0]', undefined)}>Site / Location <span className={tc('text-red-400', 'text-pl-danger-text')}>*</span></Label>
+                        <Label>Site / Location <span className="text-pl-danger-text">*</span></Label>
                         
                         <Tabs defaultValue="map" className="w-full">
-                            <TabsList className={tc('grid w-full grid-cols-2 bg-[#1a1a2e] border border-[#3a3a5a]', 'grid w-full grid-cols-2')}>
-                                <TabsTrigger value="map" className={tc('data-[state=active]:bg-[#252541] data-[state=active]:text-[#FFC107]', undefined)}>
+                            <TabsList className="grid w-full grid-cols-2">
+                                <TabsTrigger value="map">
                                     <MapPin className="h-4 w-4 mr-2" /> Map View
                                 </TabsTrigger>
-                                <TabsTrigger value="search" className={tc('data-[state=active]:bg-[#252541] data-[state=active]:text-[#FFC107]', undefined)}>
+                                <TabsTrigger value="search">
                                     <Search className="h-4 w-4 mr-2" /> Search
                                 </TabsTrigger>
                             </TabsList>
@@ -641,25 +634,25 @@ export default function ReportWizard({ onSuccess, onCancel, initialType = '' }) 
                                 />
                                 
                                 {isQuickAddOpen && (
-                                    <div className={tc('absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[500] bg-[#252541] p-4 rounded-lg shadow-2xl border border-[#3a3a5a] w-80', 'absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[500] bg-pl-raised text-pl-text p-4 rounded-lg shadow-pl-lg border border-pl-border w-80 max-w-[calc(100%-2rem)]')}>
-                                        <h4 className={tc('text-sm font-bold text-white mb-2', 'text-sm font-semibold text-pl-text mb-2')}>Create New Site</h4>
-                                        <p className={tc('text-xs text-gray-400 mb-2', 'text-xs text-pl-muted mb-2')}>
+                                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[500] bg-pl-raised text-pl-text p-4 rounded-lg shadow-pl-lg border border-pl-border w-80 max-w-[calc(100%-2rem)]">
+                                        <h4 className="text-sm font-semibold text-pl-text mb-2">Create New Site</h4>
+                                        <p className="text-xs text-pl-muted mb-2">
                                             Location: {newSiteCoords ? `${newSiteCoords.lat.toFixed(4)}, ${newSiteCoords.lng.toFixed(4)}` : 'Map Center'}
                                         </p>
                                         <Input 
                                             placeholder="Site Name" 
                                             value={newSiteName} 
                                             onChange={e => setNewSiteName(e.target.value)} 
-                                            className={tc('bg-[#1a1a2e] border-[#3a3a5a] mb-2', 'mb-2')}
+                                            className="mb-2"
                                         />
                                         <Textarea 
                                             placeholder="Address / Description" 
                                             value={newSiteAddress}
                                             onChange={e => setNewSiteAddress(e.target.value)}
-                                            className={tc('bg-[#1a1a2e] border-[#3a3a5a] mb-2 h-20 text-xs', 'mb-2 h-20 text-xs')}
+                                            className="mb-2 h-20 text-xs"
                                         />
                                         <div className="flex gap-2">
-                                            <Button size="sm" className={tc('flex-1 bg-[#FFC107] text-black', 'flex-1')} onClick={handleCreateSite} disabled={isCreatingSite}>
+                                            <Button size="sm" className="flex-1" onClick={handleCreateSite} disabled={isCreatingSite}>
                                                 {isCreatingSite ? <Loader2 className="h-3 w-3 animate-spin" /> : "Create"}
                                             </Button>
                                             <Button size="sm" variant="ghost" className="flex-1" onClick={() => setIsQuickAddOpen(false)}>Cancel</Button>
@@ -669,14 +662,14 @@ export default function ReportWizard({ onSuccess, onCancel, initialType = '' }) 
                             </TabsContent>
                             
                             <TabsContent value="search" className="mt-2 h-[400px] flex flex-col">
-                                <div className={tc('flex-1 bg-[#1a1a2e] p-6 rounded-lg border border-[#3a3a5a]', 'flex-1 bg-pl-sunken p-4 sm:p-6 rounded-lg border border-pl-border')}>
+                                <div className="flex-1 bg-pl-sunken p-4 sm:p-6 rounded-lg border border-pl-border">
                                     <div className="max-w-md mx-auto space-y-4">
                                         <div className="text-center mb-6">
-                                            <div className={tc('inline-flex h-12 w-12 items-center justify-center rounded-full bg-[#252541] mb-3', 'inline-flex h-12 w-12 items-center justify-center rounded-full bg-pl-surface border border-pl-border mb-3')}>
-                                                <Search className={tc('h-6 w-6 text-[#FFC107]', 'h-6 w-6 text-pl-muted')} />
+                                            <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-pl-surface border border-pl-border mb-3">
+                                                <Search className="h-6 w-6 text-pl-muted" />
                                             </div>
-                                            <h3 className={tc('text-lg font-medium text-white', 'text-lg font-medium text-pl-text')}>Find Location</h3>
-                                            <p className={tc('text-sm text-[#7a7a9a]', 'text-sm text-pl-muted')}>Search existing sites or locations</p>
+                                            <h3 className="text-lg font-medium text-pl-text">Find Location</h3>
+                                            <p className="text-sm text-pl-muted">Search existing sites or locations</p>
                                         </div>
                                         <LocationAutocomplete 
                                             onSelect={handleAutocompleteSelect}
@@ -692,22 +685,21 @@ export default function ReportWizard({ onSuccess, onCancel, initialType = '' }) 
                         </Tabs>
 
                         {formData.site_id && (
-                            <div className={tc('flex items-center justify-between p-3 bg-green-500/10 border border-green-500/30 rounded-lg', 'flex items-center justify-between gap-3 p-3 bg-pl-success-bg border border-pl-success/40 rounded-lg')}>
+                            <div className="flex items-center justify-between gap-3 p-3 bg-pl-success-bg border border-pl-success/40 rounded-lg">
                                 <div className="flex items-center gap-3">
-                                    <CheckCircle2 className={tc('h-5 w-5 text-green-500', 'h-5 w-5 text-pl-success-text')} />
+                                    <CheckCircle2 className="h-5 w-5 text-pl-success-text" />
                                     <div>
-                                        <p className={tc('text-sm font-medium text-white', 'text-sm font-medium text-pl-text')}>
-                                            Selected Site: <span className={tc('text-[#FFC107]', 'font-semibold text-pl-text')}>{sites.find(s => s.id === formData.site_id)?.name || 'Unknown'}</span>
+                                        <p className="text-sm font-medium text-pl-text">
+                                            Selected Site: <span className="font-semibold text-pl-text">{sites.find(s => s.id === formData.site_id)?.name || 'Unknown'}</span>
                                         </p>
                                         {formData.location_detail && (
-                                            <p className={tc('text-xs text-[#b0b0c0]', 'text-xs text-pl-muted')}>Detail: {formData.location_detail}</p>
+                                            <p className="text-xs text-pl-muted">Detail: {formData.location_detail}</p>
                                         )}
                                     </div>
                                 </div>
                                 <Button 
                                     variant="ghost" 
-                                    size="sm" 
-                                    className={tc('text-[#7a7a9a] hover:text-white', undefined)}
+                                    size="sm"
                                     onClick={() => { updateField('site_id', ''); updateField('location_detail', ''); }}
                                 >
                                     Change
@@ -718,36 +710,34 @@ export default function ReportWizard({ onSuccess, onCancel, initialType = '' }) 
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                        <Label className={tc('text-[#b0b0c0]', undefined)}>Department</Label>
+                        <Label>Department</Label>
                         <Select value={formData.department_id} onValueChange={(val) => updateField('department_id', val)}>
-                        <SelectTrigger className={tc('bg-[#1a1a2e] border-[#3a3a5a]', undefined)}><SelectValue placeholder="Select Department" /></SelectTrigger>
-                        <SelectContent className={tc('bg-[#1a1a2e] border-[#3a3a5a]', undefined)}>
+                        <SelectTrigger><SelectValue placeholder="Select Department" /></SelectTrigger>
+                        <SelectContent>
                             {departments.length > 0 ? (
                                 departments.map(d => <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>)
                             ) : (
-                                <div className={tc('p-2 text-xs text-center text-gray-500', 'p-2 text-xs text-center text-pl-muted')}>No active departments</div>
+                                <div className="p-2 text-xs text-center text-pl-muted">No active departments</div>
                             )}
                         </SelectContent>
                         </Select>
                     </div>
                     <div className="space-y-2">
-                        <Label className={tc('text-[#b0b0c0]', undefined)}>Date & Time <span className={tc('text-red-400', 'text-pl-danger-text')}>*</span></Label>
+                        <Label>Date & Time <span className="text-pl-danger-text">*</span></Label>
                         <Input 
                             type="datetime-local"
                             value={formData.incident_date}
                             onChange={(e) => updateField('incident_date', e.target.value)}
-                            className={tc('bg-[#1a1a2e] border-[#3a3a5a]', undefined)}
                         />
                     </div>
                     </div>
 
                     <div className="space-y-2">
-                    <Label className={tc('text-[#b0b0c0]', undefined)}>Specific Location Detail</Label>
+                    <Label>Specific Location Detail</Label>
                     <Input 
                         placeholder="e.g. 3rd Floor, Pump Room B" 
                         value={formData.location_detail}
                         onChange={(e) => updateField('location_detail', e.target.value)}
-                        className={tc('bg-[#1a1a2e] border-[#3a3a5a]', undefined)}
                     />
                     </div>
                   </motion.div>
@@ -757,18 +747,17 @@ export default function ReportWizard({ onSuccess, onCancel, initialType = '' }) 
                 {currentStep === 3 && (
                   <motion.div key="step3" className="space-y-6" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }}>
                     <div className="space-y-2 relative">
-                    <Label className={tc('text-[#b0b0c0]', undefined)}>Title <span className={tc('text-red-400', 'text-pl-danger-text')}>*</span></Label>
+                    <Label>Title <span className="text-pl-danger-text">*</span></Label>
                     <Input 
                         placeholder="Brief headline..." 
                         value={formData.title}
                         onChange={(e) => updateField('title', e.target.value)}
-                        className={tc('bg-[#1a1a2e] border-[#3a3a5a]', undefined)}
                     />
                     {duplicates.length > 0 && (
-                        <div className={tc('absolute top-full left-0 right-0 bg-[#252541] border border-yellow-500/30 p-2 rounded z-10 shadow-xl', 'absolute top-full left-0 right-0 bg-pl-raised border border-pl-warning/40 p-2 rounded z-10 shadow-pl-md')}>
-                        <p className={tc('text-xs text-yellow-500 mb-1 flex items-center', 'text-xs text-pl-warning-text mb-1 flex items-center')}><AlertCircle className="w-3 h-3 mr-1"/> Similar reports found:</p>
+                        <div className="absolute top-full left-0 right-0 bg-pl-raised border border-pl-warning/40 p-2 rounded z-10 shadow-pl-md">
+                        <p className="text-xs text-pl-warning-text mb-1 flex items-center"><AlertCircle className="w-3 h-3 mr-1"/> Similar reports found:</p>
                         {duplicates.map(d => (
-                            <div key={d.id} className={tc('text-xs text-[#b0b0c0] truncate border-b border-[#3a3a5a] py-1 cursor-pointer hover:text-white', 'text-xs text-pl-muted truncate border-b border-pl-border py-1 cursor-pointer hover:text-pl-text')}>
+                            <div key={d.id} className="text-xs text-pl-muted truncate border-b border-pl-border py-1 cursor-pointer hover:text-pl-text">
                             {d.reference_code}: {d.title}
                             </div>
                         ))}
@@ -776,15 +765,15 @@ export default function ReportWizard({ onSuccess, onCancel, initialType = '' }) 
                     )}
                     </div>
                     <div className="space-y-2">
-                    <Label className={tc('text-[#b0b0c0]', undefined)}>What Happened? (Description) <span className={tc('text-red-400', 'text-pl-danger-text')}>*</span></Label>
+                    <Label>What Happened? (Description) <span className="text-pl-danger-text">*</span></Label>
                     <div className="relative">
                         <Textarea 
                             placeholder="Detailed description..." 
                             value={formData.description}
                             onChange={(e) => updateField('description', e.target.value)}
-                            className={tc('bg-[#1a1a2e] border-[#3a3a5a] min-h-[200px] font-sans', 'min-h-[200px] font-sans')}
+                            className="min-h-[200px] font-sans"
                         />
-                        <span className={tc('text-xs text-[#7a7a9a] absolute bottom-2 right-2', 'text-xs text-pl-muted font-pl-mono tabular-nums absolute bottom-2 right-2')}>{formData.description.length} chars</span>
+                        <span className="text-xs text-pl-muted font-pl-mono tabular-nums absolute bottom-2 right-2">{formData.description.length} chars</span>
                     </div>
                     </div>
                   </motion.div>
@@ -793,14 +782,14 @@ export default function ReportWizard({ onSuccess, onCancel, initialType = '' }) 
                 {/* Step 4 - Category */}
                 {currentStep === 4 && (
                   <motion.div key="step4" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }}>
-                    <h3 className={tc('text-lg font-medium text-[#e0e0e0] mb-4', 'text-lg font-medium text-pl-text mb-4')}>Select Hazard Category</h3>
+                    <h3 className="text-lg font-medium text-pl-text mb-4">Select Hazard Category</h3>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     {HAZARD_CATEGORIES.map(cat => (
                         <button
                         key={cat}
                         onClick={() => updateField('hazard_category', cat)}
-                        aria-pressed={tc(undefined, formData.hazard_category === cat)}
-                        className={tc(`p-3 text-sm rounded border transition-colors ${formData.hazard_category === cat ? 'bg-[#FFC107] text-black border-[#FFC107] font-semibold' : 'bg-[#1a1a2e] border-[#3a3a5a] text-[#b0b0c0] hover:border-[#FFC107]'}`, `p-3 text-sm rounded border transition-colors ${formData.hazard_category === cat ? 'bg-pl-primary text-pl-primary-fg border-pl-primary font-semibold' : 'bg-pl-surface border-pl-border text-pl-text hover:border-pl-border-strong'}`)}
+                        aria-pressed={formData.hazard_category === cat}
+                        className={`p-3 text-sm rounded border transition-colors ${formData.hazard_category === cat ? 'bg-pl-primary text-pl-primary-fg border-pl-primary font-semibold' : 'bg-pl-surface border-pl-border text-pl-text hover:border-pl-border-strong'}`}
                         >
                         {cat}
                         </button>
@@ -817,13 +806,10 @@ export default function ReportWizard({ onSuccess, onCancel, initialType = '' }) 
                         <div 
                             key={level}
                             onClick={() => updateField('severity', level.toLowerCase())}
-                            className={tc(`cursor-pointer p-6 rounded-xl border-2 flex flex-col items-center text-center gap-2 transition-all
-                            ${formData.severity === level.toLowerCase() 
-                                ? (level === 'Critical' ? 'bg-red-500/20 border-red-500' : level === 'High' ? 'bg-orange-500/20 border-orange-500' : level === 'Medium' ? 'bg-yellow-500/20 border-yellow-500' : 'bg-green-500/20 border-green-500') 
-                                : 'bg-[#1a1a2e] border-[#3a3a5a] opacity-60 hover:opacity-100'}`, `cursor-pointer p-4 sm:p-6 rounded-xl border-2 flex flex-col items-center text-center gap-2 transition-all ${formData.severity === level.toLowerCase() ? THEMED_SEVERITY[level] : 'bg-pl-surface border-pl-border hover:border-pl-border-strong'}`)}
+                            className={`cursor-pointer p-4 sm:p-6 rounded-xl border-2 flex flex-col items-center text-center gap-2 transition-all ${formData.severity === level.toLowerCase() ? THEMED_SEVERITY[level] : 'bg-pl-surface border-pl-border hover:border-pl-border-strong'}`}
                         >
-                            <span className={tc('text-xl font-bold text-[#e0e0e0]', 'text-xl font-semibold text-pl-text')}>{level}</span>
-                            <p className={tc('text-xs text-[#b0b0c0]', 'text-xs text-pl-muted')}>
+                            <span className="text-xl font-semibold text-pl-text">{level}</span>
+                            <p className="text-xs text-pl-muted">
                                 {level === 'Low' ? 'No injury, minor damage.' :
                                 level === 'Medium' ? 'First aid, localized damage.' :
                                 level === 'High' ? 'Medical treatment, serious damage.' :
@@ -838,14 +824,14 @@ export default function ReportWizard({ onSuccess, onCancel, initialType = '' }) 
                 {/* Step 6 - Controls */}
                 {currentStep === 6 && (
                   <motion.div key="step6" className="space-y-4" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }}>
-                    <Label className={tc('text-[#b0b0c0]', undefined)}>Immediate Actions Taken</Label>
+                    <Label>Immediate Actions Taken</Label>
                     <Textarea 
                         placeholder="What was done to make the area safe?"
                         value={formData.immediate_controls}
                         onChange={(e) => updateField('immediate_controls', e.target.value)}
-                        className={tc('bg-[#1a1a2e] border-[#3a3a5a] min-h-[150px]', 'min-h-[150px]')}
+                        className="min-h-[150px]"
                     />
-                    <div className={tc('flex gap-2 text-xs text-[#7a7a9a]', 'flex gap-2 text-xs text-pl-muted')}>
+                    <div className="flex gap-2 text-xs text-pl-muted">
                         <Lightbulb className="h-4 w-4" />
                         <span>Tip: Mention who took the action and when.</span>
                     </div>
@@ -856,23 +842,23 @@ export default function ReportWizard({ onSuccess, onCancel, initialType = '' }) 
                 {currentStep === 7 && (
                   <motion.div key="step7" className="space-y-6" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }}>
                     <div className="flex items-center justify-center w-full">
-                        <label className={tc('flex flex-col items-center justify-center w-full h-64 border-2 border-[#3a3a5a] border-dashed rounded-lg cursor-pointer bg-[#1a1a2e] hover:bg-[#20203a] transition-colors', 'flex flex-col items-center justify-center w-full h-64 border-2 border-pl-border-strong border-dashed rounded-lg cursor-pointer bg-pl-sunken hover:bg-pl-surface transition-colors')}>
+                        <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-pl-border-strong border-dashed rounded-lg cursor-pointer bg-pl-sunken hover:bg-pl-surface transition-colors">
                             <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                                <Upload className={tc('w-10 h-10 mb-3 text-[#7a7a9a]', 'w-10 h-10 mb-3 text-pl-muted')} />
-                                <p className={tc('mb-2 text-sm text-[#e0e0e0]', 'mb-2 text-sm text-pl-text')}><span className="font-semibold">Click to upload</span> or drag and drop</p>
-                                <p className={tc('text-xs text-[#7a7a9a]', 'text-xs text-pl-muted')}>SVG, PNG, JPG or GIF (MAX. 10MB)</p>
+                                <Upload className="w-10 h-10 mb-3 text-pl-muted" />
+                                <p className="mb-2 text-sm text-pl-text"><span className="font-semibold">Click to upload</span> or drag and drop</p>
+                                <p className="text-xs text-pl-muted">SVG, PNG, JPG or GIF (MAX. 10MB)</p>
                             </div>
                             <input type="file" className="hidden" onChange={handleFileUpload} accept="image/*,video/*" />
                         </label>
                     </div>
                     <div className="space-y-2">
                         {formData.attachments.map((file, idx) => (
-                            <div key={idx} className={tc('flex items-center justify-between p-3 bg-[#1a1a2e] rounded border border-[#3a3a5a]', 'flex items-center justify-between gap-3 p-3 bg-pl-sunken rounded border border-pl-border')}>
+                            <div key={idx} className="flex items-center justify-between gap-3 p-3 bg-pl-sunken rounded border border-pl-border">
                                 <div className="flex items-center gap-3">
-                                    <FileText className={tc('h-5 w-5 text-[#FFC107]', 'h-5 w-5 text-pl-muted')}/>
+                                    <FileText className="h-5 w-5 text-pl-muted"/>
                                     <div>
-                                        <p className={tc('text-sm font-medium text-[#e0e0e0]', 'text-sm font-medium text-pl-text')}>{file.name}</p>
-                                        <p className={tc('text-xs text-[#7a7a9a]', 'text-xs text-pl-muted')}>{file.size}</p>
+                                        <p className="text-sm font-medium text-pl-text">{file.name}</p>
+                                        <p className="text-xs text-pl-muted">{file.size}</p>
                                     </div>
                                 </div>
                                 <Button variant="ghost" size="icon" onClick={() => {
@@ -889,22 +875,22 @@ export default function ReportWizard({ onSuccess, onCancel, initialType = '' }) 
                 {/* Step 8 - People */}
                 {currentStep === 8 && (
                   <motion.div key="step8" className="space-y-6" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }}>
-                    <div className={tc('grid grid-cols-1 md:grid-cols-3 gap-4 bg-[#1a1a2e] p-4 rounded-lg', 'grid grid-cols-1 md:grid-cols-3 gap-4 bg-pl-sunken border border-pl-border p-4 rounded-lg')}>
-                        <Input placeholder="Name" value={newPerson.name} onChange={e => setNewPerson({...newPerson, name: e.target.value})} className={tc('bg-[#252541] border-[#3a3a5a]', undefined)} />
-                        <Input placeholder="Role (e.g. Witness)" value={newPerson.role} onChange={e => setNewPerson({...newPerson, role: e.target.value})} className={tc('bg-[#252541] border-[#3a3a5a]', undefined)} />
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-pl-sunken border border-pl-border p-4 rounded-lg">
+                        <Input placeholder="Name" value={newPerson.name} onChange={e => setNewPerson({...newPerson, name: e.target.value})} />
+                        <Input placeholder="Role (e.g. Witness)" value={newPerson.role} onChange={e => setNewPerson({...newPerson, role: e.target.value})} />
                         <div className="flex gap-2">
-                            <Input placeholder="Company" value={newPerson.company} onChange={e => setNewPerson({...newPerson, company: e.target.value})} className={tc('bg-[#252541] border-[#3a3a5a]', undefined)} />
-                            <Button onClick={addPerson} variant={tc(undefined, 'secondary')} aria-label={tc(undefined, 'Add person')} className={tc('bg-[#FFC107] text-black', undefined)}><Plus className="h-4 w-4"/></Button>
+                            <Input placeholder="Company" value={newPerson.company} onChange={e => setNewPerson({...newPerson, company: e.target.value})} />
+                            <Button onClick={addPerson} variant="secondary" aria-label="Add person"><Plus className="h-4 w-4"/></Button>
                         </div>
                     </div>
                     <div className="space-y-2">
                         {formData.people_involved.map((p) => (
-                            <div key={p.id} className={tc('flex justify-between items-center p-3 bg-[#1a1a2e] rounded border border-[#3a3a5a]', 'flex justify-between items-center p-3 bg-pl-sunken rounded border border-pl-border')}>
-                                <span><span className={tc('font-bold text-[#e0e0e0]', 'font-semibold text-pl-text')}>{p.name}</span> <span className={tc('text-[#7a7a9a]', 'text-pl-muted')}>({p.role})</span></span>
+                            <div key={p.id} className="flex justify-between items-center p-3 bg-pl-sunken rounded border border-pl-border">
+                                <span><span className="font-semibold text-pl-text">{p.name}</span> <span className="text-pl-muted">({p.role})</span></span>
                                 <Button variant="ghost" size="icon" onClick={() => setFormData({...formData, people_involved: formData.people_involved.filter(x => x.id !== p.id)})}><X className="h-4 w-4"/></Button>
                             </div>
                         ))}
-                        {formData.people_involved.length === 0 && <p className={tc('text-center text-[#7a7a9a] py-4', 'text-center text-pl-muted py-4')}>No people added yet.</p>}
+                        {formData.people_involved.length === 0 && <p className="text-center text-pl-muted py-4">No people added yet.</p>}
                     </div>
                   </motion.div>
                 )}
@@ -912,25 +898,25 @@ export default function ReportWizard({ onSuccess, onCancel, initialType = '' }) 
                 {/* Step 9 - Actions */}
                 {currentStep === 9 && (
                   <motion.div key="step9" className="space-y-6" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }}>
-                    <div className={tc('space-y-4 bg-[#1a1a2e] p-4 rounded-lg', 'space-y-4 bg-pl-sunken border border-pl-border p-4 rounded-lg')}>
-                        <Input placeholder="Action Title" value={newAction.title} onChange={e => setNewAction({...newAction, title: e.target.value})} className={tc('bg-[#252541] border-[#3a3a5a]', undefined)} />
+                    <div className="space-y-4 bg-pl-sunken border border-pl-border p-4 rounded-lg">
+                        <Input placeholder="Action Title" value={newAction.title} onChange={e => setNewAction({...newAction, title: e.target.value})} />
                         <div className="grid grid-cols-2 gap-4">
                             <Select value={newAction.assigned_to} onValueChange={v => setNewAction({...newAction, assigned_to: v})}>
-                                <SelectTrigger className={tc('bg-[#252541] border-[#3a3a5a] text-[#e0e0e0]', undefined)}><SelectValue placeholder="Assign To" /></SelectTrigger>
-                                <SelectContent className={tc('bg-[#252541] border-[#3a3a5a] text-[#e0e0e0]', undefined)}>
+                                <SelectTrigger><SelectValue placeholder="Assign To" /></SelectTrigger>
+                                <SelectContent>
                                     {orgUsers.map(u => <SelectItem key={u.id} value={u.id}>{u.name || u.email}</SelectItem>)}
                                 </SelectContent>
                             </Select>
-                            <Input type="date" value={newAction.due_date} onChange={e => setNewAction({...newAction, due_date: e.target.value})} className={tc('bg-[#252541] border-[#3a3a5a] text-[#e0e0e0]', undefined)} />
+                            <Input type="date" value={newAction.due_date} onChange={e => setNewAction({...newAction, due_date: e.target.value})} />
                         </div>
-                        <Button onClick={addAction} variant={tc(undefined, 'secondary')} className={tc('w-full bg-[#FFC107] text-black', 'w-full')}>Add Action</Button>
+                        <Button onClick={addAction} variant="secondary" className="w-full">Add Action</Button>
                     </div>
                     <div className="space-y-2">
                         {formData.actions.map((a) => (
-                            <div key={a.id} className={tc('p-3 bg-[#1a1a2e] rounded border border-[#3a3a5a] flex justify-between', 'p-3 bg-pl-sunken rounded border border-pl-border flex justify-between')}>
+                            <div key={a.id} className="p-3 bg-pl-sunken rounded border border-pl-border flex justify-between">
                                 <div>
-                                    <p className={tc('font-bold text-[#e0e0e0]', 'font-semibold text-pl-text')}>{a.title}</p>
-                                    <p className={tc('text-xs text-[#7a7a9a]', 'text-xs text-pl-muted')}>Due: {a.due_date || tc('N/A', 'n/a')}</p>
+                                    <p className="font-semibold text-pl-text">{a.title}</p>
+                                    <p className="text-xs text-pl-muted">Due: {a.due_date || 'n/a'}</p>
                                 </div>
                                 <Button variant="ghost" size="icon" onClick={() => setFormData({...formData, actions: formData.actions.filter(x => x.id !== a.id)})}><X className="h-4 w-4"/></Button>
                             </div>
@@ -942,30 +928,30 @@ export default function ReportWizard({ onSuccess, onCancel, initialType = '' }) 
                 {/* Step 10 - Review */}
                 {currentStep === 10 && (
                   <motion.div key="step10" className="space-y-6" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }}>
-                    <div className={tc('bg-[#1a1a2e] p-6 rounded-xl border border-[#3a3a5a] space-y-4', 'bg-pl-sunken p-4 sm:p-6 rounded-xl border border-pl-border space-y-4')}>
+                    <div className="bg-pl-sunken p-4 sm:p-6 rounded-xl border border-pl-border space-y-4">
                         <div className="flex justify-between items-start">
                             <div>
-                                <h3 className={tc('text-xl font-bold text-[#e0e0e0]', 'text-xl font-semibold text-pl-text')}>{formData.title}</h3>
-                                <Badge className={tc('mt-2 bg-[#FFC107] text-black', 'mt-2')}>{formData.report_type}</Badge>
+                                <h3 className="text-xl font-semibold text-pl-text">{formData.title}</h3>
+                                <Badge className="mt-2">{formData.report_type}</Badge>
                             </div>
-                            <div className={tc('text-right text-xs text-[#7a7a9a]', 'text-right text-xs text-pl-muted')}>
+                            <div className="text-right text-xs text-pl-muted">
                                 <p>{new Date(formData.incident_date).toLocaleString()}</p>
                                 <p>{sites.find(s => s.id === formData.site_id)?.name}</p>
                             </div>
                         </div>
-                        <div className={tc('border-t border-[#3a3a5a] pt-4', 'border-t border-pl-border pt-4')}>
-                            <Label className={tc('text-[#7a7a9a]', 'text-pl-muted')}>Description</Label>
-                            <p className={tc('text-[#e0e0e0] mt-1', 'text-pl-text mt-1')}>{formData.description}</p>
+                        <div className="border-t border-pl-border pt-4">
+                            <Label className="text-pl-muted">Description</Label>
+                            <p className="text-pl-text mt-1">{formData.description}</p>
                         </div>
                         <div className="grid grid-cols-2 gap-4 text-sm">
-                            <div><span className={tc('text-[#7a7a9a]', 'text-pl-muted')}>Category:</span> <span className={tc('text-[#e0e0e0]', 'text-pl-text')}>{formData.hazard_category}</span></div>
-                            <div><span className={tc('text-[#7a7a9a]', 'text-pl-muted')}>Severity:</span> <span className={tc('text-[#e0e0e0] capitalize', 'text-pl-text capitalize')}>{formData.severity}</span></div>
-                            <div><span className={tc('text-[#7a7a9a]', 'text-pl-muted')}>People:</span> <span className={tc('text-[#e0e0e0]', 'text-pl-text')}>{formData.people_involved.length}</span></div>
-                            <div><span className={tc('text-[#7a7a9a]', 'text-pl-muted')}>Actions:</span> <span className={tc('text-[#e0e0e0]', 'text-pl-text')}>{formData.actions.length}</span></div>
+                            <div><span className="text-pl-muted">Category:</span> <span className="text-pl-text">{formData.hazard_category}</span></div>
+                            <div><span className="text-pl-muted">Severity:</span> <span className="text-pl-text capitalize">{formData.severity}</span></div>
+                            <div><span className="text-pl-muted">People:</span> <span className="text-pl-text">{formData.people_involved.length}</span></div>
+                            <div><span className="text-pl-muted">Actions:</span> <span className="text-pl-text">{formData.actions.length}</span></div>
                         </div>
-                        <div className={tc('flex items-center gap-2 pt-4 border-t border-[#3a3a5a]', 'flex items-center gap-2 pt-4 border-t border-pl-border')}>
+                        <div className="flex items-center gap-2 pt-4 border-t border-pl-border">
                             <Switch checked={formData.is_anonymous} onCheckedChange={c => updateField('is_anonymous', c)} />
-                            <Label className={tc('text-[#b0b0c0]', undefined)}>Submit Anonymously</Label>
+                            <Label>Submit Anonymously</Label>
                         </div>
                     </div>
                   </motion.div>
@@ -973,18 +959,18 @@ export default function ReportWizard({ onSuccess, onCancel, initialType = '' }) 
 
               </AnimatePresence>
             </CardContent>
-            <CardFooter className={tc('flex justify-between border-t border-[#3a3a5a] pt-6', 'flex justify-between gap-3 border-t border-pl-border pt-6')}>
-              <Button variant="outline" onClick={currentStep <= 1 ? onCancel : () => setCurrentStep(p => p - 1)} className={tc('border-[#3a3a5a] text-[#e0e0e0]', undefined)}>
+            <CardFooter className="flex justify-between gap-3 border-t border-pl-border pt-6">
+              <Button variant="outline" onClick={currentStep <= 1 ? onCancel : () => setCurrentStep(p => p - 1)}>
                 <ChevronLeft className="mr-2 h-4 w-4" /> {currentStep <= 1 ? 'Cancel' : 'Back'}
               </Button>
               {currentStep < 10 && currentStep > 0 ? (
-                <Button onClick={nextStep} className={tc('petrolord-button bg-[#FFC107] text-black font-bold', 'font-semibold')}>
+                <Button onClick={nextStep} className="font-semibold">
                   Next Step <ChevronRight className="ml-2 h-4 w-4" />
                 </Button>
               ) : currentStep === 0 ? (
                  null // Handled by template select
               ) : (
-                <Button onClick={handleSubmit} disabled={isSubmitting} className={tc('bg-green-600 hover:bg-green-700 text-white font-bold px-8', 'font-semibold px-8')}>
+                <Button onClick={handleSubmit} disabled={isSubmitting} className="font-semibold px-8">
                   {isSubmitting ? <RefreshCw className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle2 className="mr-2 h-4 w-4" />}
                   Submit Report
                 </Button>
@@ -999,9 +985,9 @@ export default function ReportWizard({ onSuccess, onCancel, initialType = '' }) 
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className={tc('absolute inset-0 bg-[#1a1a2e]/95 z-50 flex items-center justify-center p-4', 'absolute inset-0 bg-pl-bg/95 z-50 flex items-center justify-center p-4')}
+                    className="absolute inset-0 bg-pl-bg/95 z-50 flex items-center justify-center p-4"
                 >
-                    <Card className={tc('w-full max-w-4xl bg-[#1f1f35] border-[#3a3a5a] shadow-2xl', 'w-full max-w-4xl shadow-pl-lg')}>
+                    <Card className="w-full max-w-4xl shadow-pl-lg">
                         <CardContent className="p-8">
                             <ReportTemplates 
                                 onSelect={handleTemplateSelect} 

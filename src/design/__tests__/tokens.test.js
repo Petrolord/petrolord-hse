@@ -3,7 +3,7 @@
  * in step with tokens.js, every generated rule scoped so unmigrated screens
  * are untouched, and the Tailwind wiring. Ported from the Suite's
  * src/design/__tests__/tokens.test.js; the index.css checks are HSE's own
- * (HSE still has its legacy globals until the end-state wave).
+ * (the end state since batch 4A: light :root, no .dark, no legacy palette).
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -69,16 +69,22 @@ describe('colour roles', () => {
     }
   });
 
-  it('re-points only shadcn variables HSE declares as HSL triplets (never the raw hex --accent)', () => {
+  it('re-points every shadcn variable index.css declares, and :root holds the light scope values (4A)', () => {
     const index = read('src/index.css');
     const rootBlock = index.slice(index.indexOf(':root {'), index.indexOf('}', index.indexOf(':root {')));
-    const triplets = [...rootBlock.matchAll(/--([a-z0-9-]+):\s*([\d.]+ [\d.]+% [\d.]+%);/g)].map((m) => m[1]);
+    const triplets = [...rootBlock.matchAll(/--([a-z0-9-]+):\s*([\d.]+ [\d.]+% [\d.]+%);/g)];
     const hexVars = [...rootBlock.matchAll(/--([a-z0-9-]+):\s*#[0-9a-fA-F]{3,8};/g)].map((m) => m[1]);
+    expect(triplets.length).toBeGreaterThan(10);
     // every HSL variable index.css defines is re-pointed inside the scope
-    for (const v of triplets) expect(Object.keys(SHADCN_ALIASES)).toContain(v);
-    // no raw hex variable (var(--accent) is the brand amber) is overwritten with a triplet
-    for (const v of hexVars) expect(Object.keys(SHADCN_ALIASES)).not.toContain(v);
-    expect(hexVars).toContain('accent');
+    for (const [, v] of triplets) expect(Object.keys(SHADCN_ALIASES)).toContain(v);
+    // the legacy raw hex palette (--bg-app, --accent ...) is retired
+    expect(hexVars).toEqual([]);
+    // and each value is the light scope's own
+    const css = read('src/design/theme.css');
+    const light = css.slice(css.indexOf('[data-pl-theme="light"]'), css.indexOf('}', css.indexOf('[data-pl-theme="light"]')));
+    for (const [, v, value] of triplets) {
+      expect({ v, value }).toEqual({ v, value: light.match(new RegExp(`--${v}:\\s*([^;]+);`))[1] });
+    }
   });
 });
 
@@ -113,10 +119,13 @@ describe('theme.css', () => {
     expect(css).toMatch(/:where\(\[data-pl-theme\] \*\) \{\n  border-color: rgb\(var\(--pl-border\)\);/);
   });
 
-  it('leaves the legacy index.css globals alone until the end-state wave', () => {
+  it('index.css has no dark defaults and no legacy palette left (end state, 4A)', () => {
     const index = read('src/index.css');
     expect(index).not.toMatch(/data-pl-theme|--pl-/);
-    expect(index).toMatch(/\.dark \{/);
+    expect(index).not.toMatch(/\.dark\b/);
+    expect(index).not.toMatch(/--(bg-app|bg-card|bg-hover|text-primary|text-secondary|text-muted|border-color|accent|accent-hover|accent-foreground):/);
+    expect(index).not.toMatch(/var\(--(bg-|text-primary|text-secondary|text-muted|border-color|accent)/);
+    expect(index).not.toMatch(/petrolord-(card|button)/);
   });
 
   it('is imported once, after index.css, from main.jsx', () => {

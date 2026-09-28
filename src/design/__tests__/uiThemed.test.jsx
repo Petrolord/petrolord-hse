@@ -79,19 +79,31 @@ describe('ui kit inside a scope', () => {
     expect(trigger.className).toContain('border-pl-border-strong');
   });
 
-  it('themes toasts only while a scope is on screen', async () => {
+  it('toasts follow the scope on screen, and are light where none is mounted (4A)', async () => {
     const { Toaster } = await import('@/components/ui/toaster');
     const { toast } = await import('@/components/ui/use-toast');
     const { unmount } = render(<Toaster />);
-    act(() => { toast({ title: 'Outside' }); });
-    const outside = document.querySelector('ol');
-    expect(outside.closest('[data-pl-theme]')).toBeNull();
+    act(() => { toast({ title: 'Homepage' }); });
+    const bare = document.querySelector('ol');
+    expect(bare).toHaveAttribute('data-pl-theme', 'light');
+    expect(legacyChromeClasses()).toEqual([]);
     unmount();
 
+    window.localStorage.setItem('petrolord.theme.v1:anon', 'dark');
     render(<><ThemedApp><p>page</p></ThemedApp><Toaster /></>);
     act(() => { toast({ title: 'Inside' }); });
     const viewport = [...document.querySelectorAll('ol')].pop();
-    expect(viewport).toHaveAttribute('data-pl-theme', 'light');
+    expect(viewport).toHaveAttribute('data-pl-theme', 'dark');
     expect(legacyChromeClasses()).toEqual([]);
+  });
+
+  it('the kit has one variant set: Button, Badge, Alert, Label and Toast carry roles with no scope', async () => {
+    const { buttonVariants } = await import('@/components/ui/button');
+    const { badgeVariants } = await import('@/components/ui/badge');
+    expect(buttonVariants()).toContain('bg-pl-primary');
+    expect(buttonVariants({ variant: 'accent' })).toContain('bg-pl-accent');
+    expect(badgeVariants({ variant: 'success' })).toContain('bg-pl-success-bg');
+    const button = await import('@/components/ui/button');
+    expect(Object.keys(button).sort()).toEqual(['Button', 'buttonVariants']);
   });
 });

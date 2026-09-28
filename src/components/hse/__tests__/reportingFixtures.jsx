@@ -3,12 +3,9 @@
 // Report flow, the Report Wizard (with its template picker, location search
 // and map frame) and the Upgrade modal.
 //
-// Two tests share them:
-//   reportingLegacyDom.test.jsx   walks each flow OUTSIDE a scope and pins the
-//                                 DOM byte for byte (the dialogs open from the
-//                                 TopBar on every module, migrated or not);
-//   Reporting.theme.test.jsx      walks the same flows INSIDE the scope and
-//                                 checks the roles in light and dark.
+// Reporting.theme.test.jsx walks the flows inside the scope and checks the
+// roles in light and dark. (Until batch 4A reportingLegacyDom.test.jsx also
+// walked them outside a scope to pin the legacy DOM; that pin is retired.)
 // Every data call is stubbed; nothing here reaches the network.
 import React from 'react';
 import { screen, fireEvent, act } from '@testing-library/react';

@@ -186,8 +186,7 @@
 :where([data-pl-theme] [data-canvas="chart"]) {
   background-color: rgb(var(--pl-chart-surface));
 }
-/* HSE: index.css paints every border with the legacy var(--border-color);
-   inside a scope a plain `border` takes the hairline role (zero
+/* HSE: inside a scope a plain `border` takes the hairline role (zero
    specificity, so any border colour utility still wins) */
 :where([data-pl-theme] *) {
   border-color: rgb(var(--pl-border));

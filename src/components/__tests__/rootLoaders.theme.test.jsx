@@ -1,15 +1,15 @@
 // @vitest-environment jsdom
-// Batch 3A theme test: the root loaders and error panels.
+// Batch 3A theme test: the root loaders and error panels (end state since
+// batch 4A, which removed their legacy branches and the rootLegacyDom pin).
 //
-// - ProtectedRoute's cold-load loader paints the device's last theme on the
-//   pages outside the layout and on migrated modules, and stays legacy on an
-//   unmigrated module (pinned byte for byte in
-//   common/__tests__/rootLegacyDom.test.jsx); its denied panels open a
-//   scope through AccountScope.
+// - ProtectedRoute's cold-load loader paints the device's last theme on
+//   every protected path; its denied panels open a scope through
+//   AccountScope.
 // - The root ErrorBoundary panel opens its own scope in the device's last
 //   theme (it sits above the auth provider).
-// - The offline pill, the install prompt and the back-online toast follow
-//   the scope on screen; with none they stay legacy (the pin again).
+// - The offline pill, the install prompt, the toaster and the back-online
+//   toast follow the scope on screen, and are light where none is mounted
+//   (the homepage).
 import React from 'react';
 import { render, screen, act, cleanup, configure } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
@@ -70,9 +70,9 @@ describe('ProtectedRoute loader and denied panels (batch 3A)', () => {
     for (const p of ['/dashboard', '/dashboard/super-admin', '/suites', '/', null]) {
       expect({ p, outside: isOutsideLayoutPath(p) }).toEqual({ p, outside: false });
     }
-    expect(protectedLoaderTheme('/dashboard', 'legacy-probe')).toBeNull();
-    expect(protectedLoaderTheme('/dashboard', 'dashboard')).toBe('light');
-    expect(protectedLoaderTheme('/auditor', 'legacy-probe')).toBe('light');
+    expect(protectedLoaderTheme()).toBe('light');
+    window.localStorage.setItem(LAST, 'dark');
+    expect(protectedLoaderTheme()).toBe('dark');
   });
 
   it('paints light on a page outside the layout, and the last theme for a returning dark user', async () => {
@@ -93,18 +93,15 @@ describe('ProtectedRoute loader and denied panels (batch 3A)', () => {
     expect(loader).toHaveAttribute('data-pl-theme', 'dark');
   });
 
-  it('follows the rollout on the layout: themed for a migrated module, legacy for the probe', async () => {
+  it('is themed on the layout whatever module is being restored (the probe id included)', async () => {
     hse.isLoading = true;
-    appState.persistedModule = { id: 'dashboard' };
-    renderProtected('/dashboard');
-    expect(screen.getByTestId('protected-route-loader')).toHaveAttribute('data-pl-theme', 'light');
-    cleanup();
-
-    appState.persistedModule = { id: 'legacy-probe' };
-    renderProtected('/dashboard');
-    expect(screen.queryByTestId('protected-route-loader')).toBeNull();
-    expect(document.querySelector('[data-pl-theme]')).toBeNull();
-    expect(screen.getByText('Verifying access...').parentElement.className).toContain('bg-[#1a1a2e]');
+    for (const id of ['dashboard', 'legacy-probe', undefined]) {
+      appState.persistedModule = id ? { id } : null;
+      renderProtected('/dashboard');
+      expect(screen.getByTestId('protected-route-loader')).toHaveAttribute('data-pl-theme', 'light');
+      expectNoLegacyChrome();
+      cleanup();
+    }
   });
 
   it('the access restricted panel opens a scope, with the word beside the danger icon', async () => {
@@ -170,7 +167,7 @@ describe('root ErrorBoundary panel (batch 3A)', () => {
   });
 });
 
-describe('root pieces follow the scope on screen (batch 3A)', () => {
+describe('root pieces follow the scope on screen (batch 3A, 4A)', () => {
   const setOnline = (v) => Object.defineProperty(window.navigator, 'onLine', { configurable: true, get: () => v });
   afterEach(() => setOnline(true));
 
@@ -206,8 +203,27 @@ describe('root pieces follow the scope on screen (batch 3A)', () => {
     expect(legacyChromeClasses()).toEqual([]);
   });
 
-  it('the back-online toast drops its legacy blue while a scope is on screen', async () => {
+  it('with no scope on screen (the homepage) the pill and the prompt are light', async () => {
+    render(<><OfflineIndicator /><PWAInstallPrompt /></>);
+    await act(async () => {
+      const e = new Event('beforeinstallprompt');
+      e.prompt = () => {};
+      e.userChoice = Promise.resolve({ outcome: 'dismissed' });
+      window.dispatchEvent(e);
+    });
+    await flush(3300);
+    expect(screen.getByTestId('offline-indicator')).toHaveAttribute('data-pl-theme', 'light');
+    expect(screen.getByRole('button', { name: 'Install Now' }).closest('[data-pl-theme]')).toHaveAttribute('data-pl-theme', 'light');
+    expect(legacyChromeClasses()).toEqual([]);
+  });
+
+  it('the back-online toast takes the default raised style, scope or none', async () => {
     render(<><ThemedApp><p>page</p></ThemedApp><BackgroundSync /></>);
+    await act(async () => { window.dispatchEvent(new Event('online')); });
+    expect(toasts).toEqual([{ title: 'Back Online', description: 'Syncing your offline data...' }]);
+    cleanup();
+    toasts.length = 0;
+    render(<BackgroundSync />);
     await act(async () => { window.dispatchEvent(new Event('online')); });
     expect(toasts).toEqual([{ title: 'Back Online', description: 'Syncing your offline data...' }]);
   });

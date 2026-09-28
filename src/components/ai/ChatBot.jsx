@@ -17,15 +17,12 @@ import { useHSE } from '@/context/HSEContext';
 import { chatbotService } from '@/services/chatbotService';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { useThemeClass } from '@/design/themeClass';
 
-// Outside a design-system scope this renders exactly as before; inside one
-// the panel is a raised surface, the launcher is the gold accent button,
+// The panel is a raised surface, the launcher is the gold accent button,
 // your messages carry the primary tint and the assistant's the sunken one.
 
 export default function ChatBot() {
   const { currentUser, currentOrganization } = useHSE();
-  const tc = useThemeClass();
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [messages, setMessages] = useState([]);
@@ -127,37 +124,37 @@ export default function ChatBot() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className={tc('w-[90vw] sm:w-[400px] h-[60vh] sm:h-[500px] bg-[#1a1a2e] border border-[#3a3a5a] rounded-xl shadow-2xl flex flex-col overflow-hidden pointer-events-auto ring-1 ring-black/50', 'w-[90vw] sm:w-[400px] h-[60vh] sm:h-[500px] bg-pl-raised text-pl-text border border-pl-border rounded-xl shadow-pl-lg flex flex-col overflow-hidden pointer-events-auto')}
+            className="w-[90vw] sm:w-[400px] h-[60vh] sm:h-[500px] bg-pl-raised text-pl-text border border-pl-border rounded-xl shadow-pl-lg flex flex-col overflow-hidden pointer-events-auto"
           >
             {/* Header */}
-            <div className={tc('p-4 bg-[#252541] border-b border-[#3a3a5a] flex items-center justify-between shrink-0', 'p-4 bg-pl-sunken border-b border-pl-border flex items-center justify-between shrink-0')}>
+            <div className="p-4 bg-pl-sunken border-b border-pl-border flex items-center justify-between shrink-0">
               <div className="flex items-center gap-2">
-                <div className={tc('bg-[#FFC107] p-1.5 rounded-lg', 'bg-pl-accent p-1.5 rounded-lg')}>
-                  <Bot className={tc('h-4 w-4 text-black', 'h-4 w-4 text-pl-accent-fg')} />
+                <div className="bg-pl-accent p-1.5 rounded-lg">
+                  <Bot className="h-4 w-4 text-pl-accent-fg" />
                 </div>
                 <div>
-                  <h3 className={tc('text-sm font-bold text-white', 'text-sm font-bold text-pl-text')}>Petrolord Assistant</h3>
-                  <p className={tc('text-[10px] text-emerald-400 flex items-center gap-1', 'text-[10px] text-pl-success-text flex items-center gap-1')}>
-                    <span className={tc('w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse', 'w-1.5 h-1.5 rounded-full bg-pl-success')} />
+                  <h3 className="text-sm font-bold text-pl-text">Petrolord Assistant</h3>
+                  <p className="text-[10px] text-pl-success-text flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-pl-success" />
                     Online
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-1">
-                <Button variant="ghost" size="icon" className={tc('h-6 w-6 text-gray-400 hover:text-white', 'h-6 w-6')} onClick={handleClear} title="Clear Chat">
+                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={handleClear} title="Clear Chat">
                   <Trash2 className="h-3 w-3" />
                 </Button>
-                <Button variant="ghost" size="icon" className={tc('h-6 w-6 text-gray-400 hover:text-white', 'h-6 w-6')} onClick={() => setIsMinimized(true)} title="Minimize">
+                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setIsMinimized(true)} title="Minimize">
                   <Minimize2 className="h-3 w-3" />
                 </Button>
-                <Button variant="ghost" size="icon" className={tc('h-6 w-6 text-gray-400 hover:text-white', 'h-6 w-6')} onClick={() => setIsOpen(false)} title="Close">
+                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setIsOpen(false)} title="Close">
                   <X className="h-3 w-3" />
                 </Button>
               </div>
             </div>
 
             {/* Chat Area */}
-            <ScrollArea className={tc('flex-1 p-4 bg-[#151525]', 'flex-1 p-4 bg-pl-surface')}>
+            <ScrollArea className="flex-1 p-4 bg-pl-surface">
               <div className="space-y-4">
                 {messages.map((msg, idx) => (
                   <div 
@@ -168,17 +165,17 @@ export default function ChatBot() {
                     )}
                   >
                     <div className={cn(
-                      tc("w-8 h-8 rounded-full flex items-center justify-center shrink-0 border border-white/10", "w-8 h-8 rounded-full flex items-center justify-center shrink-0 border border-pl-border"),
-                      msg.role === 'user' ? tc("bg-blue-600", "bg-pl-primary") : tc("bg-[#FFC107]", "bg-pl-accent")
+                      "w-8 h-8 rounded-full flex items-center justify-center shrink-0 border border-pl-border",
+                      msg.role === 'user' ? "bg-pl-primary" : "bg-pl-accent"
                     )}>
-                      {msg.role === 'user' ? <User className={tc("h-4 w-4 text-white", "h-4 w-4 text-pl-primary-fg")} /> : <Bot className={tc("h-4 w-4 text-black", "h-4 w-4 text-pl-accent-fg")} />}
+                      {msg.role === 'user' ? <User className="h-4 w-4 text-pl-primary-fg" /> : <Bot className="h-4 w-4 text-pl-accent-fg" />}
                     </div>
                     <div className={cn(
                       "p-3 rounded-lg text-sm shadow-sm",
                       msg.role === 'user' 
-                        ? tc("bg-blue-600/20 text-blue-100 border border-blue-500/30 rounded-tr-none", "bg-pl-primary/10 text-pl-text border border-pl-primary/30 rounded-tr-none")
-                        : tc("bg-[#252541] text-gray-200 border border-[#3a3a5a] rounded-tl-none", "bg-pl-sunken text-pl-text border border-pl-border rounded-tl-none"),
-                      msg.isError && tc("border-red-500/50 bg-red-900/20 text-red-200", "border-pl-danger/40 bg-pl-danger-bg text-pl-danger-text")
+                        ? "bg-pl-primary/10 text-pl-text border border-pl-primary/30 rounded-tr-none"
+                        : "bg-pl-sunken text-pl-text border border-pl-border rounded-tl-none",
+                      msg.isError && "border-pl-danger/40 bg-pl-danger-bg text-pl-danger-text"
                     )}>
                       {msg.content}
                     </div>
@@ -186,13 +183,13 @@ export default function ChatBot() {
                 ))}
                 {isLoading && (
                   <div className="flex gap-3 max-w-[85%]">
-                    <div className={tc("w-8 h-8 rounded-full bg-[#FFC107] flex items-center justify-center shrink-0 border border-white/10", "w-8 h-8 rounded-full bg-pl-accent flex items-center justify-center shrink-0 border border-pl-border")}>
-                      <Bot className={tc("h-4 w-4 text-black", "h-4 w-4 text-pl-accent-fg")} />
+                    <div className="w-8 h-8 rounded-full bg-pl-accent flex items-center justify-center shrink-0 border border-pl-border">
+                      <Bot className="h-4 w-4 text-pl-accent-fg" />
                     </div>
-                    <div className={tc("bg-[#252541] p-3 rounded-lg rounded-tl-none border border-[#3a3a5a] flex items-center gap-2", "bg-pl-sunken p-3 rounded-lg rounded-tl-none border border-pl-border flex items-center gap-2")}>
-                      <span className={tc("w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce", "w-1.5 h-1.5 bg-pl-muted rounded-full animate-bounce")} style={{ animationDelay: '0ms' }} />
-                      <span className={tc("w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce", "w-1.5 h-1.5 bg-pl-muted rounded-full animate-bounce")} style={{ animationDelay: '150ms' }} />
-                      <span className={tc("w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce", "w-1.5 h-1.5 bg-pl-muted rounded-full animate-bounce")} style={{ animationDelay: '300ms' }} />
+                    <div className="bg-pl-sunken p-3 rounded-lg rounded-tl-none border border-pl-border flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 bg-pl-muted rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <span className="w-1.5 h-1.5 bg-pl-muted rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                      <span className="w-1.5 h-1.5 bg-pl-muted rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                     </div>
                   </div>
                 )}
@@ -201,7 +198,7 @@ export default function ChatBot() {
             </ScrollArea>
 
             {/* Input Area */}
-            <div className={tc("p-3 bg-[#252541] border-t border-[#3a3a5a] shrink-0", "p-3 bg-pl-sunken border-t border-pl-border shrink-0")}>
+            <div className="p-3 bg-pl-sunken border-t border-pl-border shrink-0">
               <form 
                 onSubmit={(e) => { e.preventDefault(); handleSend(); }}
                 className="flex gap-2"
@@ -210,16 +207,15 @@ export default function ChatBot() {
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   placeholder="Ask about safety..."
-                  className={tc("bg-[#151525] border-[#3a3a5a] text-white focus:border-[#FFC107] placeholder:text-gray-500", undefined)}
-                  aria-label={tc(undefined, 'Message')}
+                  aria-label="Message"
                 />
                 <Button 
                   type="submit" 
                   size="icon" 
                   disabled={isLoading || !inputValue.trim()}
-                  variant={tc('default', 'accent')}
-                  className={tc("bg-[#FFC107] hover:bg-[#FFD54F] text-black shrink-0", "shrink-0")}
-                  aria-label={tc(undefined, 'Send')}
+                  variant="accent"
+                  className="shrink-0"
+                  aria-label="Send"
                 >
                   {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                 </Button>
@@ -235,10 +231,10 @@ export default function ChatBot() {
           setIsOpen(true);
           setIsMinimized(false);
         }}
-        variant={tc('default', 'accent')}
+        variant="accent"
         className={cn(
-          tc("h-14 w-14 rounded-full shadow-lg shadow-[#FFC107]/20 pointer-events-auto transition-all duration-300 ring-2 ring-black/20", "h-14 w-14 rounded-full shadow-pl-lg pointer-events-auto transition-all duration-300"),
-          isOpen && !isMinimized ? "scale-0 opacity-0" : tc("scale-100 opacity-100 bg-[#FFC107] hover:bg-[#FFD54F] text-black", "scale-100 opacity-100")
+          "h-14 w-14 rounded-full shadow-pl-lg pointer-events-auto transition-all duration-300",
+          isOpen && !isMinimized ? "scale-0 opacity-0" : "scale-100 opacity-100"
         )}
         title="Open Chat Assistant"
       >

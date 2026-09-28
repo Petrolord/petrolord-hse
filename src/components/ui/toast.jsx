@@ -3,13 +3,12 @@ import * as ToastPrimitives from '@radix-ui/react-toast';
 import { cva } from 'class-variance-authority';
 import { X } from 'lucide-react';
 import React from 'react';
-import { useThemeClass } from '@/design/themeClass';
-import { useDsTheme, usePortalThemeProps } from '@/design/themeContext';
+import { usePortalThemeProps } from '@/design/themeContext';
 
-// Legacy strings outside a design-system scope (byte for byte). The root
-// Toaster sits outside every scope, so it provides the theme of the scope
-// on screen (activeTheme.js) through a FixedTheme: toasts match the page,
-// as in the Suite, and stay legacy on screens that have not migrated.
+// The root Toaster sits outside every scope, so it provides the theme of
+// the scope on screen (activeTheme.js) through a FixedTheme: toasts match
+// the page, as in the Suite, and take the light paper style where no scope
+// is mounted (the homepage).
 
 const ToastProvider = ToastPrimitives.Provider;
 
@@ -29,24 +28,8 @@ const ToastViewport = React.forwardRef(({ className, ...props }, ref) => {
 });
 ToastViewport.displayName = ToastPrimitives.Viewport.displayName;
 
+// A raised card; destructive and success are status tints.
 const toastVariants = cva(
-	'data-[swipe=move]:transition-none group relative pointer-events-auto flex w-full items-center justify-between space-x-4 overflow-hidden rounded-md border p-6 pr-8 shadow-lg transition-all data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=open]:slide-in-from-top-full data-[state=open]:sm:slide-in-from-bottom-full data-[state=closed]:slide-out-to-right-full',
-	{
-		variants: {
-			variant: {
-				default: 'bg-background border',
-				destructive:
-          'group destructive border-destructive bg-destructive text-destructive-foreground',
-			},
-		},
-		defaultVariants: {
-			variant: 'default',
-		},
-	},
-);
-
-// Inside a scope: a raised card; destructive and success are status tints.
-const themedToastVariants = cva(
 	'data-[swipe=move]:transition-none group relative pointer-events-auto flex w-full items-center justify-between space-x-4 overflow-hidden rounded-md border p-6 pr-8 transition-all data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=open]:slide-in-from-top-full data-[state=open]:sm:slide-in-from-bottom-full data-[state=closed]:slide-out-to-right-full shadow-pl-lg',
 	{
 		variants: {
@@ -63,11 +46,10 @@ const themedToastVariants = cva(
 );
 
 const Toast = React.forwardRef(({ className, variant, ...props }, ref) => {
-	const variants = useDsTheme() ? themedToastVariants : toastVariants;
 	return (
 		<ToastPrimitives.Root
 			ref={ref}
-			className={cn(variants({ variant }), className)}
+			className={cn(toastVariants({ variant }), className)}
 			{...props}
 		/>
 	);
@@ -75,15 +57,11 @@ const Toast = React.forwardRef(({ className, variant, ...props }, ref) => {
 Toast.displayName = ToastPrimitives.Root.displayName;
 
 const ToastAction = React.forwardRef(({ className, ...props }, ref) => {
-	const tc = useThemeClass();
 	return (
 		<ToastPrimitives.Action
 			ref={ref}
 			className={cn(
-				tc(
-					'inline-flex h-8 shrink-0 items-center justify-center rounded-md border bg-transparent px-3 text-sm font-medium ring-offset-background transition-colors hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 group-[.destructive]:border-destructive/30 group-[.destructive]:hover:border-destructive/30 group-[.destructive]:hover:bg-destructive group-[.destructive]:hover:text-destructive-foreground group-[.destructive]:focus:ring-destructive',
-					'inline-flex h-8 shrink-0 items-center justify-center rounded-md border border-pl-border-strong bg-transparent px-3 text-sm font-medium ring-offset-pl-bg transition-colors hover:bg-pl-sunken focus:outline-none focus:ring-2 focus:ring-pl-focus focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
-				),
+				'inline-flex h-8 shrink-0 items-center justify-center rounded-md border border-pl-border-strong bg-transparent px-3 text-sm font-medium ring-offset-pl-bg transition-colors hover:bg-pl-sunken focus:outline-none focus:ring-2 focus:ring-pl-focus focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
 				className,
 			)}
 			{...props}
@@ -93,15 +71,11 @@ const ToastAction = React.forwardRef(({ className, ...props }, ref) => {
 ToastAction.displayName = ToastPrimitives.Action.displayName;
 
 const ToastClose = React.forwardRef(({ className, ...props }, ref) => {
-	const tc = useThemeClass();
 	return (
 		<ToastPrimitives.Close
 			ref={ref}
 			className={cn(
-				tc(
-					'absolute right-2 top-2 rounded-md p-1 text-foreground/50 opacity-0 transition-opacity hover:text-foreground focus:opacity-100 focus:outline-none focus:ring-2 group-hover:opacity-100 group-[.destructive]:text-red-300 group-[.destructive]:hover:text-red-50 group-[.destructive]:focus:ring-red-400 group-[.destructive]:focus:ring-offset-red-600',
-					'absolute right-2 top-2 rounded-md p-1 text-pl-muted opacity-0 transition-opacity hover:text-pl-text focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-pl-focus group-hover:opacity-100',
-				),
+				'absolute right-2 top-2 rounded-md p-1 text-pl-muted opacity-0 transition-opacity hover:text-pl-text focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-pl-focus group-hover:opacity-100',
 				className,
 			)}
 			toast-close=""

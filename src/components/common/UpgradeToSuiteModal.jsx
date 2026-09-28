@@ -2,8 +2,24 @@ import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Check, Sparkles, ArrowRight } from 'lucide-react';
+import { useActiveTheme } from '@/design/activeTheme';
+import { FixedTheme } from '@/design/ThemeProvider';
 
-export default function UpgradeToSuiteModal({ isOpen, onClose, featureName }) {
+// Mounted by FeatureAccessProvider at the app root, outside every scope
+// (no routed screen opens it today; FeatureGuard is unrouted). It takes the
+// theme of the scope on screen, as the toaster does, light where none is
+// mounted, and sits on the roles with the gold accent for the offer.
+
+export default function UpgradeToSuiteModal(props) {
+  const active = useActiveTheme() || 'light';
+  return (
+    <FixedTheme theme={active}>
+      <UpgradeToSuiteDialog {...props} />
+    </FixedTheme>
+  );
+}
+
+function UpgradeToSuiteDialog({ isOpen, onClose, featureName }) {
   const handleRequestQuote = () => {
     const subject = encodeURIComponent('Petrolord HSE Premium Quote Request');
     const body = encodeURIComponent(
@@ -16,20 +32,20 @@ export default function UpgradeToSuiteModal({ isOpen, onClose, featureName }) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px] bg-[#1a1a2e] border-[#3a3a5a] text-white p-0 overflow-hidden gap-0">
+      <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden gap-0">
         
-        {/* Header Section with Gradient */}
-        <div className="bg-gradient-to-r from-blue-900/50 to-purple-900/50 p-6 border-b border-[#3a3a5a]">
+        {/* Header Section */}
+        <div className="bg-pl-sunken p-6 border-b border-pl-border">
           <div className="flex items-center gap-2 mb-4">
-            <div className="p-2 bg-[#FFC107] rounded-lg text-black">
-              <Sparkles className="h-5 w-5" />
+            <div className="p-2 bg-pl-accent rounded-lg text-pl-accent-fg">
+              <Sparkles className="h-5 w-5" aria-hidden="true" />
             </div>
-            <span className="text-[#FFC107] font-semibold tracking-wide text-sm uppercase">Premium Feature</span>
+            <span className="text-pl-accent-text font-semibold tracking-wide text-sm uppercase">Premium Feature</span>
           </div>
-          <DialogTitle className="text-2xl font-bold text-white mb-2">
+          <DialogTitle className="text-2xl font-semibold mb-2">
             Unlock Advanced HSE Capabilities
           </DialogTitle>
-          <DialogDescription className="text-blue-100">
+          <DialogDescription>
             The <strong>{featureName?.replace(/_/g, ' ')}</strong> feature is available exclusively in Petrolord Suite or HSE Premium.
           </DialogDescription>
         </div>
@@ -48,27 +64,28 @@ export default function UpgradeToSuiteModal({ isOpen, onClose, featureName }) {
         </div>
 
         {/* Footer Actions */}
-        <div className="p-6 bg-[#151525] border-t border-[#3a3a5a] flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div className="p-6 bg-pl-sunken border-t border-pl-border flex flex-col sm:flex-row justify-between items-center gap-4">
           <Button 
             variant="ghost" 
             onClick={onClose}
-            className="text-[#7a7a9a] hover:text-white w-full sm:w-auto order-2 sm:order-1"
+            className="w-full sm:w-auto order-2 sm:order-1"
           >
             Continue with Free Features
           </Button>
           <div className="flex gap-3 w-full sm:w-auto order-1 sm:order-2">
             <Button 
               variant="outline" 
-              className="border-[#3a3a5a] hover:bg-[#252541] hover:text-white flex-1 sm:flex-none"
+              className="flex-1 sm:flex-none"
               onClick={() => window.open('https://petrolord.com/pricing', '_blank')}
             >
               Learn More
             </Button>
             <Button
-              className="petrolord-button flex-1 sm:flex-none bg-[#FFC107] hover:bg-[#FFD54F] text-black font-semibold"
+              variant="accent"
+              className="flex-1 sm:flex-none font-semibold"
               onClick={handleRequestQuote}
             >
-              Request Quote <ArrowRight className="h-4 w-4 ml-2" />
+              Request Quote <ArrowRight className="h-4 w-4 ml-2" aria-hidden="true" />
             </Button>
           </div>
         </div>
@@ -81,10 +98,10 @@ export default function UpgradeToSuiteModal({ isOpen, onClose, featureName }) {
 function BenefitItem({ text }) {
   return (
     <div className="flex items-center gap-3">
-      <div className="h-5 w-5 rounded-full bg-green-500/20 flex items-center justify-center shrink-0">
-        <Check className="h-3 w-3 text-green-400" />
+      <div className="h-5 w-5 rounded-full bg-pl-primary/10 flex items-center justify-center shrink-0">
+        <Check className="h-3 w-3 text-pl-primary-text" aria-hidden="true" />
       </div>
-      <span className="text-[#e0e0e0] text-sm">{text}</span>
+      <span className="text-pl-text text-sm">{text}</span>
     </div>
   );
 }

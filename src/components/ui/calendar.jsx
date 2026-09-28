@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react"
 import { DayPicker } from "react-day-picker"
 
 import { cn } from "@/lib/utils"
-import { useButtonVariants } from "@/components/ui/button"
+import { buttonVariants } from "@/components/ui/button"
 
 function Calendar({
   className,
@@ -13,7 +13,6 @@ function Calendar({
 }) {
   // Inside a design-system scope the nav and day buttons take the themed
   // Button variants; the other classes are shadcn tokens the scope re-points.
-  const buttonVariants = useButtonVariants()
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
