@@ -29,7 +29,7 @@ export const faqs = [
     category: 'Getting Started',
     questions: [
       { q: 'What is Petrolord HSE?', a: 'Petrolord HSE is a comprehensive Health, Safety, Security and Environment management platform for the energy sector. It centralises reporting, permits, audits, training, risk and analytics in one place.' },
-      { q: 'Why do I only see some modules in the sidebar?', a: 'The navigation is role-based — you only see the modules your role grants. For example, only the Environment Officer (and admins/managers) see the Environment module. An org admin can adjust your role under Members.' },
+      { q: 'Why do I only see some modules in the sidebar?', a: 'The navigation is role-based: you only see the modules your role grants. For example, only the Environment Officer (and admins/managers) see the Environment module. An org admin can adjust your role under Members.' },
       { q: 'How do I reset my password?', a: 'On the login page click "Forgot Password" and follow the link emailed to you.' }
     ]
   },
@@ -37,7 +37,7 @@ export const faqs = [
     category: 'Reporting',
     questions: [
       { q: 'How do I report a hazard or incident?', a: 'Use Quick Report: capture a photo and/or a voice note, let the AI suggest the category, severity and description, review it, and submit. See the Quick Report guide under Module Guides.' },
-      { q: 'Do I need both a photo and a voice note?', a: 'No — either one works. The AI uses whatever you provide. A clear photo plus a short spoken description gives the best result.' },
+      { q: 'Do I need both a photo and a voice note?', a: 'No. Either one works. The AI uses whatever you provide. A clear photo plus a short spoken description gives the best result.' },
       { q: 'Where do my submitted reports go?', a: 'They appear under My Reports where you can track status, and in the Supervisor View where supervisors investigate, assign and resolve them.' },
       { q: 'Should I report near misses?', a: 'Yes. Near misses are the strongest early warning of future incidents and they directly improve the AI Safety Predictor\'s forecasts.' },
       { q: 'Can I export reports and registers?', a: 'Yes. Most registers and dashboards have an Export button that produces a CSV; some reports also offer Print (PDF).' }

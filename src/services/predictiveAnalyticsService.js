@@ -340,7 +340,7 @@ export const predictiveAnalyticsService = {
       await supabase.from('ai_insights').insert({
         org_id: orgId,
         type: 'safety_forecast',
-        title: `Safety outlook — next ${horizon} days (${forecast.overall_risk_level || 'n/a'} risk)`,
+        title: `Safety outlook, next ${horizon} days (${forecast.overall_risk_level || 'n/a'} risk)`,
         description: forecast.summary || '',
         confidence_score: forecast.confidence ?? null,
         metadata: forecast,

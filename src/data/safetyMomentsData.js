@@ -194,7 +194,7 @@ export const safetyMomentsData = [
       "Are 'Expected Response' drills conducted?",
       "Is training offered to staff?"
     ],
-    one_minute_recap: "If someone collapses and isn't breathing, they need you. Call 911, get the AED, and start pushing hard and fast in the center of the chest. Don't be afraid of hurting them—you are their only hope. Hands-only CPR is simple and effective. You are the vital link in the chain of survival.",
+    one_minute_recap: "If someone collapses and isn't breathing, they need you. Call 911, get the AED, and start pushing hard and fast in the center of the chest. Don't be afraid of hurting them: you are their only hope. Hands-only CPR is simple and effective. You are the vital link in the chain of survival.",
     references: ["American Heart Association", "Red Cross", "ILCOR Guidelines"]
   },
   {
@@ -334,11 +334,11 @@ export const safetyMomentsData = [
       "Screen free from glare?",
       "Keyboard/mouse at elbow height?",
       "Wrists straight while typing?",
-      "Shoulders relaxed, not hunched?",
+      "Shoulders relaxed and down?",
       "Headset available for phone users?",
       "Under-desk area clear for legs?"
     ],
-    one_minute_recap: "Office safety starts with your setup. Ensure your chair supports your back and allows feet to rest flat. Keep your monitor at eye level to save your neck, and keep your keyboard close to save your shoulders. Most importantly, listen to your body—discomfort is a warning sign. Move often and adjust early.",
+    one_minute_recap: "Office safety starts with your setup. Ensure your chair supports your back and allows feet to rest flat. Keep your monitor at eye level to save your neck, and keep your keyboard close to save your shoulders. Most importantly, listen to your body. Discomfort is a warning sign. Move often and adjust early.",
     references: ["OSHA eTools: Computer Workstations", "ISO 9241: Ergonomics of Human-System Interaction", "Mayo Clinic: Office Ergonomics"]
   },
   {
@@ -410,7 +410,7 @@ export const safetyMomentsData = [
       "Is there a designated break area?",
       "Are stretch charts available?"
     ],
-    one_minute_recap: "You don't need to stop working for 15 minutes to get a benefit. A 'Micro-Break' is just 30 to 60 seconds of movement. Stand up, stretch your arms, look out a window, or roll your neck. These tiny investments of time prevent stiffness, reduce eye strain, and keep your blood flowing. Your body is designed to move—don't keep it frozen.",
+    one_minute_recap: "You don't need to stop working for 15 minutes to get a benefit. A 'Micro-Break' is just 30 to 60 seconds of movement. Stand up, stretch your arms, look out a window, or roll your neck. These tiny investments of time prevent stiffness, reduce eye strain, and keep your blood flowing. Your body is designed to move, so don't keep it frozen.",
     references: ["Cornell University Ergonomics Web", "CDC: Workplace Health Promotion", "National Safety Council"]
   },
   {
@@ -422,7 +422,7 @@ export const safetyMomentsData = [
     key_talking_points: [
       "Seat Distance: Knees slightly bent when pedals fully depressed.",
       "Seat Height: Clear view of road, 3 inches headroom.",
-      "Backrest: Reclined slightly (100-110 degrees), not vertical.",
+      "Backrest: Reclined slightly (100-110 degrees) from vertical.",
       "Lumbar: Support the curve of the lower back.",
       "Steering Wheel: 10 inches from chest, airbag aimed at chest not face.",
       "Hand Position: 9 and 3 o'clock or 8 and 4.",
@@ -451,7 +451,7 @@ export const safetyMomentsData = [
       "DON'T keep heavy items on the passenger seat.",
       "DON'T drive if you are fatigued.",
       "DON'T wear bulky coats that restrict movement.",
-      "DON'T ignore seatbelt fit (across shoulder, not neck)."
+      "DON'T ignore seatbelt fit (across the shoulder, clear of the neck)."
     ],
     incident_scenario: {
       what_happened: "A fleet driver experienced a sudden back spasm while merging on a highway, causing him to swerve. He had been driving for 4 hours with his wallet in his back pocket and the seat too far back.",
@@ -482,7 +482,7 @@ export const safetyMomentsData = [
       "Are pedals slip-resistant?",
       "Is there a spot for water/supplies?"
     ],
-    one_minute_recap: "Your vehicle is your office. Treat it that way. Before you turn the key, take 30 seconds to fit the car to you. Remove your wallet, set your seat so your knees are bent, and ensure your mirrors frame the road, not your car. A comfortable driver is an alert driver. Don't just drive—drive comfortably.",
+    one_minute_recap: "Your vehicle is your office. Treat it that way. Before you turn the key, take 30 seconds to fit the car to you. Remove your wallet, set your seat so your knees are bent, and ensure your mirrors frame the road with little of your own car in view. A comfortable driver is an alert driver. Don't just drive: drive comfortably.",
     references: ["NHTSA: Motor Vehicle Safety", "AAA: Car Fit for Older Drivers", "Canadian Centre for OHS: Driving Ergonomics"]
   },
   {
@@ -1078,7 +1078,7 @@ export const safetyMomentsData = [
     key_talking_points: [
       "Report: Immediately. All incidents.",
       "Why: Identify cause, fix hazard, medical care.",
-      "Culture: No retaliation. Fact finding, not fault.",
+      "Culture: No retaliation. Find the facts; do not assign fault.",
       "Process: Notify supervisor, form, investigation.",
       "Outcome: Safer workplace."
     ],
@@ -1152,7 +1152,7 @@ export const safetyMomentsData = [
     when_to_use: "Entering tanks, vessels, pits, sewers.",
     why_it_matters: "Deadly hazards (gas, oxygen, engulfment). Rescue difficult. Strict rules.",
     key_talking_points: [
-      "Def: Limited entry, not for occupancy, hazard potential.",
+      "Def: Limited entry, unsuitable for occupancy, hazard potential.",
       "Permit: Required for hazards (PRCS).",
       "Hazards: Atmosphere (O2, Tox, Flam), Engulfment, Config.",
       "Roles: Entrant, Attendant, Supervisor.",
@@ -1587,7 +1587,7 @@ export const safetyMomentsData = [
       "Heat/Arc: FR rating.",
       "Traffic: Class 1, 2, 3 High-Vis.",
       "Cuts: Kevlar sleeves/aprons.",
-      "Fit: Not loose (catch), not tight."
+      "Fit: Snug. Too loose can catch; too tight restricts."
     ],
     do_list: [
       "DO assess hazard",

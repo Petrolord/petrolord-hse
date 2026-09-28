@@ -13,15 +13,15 @@ export const securityModuleGuide = {
       content: [
         { type: 'paragraph', text: 'The Security module manages physical and personnel security across a row of tabs. It is available to admins, managers and the Security Officer role.' },
         { type: 'list', items: [
-          'Dashboard — key security metrics and a quick "Log Security Incident" action',
-          'Awareness — security awareness content',
-          'Incidents — log and manage security incidents',
-          'Access Control — credentials and access logs',
-          'Behavioral — behavioural analytics / anomaly monitoring',
-          'Threats — threat levels and assessments',
-          'Compliance — security compliance status',
-          'Analytics — incident analytics and trends',
-          'Team — team security view (supervisors only)',
+          'Dashboard: key security metrics and a quick "Log Security Incident" action',
+          'Awareness: security awareness content',
+          'Incidents: log and manage security incidents',
+          'Access Control: credentials and access logs',
+          'Behavioral: behavioural analytics / anomaly monitoring',
+          'Threats: threat levels and assessments',
+          'Compliance: security compliance status',
+          'Analytics: incident analytics and trends',
+          'Team: team security view (supervisors only)',
         ]},
       ],
     },
@@ -30,7 +30,7 @@ export const securityModuleGuide = {
       title: 'Dashboard',
       description: 'Your security posture at a glance.',
       content: [
-        { type: 'paragraph', text: 'The Dashboard shows data-backed security metrics — incidents year-to-date, pending security trainings and expiring access credentials — and a prominent "Log Security Incident" button to report an event quickly. Where a figure has no underlying data yet it shows an honest empty state rather than a placeholder number.' },
+        { type: 'paragraph', text: 'The Dashboard shows data-backed security metrics (incidents year-to-date, pending security trainings and expiring access credentials) and a prominent "Log Security Incident" button to report an event quickly. Where a figure has no underlying data yet it shows an honest empty state with no placeholder number.' },
       ],
     },
     {
@@ -53,7 +53,7 @@ export const securityModuleGuide = {
       description: 'Credentials and entry/exit activity.',
       content: [
         { type: 'paragraph', text: 'Access Control lists access credentials (type, expiry, status) and recent access-log activity, with summary cards for your current access level, MFA status and recent failed/denied attempts.' },
-        { type: 'alert', variant: 'info', title: 'Keep credentials current', text: 'Expiring credentials are surfaced on the Security dashboard — renew them before they lapse to avoid access disruptions.' },
+        { type: 'alert', variant: 'info', title: 'Keep credentials current', text: 'Expiring credentials are surfaced on the Security dashboard. Renew them before they lapse to avoid access disruptions.' },
       ],
     },
     {
@@ -89,7 +89,7 @@ export const securityModuleGuide = {
       title: 'Analytics',
       description: 'Trends across security incidents.',
       content: [
-        { type: 'paragraph', text: 'Security Analytics visualises your real security incidents — for example severity distribution and incidents per month — so you can spot trends and recurring problem areas.' },
+        { type: 'paragraph', text: 'Security Analytics visualises your real security incidents, for example severity distribution and incidents per month, so you can spot trends and recurring problem areas.' },
       ],
     },
   ],

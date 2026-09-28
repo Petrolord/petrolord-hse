@@ -15,10 +15,10 @@ export const safetyAuditsGuide = {
         { type: 'paragraph', text: 'The Safety Audits Module helps you plan and keep track of safety audits across your organization. An audit is a structured check of how well a site, team, or system meets your safety standards. Scheduling and recording audits ensures issues are caught early and that nothing slips through the cracks.' },
         { type: 'paragraph', text: 'The module is organized into four tabs, shown at the top of the screen:' },
         { type: 'list', items: [
-          'Schedule — the main working area, where you create and view planned audits.',
-          'Internal Audits — a dedicated workspace for conducting internal reviews (in progress).',
-          'Findings — for logging and tracking issues raised during audits (in progress).',
-          'Reporting — for audit summaries and trend reports (in progress).'
+          'Schedule: the main working area, where you create and view planned audits.',
+          'Internal Audits: a dedicated workspace for conducting internal reviews (in progress).',
+          'Findings: for logging and tracking issues raised during audits (in progress).',
+          'Reporting: for audit summaries and trend reports (in progress).'
         ]},
         { type: 'alert', variant: 'info', title: 'Where to start', text: 'The Schedule tab is fully available today. Use the "Schedule Audit" button in the top right to create your first audit.' },
         { type: 'alert', variant: 'warning', title: 'Tabs in progress', text: 'The Internal Audits, Findings, and Reporting tabs are still being built. Selecting one currently shows a "coming soon" message. These features are on the roadmap and will be activated in a future release.' }
@@ -33,10 +33,10 @@ export const safetyAuditsGuide = {
         { type: 'paragraph', text: 'The Schedule tab is the heart of the module. It lists every audit that has been planned, in a table that shows the audit ID, type, scheduled date, assigned auditor, location, and current status.' },
         { type: 'paragraph', text: 'Each audit row displays a status badge so you can see progress at a glance:' },
         { type: 'list', items: [
-          'Scheduled — the audit is planned but has not started yet.',
-          'In Progress — the audit is currently underway.',
-          'Completed — the audit has been finished.',
-          'Overdue — the scheduled date has passed without completion.'
+          'Scheduled: the audit is planned but has not started yet.',
+          'In Progress: the audit is currently underway.',
+          'Completed: the audit has been finished.',
+          'Overdue: the scheduled date has passed without completion.'
         ]},
         { type: 'paragraph', text: 'Use the "View" button on the right of any row to open that audit, and the Filters panel on the left to narrow the list down (see the Filters section below).' },
         { type: 'alert', variant: 'info', title: 'Empty list?', text: 'If no audits appear, the table shows "No scheduled audits found." This is normal for a new organization. Click "Schedule Audit" to add one.' }
@@ -63,9 +63,9 @@ export const safetyAuditsGuide = {
           content: [
             { type: 'paragraph', text: 'The Filters panel appears on the left side of the Schedule tab. It lets you focus the audit list on what matters to you.' },
             { type: 'list', items: [
-              'Type — show only audits of a chosen type (Internal, Contractor, Site, or System), or All Types.',
-              'Status — show only audits with a chosen status (Scheduled, In Progress, Completed, or Overdue), or All Status.',
-              'Clear — reset both filters back to showing everything.'
+              'Type: show only audits of a chosen type (Internal, Contractor, Site, or System), or All Types.',
+              'Status: show only audits with a chosen status (Scheduled, In Progress, Completed, or Overdue), or All Status.',
+              'Clear: reset both filters back to showing everything.'
             ]},
             { type: 'alert', variant: 'info', title: 'Filters apply to the Schedule tab only', text: 'The Filters panel is shown when you are on the Schedule tab. It updates the audit table as soon as you change a selection.' }
           ]

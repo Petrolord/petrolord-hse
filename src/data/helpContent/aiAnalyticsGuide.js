@@ -11,9 +11,9 @@ export const aiAnalyticsGuide = {
       title: 'Overview',
       description: 'What the predictor does and where to find it.',
       content: [
-        { type: 'paragraph', text: 'The AI Safety Predictor reads your organisation\'s safety history — submitted reports, observed behaviours, incidents, hazards and trends — and produces a forward-looking forecast of the incidents most likely to occur next, so you can act before they happen.' },
+        { type: 'paragraph', text: 'The AI Safety Predictor reads your organisation\'s safety history (submitted reports, observed behaviours, incidents, hazards and trends) and produces a forward-looking forecast of the incidents most likely to occur next, so you can act before they happen.' },
         { type: 'paragraph', text: 'You\'ll find it in the AI Safety Predictor section on the main Dashboard, and the underlying figures are also available under the Analytics navigation item.' },
-        { type: 'alert', variant: 'info', title: 'Predictive, not just historical', text: 'Most dashboards tell you what already happened. The AI Forecast tab estimates what is likely to happen in the next 30 days and what to do about it.' },
+        { type: 'alert', variant: 'info', title: 'Predictive as well as historical', text: 'Most dashboards tell you what already happened. The AI Forecast tab estimates what is likely to happen in the next 30 days and what to do about it.' },
       ],
     },
     {
@@ -27,7 +27,7 @@ export const aiAnalyticsGuide = {
           { title: 'Read the outlook', description: 'You get an overall risk level, a plain-English summary, and a confidence score for the forecast.' },
           { title: 'Regenerate any time', description: 'As new reports come in, click Regenerate to refresh the forecast with the latest signals.' },
         ]},
-        { type: 'alert', variant: 'info', title: 'No data, no guesswork', text: 'If there is little history to learn from, the forecast says so and lowers its confidence rather than inventing risks.' },
+        { type: 'alert', variant: 'info', title: 'No data, no guesswork', text: 'If there is little history to learn from, the forecast says so and lowers its confidence. It does not invent risks.' },
       ],
     },
     {
@@ -36,11 +36,11 @@ export const aiAnalyticsGuide = {
       description: 'What each part of the forecast means.',
       content: [
         { type: 'list', items: [
-          'Predicted Incidents — the most likely incident categories, each with the department/area most at risk and a likelihood percentage.',
-          'Rationale & Leading Indicators — why each prediction was made, citing the specific signals (e.g. rising near-misses, a recurring behaviour, a hotspot location).',
-          'Preventive Actions — concrete steps to get ahead of each predicted incident.',
-          'Leading Indicators — organisation-level signals worth watching.',
-          'Recommended Focus — the top preventive priorities, most important first.',
+          'Predicted Incidents: the most likely incident categories, each with the department/area most at risk and a likelihood percentage.',
+          'Rationale & Leading Indicators: why each prediction was made, citing the specific signals (e.g. rising near-misses, a recurring behaviour, a hotspot location).',
+          'Preventive Actions: concrete steps to get ahead of each predicted incident.',
+          'Leading Indicators: organisation-level signals worth watching.',
+          'Recommended Focus: the top preventive priorities, most important first.',
         ]},
         { type: 'paragraph', text: 'Treat the forecast as decision support: use the predicted incidents and recommended focus to direct inspections, toolbox talks and corrective actions where the risk is rising.' },
       ],
@@ -51,7 +51,7 @@ export const aiAnalyticsGuide = {
       description: 'The forecast sharpens itself over time.',
       content: [
         { type: 'paragraph', text: 'Each predicted incident is later scored against what actually happened in that window. The resulting hit rate is shown as a badge next to the Generate button, and it is fed back into the next forecast so the engine calibrates its confidence over time.' },
-        { type: 'paragraph', text: 'The more reports your team submits, the better the signal — which makes consistent reporting (including near misses) the single biggest thing you can do to improve forecast quality.' },
+        { type: 'paragraph', text: 'The more reports your team submits, the better the signal. That makes consistent reporting (including near misses) the single biggest thing you can do to improve forecast quality.' },
       ],
     },
     {

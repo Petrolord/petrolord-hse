@@ -132,7 +132,7 @@ export const actionTrackerGuide = {
           { title: 'Submit for approval', description: 'When the work is done, click "Submit for Approval" in the footer. This moves the action to Pending Approval and marks progress as 100%.' },
           { title: 'Approval and closure', description: 'A reviewer opens the action and either clicks "Reject" (sending it back to Open) or "Approve & Close" to formally close it.' }
         ]},
-        { type: 'alert', variant: 'warning', title: 'Closure means verified, not just done', text: 'Submitting for approval is not the same as closing. An action is only Closed once a reviewer has approved it. If it is rejected, address the feedback and submit again.' }
+        { type: 'alert', variant: 'warning', title: 'Closure means verified', text: 'Submitting for approval is not the same as closing. An action is only Closed once a reviewer has approved it. If it is rejected, address the feedback and submit again.' }
       ]
     },
     {
@@ -173,7 +173,7 @@ export const actionTrackerGuide = {
           'Check "My Actions" regularly so nothing assigned to you slips past its due date.',
           'Use the Aging view to find and clear long-outstanding (90+ day) actions.',
           'Keep the progress slider up to date so managers do not have to chase you for status.',
-          'Attach evidence before submitting for approval, not after.',
+          'Attach evidence before you submit for approval.',
           'Set realistic due dates and reprioritize High and Critical actions first.'
         ]}
       ]

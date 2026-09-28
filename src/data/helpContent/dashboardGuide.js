@@ -13,7 +13,7 @@ export const dashboardGuide = {
       content: [
         { type: 'paragraph', text: 'The main dashboard brings the most important HSE information together on a single screen. From the top down you will find the AI Safety Predictor, your personal gamification widgets (Safety Score and Badges), the Team Leaderboard, and a row of KPI tiles that summarise each HSE pillar for your organization.' },
         { type: 'paragraph', text: 'Everything on the dashboard is scoped to the organization you are currently working in. If you belong to more than one organization, switch organizations to see that organization\'s data.' },
-        { type: 'alert', variant: 'info', title: 'Real data only', text: 'The KPI tiles show genuine values pulled from each module. When a pillar has no data yet, the tile shows "--" rather than a made-up number, so a dash simply means nothing has been recorded so far.' }
+        { type: 'alert', variant: 'info', title: 'Real data only', text: 'The KPI tiles show genuine values pulled from each module. When a pillar has no data yet, the tile shows "--" and never a made-up number: a dash simply means nothing has been recorded so far.' }
       ]
     },
     {
@@ -75,7 +75,7 @@ export const dashboardGuide = {
           { title: 'Refresh cadence', description: 'A footer note states that the leaderboard is "Updated daily" and that points reset monthly.' }
         ]},
         { type: 'paragraph', text: 'There is also a dedicated full-screen Leaderboard view that adds period filters (All Time, This Month, This Week) and a "Rankings" table showing each reporter\'s number of reports, a quality score, points, and a trend arrow. Your own row is highlighted with a "You" tag so it is easy to find.' },
-        { type: 'alert', variant: 'info', title: 'Ranking is points-based', text: 'Rankings are determined by points, which come from safety contributions such as reports. The precise points-and-quality formula is handled by the platform, so treat the leaderboard as a relative comparison rather than an exact scoring breakdown.' }
+        { type: 'alert', variant: 'info', title: 'Ranking is points-based', text: 'Rankings are determined by points, which come from safety contributions such as reports. The precise points-and-quality formula is handled by the platform, so read the leaderboard as a relative comparison. It is not an exact scoring breakdown.' }
       ]
     },
     {
