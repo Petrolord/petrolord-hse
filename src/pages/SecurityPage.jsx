@@ -2,6 +2,7 @@ import React from 'react';
 import { Helmet } from 'react-helmet';
 import PublicNavbar from '@/components/layout/PublicNavbar';
 import PublicFooter from '@/components/layout/PublicFooter';
+import { PublicPage, TEXT_LINK } from '@/components/public/PublicPage';
 import DocumentationHeader from '@/components/documentation/DocumentationHeader';
 import TableOfContents from '@/components/documentation/TableOfContents';
 import DocumentationSection from '@/components/documentation/DocumentationSection';
@@ -32,13 +33,12 @@ const sections = [
 
 export default function SecurityPage() {
   return (
-    <div className="min-h-screen bg-[#1a1a2e] text-[#b0b0c0] font-sans">
+    // Batch 3C: the public frame (always light) with the site navigation and footer.
+    <PublicPage testId="security-theme-scope" header={<PublicNavbar />} footer={<PublicFooter />}>
       <Helmet>
         <title>Security - Petrolord HSE</title>
         <meta name="description" content="Petrolord HSE Security Architecture and Practices. Detailed overview of our enterprise-grade security measures." />
       </Helmet>
-
-      <PublicNavbar />
 
       <DocumentationHeader
         title="Security at Petrolord HSE"
@@ -51,20 +51,20 @@ export default function SecurityPage() {
         
         {/* Security Highlights Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-          <div className="bg-[#252541] p-6 rounded-lg border border-[#3a3a5a]">
-            <Shield className="h-8 w-8 text-emerald-400 mb-4" />
-            <h3 className="text-white font-bold text-lg mb-2">Bank-Level Encryption</h3>
-            <p className="text-sm">AES-256 encryption at rest and TLS 1.3 in transit ensures your data remains confidential.</p>
+          <div className="bg-pl-surface p-6 rounded-lg border border-pl-border shadow-pl-sm">
+            <Shield className="h-8 w-8 text-pl-primary-text mb-4" aria-hidden="true" />
+            <h3 className="text-pl-text font-semibold text-lg mb-2">Bank-Level Encryption</h3>
+            <p className="text-sm text-pl-muted">AES-256 encryption at rest and TLS 1.3 in transit ensures your data remains confidential.</p>
           </div>
-          <div className="bg-[#252541] p-6 rounded-lg border border-[#3a3a5a]">
-            <Server className="h-8 w-8 text-[#FFC107] mb-4" />
-            <h3 className="text-white font-bold text-lg mb-2">Resilient Infrastructure</h3>
-            <p className="text-sm">Hosted on top-tier cloud providers with redundant data centers and automatic failover.</p>
+          <div className="bg-pl-surface p-6 rounded-lg border border-pl-border shadow-pl-sm">
+            <Server className="h-8 w-8 text-pl-primary-text mb-4" aria-hidden="true" />
+            <h3 className="text-pl-text font-semibold text-lg mb-2">Resilient Infrastructure</h3>
+            <p className="text-sm text-pl-muted">Hosted on top-tier cloud providers with redundant data centers and automatic failover.</p>
           </div>
-          <div className="bg-[#252541] p-6 rounded-lg border border-[#3a3a5a]">
-            <Lock className="h-8 w-8 text-blue-400 mb-4" />
-            <h3 className="text-white font-bold text-lg mb-2">SOC 2 Compliant</h3>
-            <p className="text-sm">Rigorous auditing and compliance with industry standards for security and availability.</p>
+          <div className="bg-pl-surface p-6 rounded-lg border border-pl-border shadow-pl-sm">
+            <Lock className="h-8 w-8 text-pl-primary-text mb-4" aria-hidden="true" />
+            <h3 className="text-pl-text font-semibold text-lg mb-2">SOC 2 Compliant</h3>
+            <p className="text-sm text-pl-muted">Rigorous auditing and compliance with industry standards for security and availability.</p>
           </div>
         </div>
 
@@ -75,7 +75,7 @@ export default function SecurityPage() {
           </aside>
 
           {/* Content */}
-          <main className="lg:col-span-9 max-w-4xl">
+          <article className="lg:col-span-9 max-w-4xl min-w-0">
             <DocumentationSection id="overview" title="1. Security Overview">
               <p>
                 At Petrolord HSE, protecting your data is our highest priority. We use a defense-in-depth strategy that layers multiple security controls to protect the confidentiality, integrity, and availability of your information. Our security program is continuously monitored and improved to meet the evolving threat landscape.
@@ -188,21 +188,19 @@ export default function SecurityPage() {
               <p>
                 If you believe you have found a security vulnerability in Petrolord HSE, please report it to us immediately. We appreciate the contributions of the security research community.
               </p>
-              <p className="mt-2 text-white">
-                Please email <a href="mailto:security@petrolord.com" className="text-emerald-400 hover:underline">security@petrolord.com</a>.
+              <p className="mt-2 text-pl-text">
+                Please email <a href="mailto:security@petrolord.com" className={TEXT_LINK}>security@petrolord.com</a>.
               </p>
             </DocumentationSection>
 
             <DocumentationSection id="contact" title="20. Contact & Support">
               <p>
-                For specific questions about our security practices or to request a copy of our latest security audit report, please contact our Security Team at <a href="mailto:security@petrolord.com" className="text-emerald-400 hover:underline">security@petrolord.com</a>.
+                For specific questions about our security practices or to request a copy of our latest security audit report, please contact our Security Team at <a href="mailto:security@petrolord.com" className={TEXT_LINK}>security@petrolord.com</a>.
               </p>
             </DocumentationSection>
-          </main>
+          </article>
         </div>
       </div>
-
-      <PublicFooter />
-    </div>
+    </PublicPage>
   );
 }

@@ -8,6 +8,7 @@ import BenefitFeatures from './BenefitFeatures';
 import BenefitUseCases from './BenefitUseCases';
 import BenefitFAQ from './BenefitFAQ';
 import BenefitCTA from './BenefitCTA';
+import { PublicPage } from '@/components/public/PublicPage';
 
 export default function BenefitPageTemplate({ data }) {
   // Scroll to top on mount
@@ -15,12 +16,17 @@ export default function BenefitPageTemplate({ data }) {
     window.scrollTo(0, 0);
   }, []);
 
-  if (!data) return <div className="min-h-screen bg-[#1a1a2e] text-white flex items-center justify-center">Loading...</div>;
+  // Batch 3C: the public frame (always light) with the site navigation and footer.
+  if (!data) {
+    return (
+      <PublicPage testId="benefit-theme-scope" header={<PublicNavbar />} mainClassName="items-center justify-center text-pl-muted">
+        Loading...
+      </PublicPage>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-[#1a1a2e] text-white font-sans">
-      <PublicNavbar />
-      
+    <PublicPage testId="benefit-theme-scope" header={<PublicNavbar />} footer={<PublicFooter />}>
       <BenefitHero 
         title={data.title}
         subtitle={data.subtitle}
@@ -39,8 +45,6 @@ export default function BenefitPageTemplate({ data }) {
       <BenefitFAQ faqs={data.faqs} />
       
       <BenefitCTA />
-      
-      <PublicFooter />
-    </div>
+    </PublicPage>
   );
 }

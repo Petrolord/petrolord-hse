@@ -39,9 +39,10 @@ export function PublicBrandBar({ children, className }) {
 
 /**
  * The themed page frame. `header` replaces the plain brand bar (a page with
- * its own navigation passes it); `header={null}` drops it.
+ * its own navigation passes it); `header={null}` drops it. `footer`
+ * (3C) renders after the main region; without it there is none.
  */
-export function PublicPage({ testId, header, className, mainClassName, children }) {
+export function PublicPage({ testId, header, footer, className, mainClassName, children }) {
   return (
     <ThemedApp
       userId={null}
@@ -50,6 +51,7 @@ export function PublicPage({ testId, header, className, mainClassName, children 
     >
       {header === undefined ? <PublicBrandBar /> : header}
       <main className={cn('flex flex-1 flex-col', mainClassName)}>{children}</main>
+      {footer ?? null}
     </ThemedApp>
   );
 }

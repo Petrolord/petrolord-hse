@@ -4,9 +4,9 @@ import { Label } from '@/components/ui/label';
 
 export default function PricingToggle({ isAnnual, setIsAnnual }) {
   return (
-    <div className="flex items-center justify-center gap-4 mb-12">
+    <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 mb-12">
       <Label 
-        className={`text-lg cursor-pointer ${!isAnnual ? 'text-white font-bold' : 'text-[#7a7a9a]'}`}
+        className={`text-lg cursor-pointer ${!isAnnual ? 'text-pl-text font-bold' : 'text-pl-muted'}`}
         onClick={() => setIsAnnual(false)}
       >
         Monthly Billing
@@ -15,17 +15,17 @@ export default function PricingToggle({ isAnnual, setIsAnnual }) {
       <Switch 
         checked={isAnnual} 
         onCheckedChange={setIsAnnual}
-        className="data-[state=checked]:bg-[#FFC107] data-[state=unchecked]:bg-[#3a3a5a]"
+        aria-label="Annual billing"
       />
       
       <div className="flex items-center gap-2">
         <Label 
-          className={`text-lg cursor-pointer ${isAnnual ? 'text-white font-bold' : 'text-[#7a7a9a]'}`}
+          className={`text-lg cursor-pointer ${isAnnual ? 'text-pl-text font-bold' : 'text-pl-muted'}`}
           onClick={() => setIsAnnual(true)}
         >
           Annual Billing
         </Label>
-        <span className="inline-block bg-emerald-500/20 text-emerald-400 text-xs font-bold px-2 py-1 rounded-full border border-emerald-500/30">
+        <span className="inline-block bg-pl-accent/15 text-pl-accent-text text-xs font-bold px-2 py-1 rounded-full border border-pl-accent/40">
           Save ~10%
         </span>
       </div>
