@@ -1,9 +1,19 @@
 import React from 'react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { CHART_SERIES, LEGEND_PROPS, TOOLTIP_STYLE } from '@/utils/chartTheme';
+
+// Design family (batch 2B): the Suite chart standard on a white ChartPanel.
+// Each slice takes its colour from its severity name, so the legend word and
+// the colour always agree (the colour used to follow the slice's position).
+const SEVERITY_COLORS = {
+  Critical: CHART_SERIES[3],
+  High: CHART_SERIES[2],
+  Medium: CHART_SERIES[0],
+  Low: CHART_SERIES[1],
+};
+const colorFor = (name) => SEVERITY_COLORS[name] || CHART_SERIES[4];
 
 export default function RiskDistributionChart({ data }) {
-  const COLORS = ['#ef4444', '#f97316', '#eab308', '#22c55e']; // Red, Orange, Yellow, Green
-
   return (
     <div className="h-[300px] w-full">
       <ResponsiveContainer width="100%" height="100%">
@@ -18,14 +28,11 @@ export default function RiskDistributionChart({ data }) {
             dataKey="value"
           >
             {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+              <Cell key={`cell-${index}`} fill={colorFor(entry.name)} />
             ))}
           </Pie>
-          <Tooltip 
-            contentStyle={{ backgroundColor: '#1e1e30', borderColor: '#3a3a5a', color: '#fff' }}
-            itemStyle={{ color: '#fff' }}
-          />
-          <Legend verticalAlign="bottom" height={36}/>
+          <Tooltip contentStyle={TOOLTIP_STYLE} />
+          <Legend {...LEGEND_PROPS} />
         </PieChart>
       </ResponsiveContainer>
     </div>
