@@ -3,9 +3,10 @@
 // signed-in layout (docs/scope/DesignSystem-Rollout.md sections 3.3 and 8.2).
 //
 // It walks the stats tiles, the rankings with the current user's row, the
-// quality words and the trend, the period tabs, the empty period and the
-// loading state, in light and in dark. Only the data layer is stubbed; no
-// request leaves the test.
+// period tabs and their note, the empty ranking and the loading state, in
+// light and in dark. Batch 4B rewired the data; the quality words are
+// checked on the table itself in LeaderboardData.test.jsx. Only the data
+// layer is stubbed; no request leaves the test.
 import React from 'react';
 import { render, screen, fireEvent, within, act, configure } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
@@ -23,21 +24,24 @@ vi.mock('@/services/chatbotService', async () => (await import('@/design/testing
 vi.mock('@/components/hse/QuickReport', async () => (await import('@/design/testing/shellMocks')).nullComponentModule);
 vi.mock('@/components/hse/ReportWizard', async () => (await import('@/design/testing/shellMocks')).nullComponentModule);
 
+// gamificationService.getLeaderboard rows (batch 4B: the module reads the
+// service's real functions; getUserStats never existed).
 const RANKS = [
-  { user_id: 'u2', rank: 1, total_reports: 14, quality_score: 92, period_points: 40, total_points: 310, user: { raw_user_meta_data: { full_name: 'Ada Obi' } } },
-  { user_id: 'u1', rank: 2, total_reports: 9, quality_score: 71, period_points: 0, total_points: 180, user: { raw_user_meta_data: { full_name: 'Test Lead' } } },
-  { user_id: 'u3', rank: 4, total_reports: 2, quality_score: 40, period_points: 5, total_points: 20, user: { email: 'kemi@example.com' } },
-  { user_id: 'u4', rank: 5, total_reports: null, quality_score: null, period_points: 0, total_points: 0, user: {} },
+  { id: 'u2', user_id: 'u2', rank: 1, name: 'Ada Obi', email: null, total_points: 310, points: 310, current_streak: 0 },
+  { id: 'u1', user_id: 'u1', rank: 2, name: 'Test Lead', email: 'lead@example.com', total_points: 180, points: 180, current_streak: 3 },
+  { id: 'u3', user_id: 'u3', rank: 3, name: 'kemi', email: 'kemi@example.com', total_points: 20, points: 20, current_streak: 0 },
+  { id: 'u4', user_id: 'u4', rank: 4, name: 'Unknown', email: null, total_points: 0, points: 0, current_streak: 0 },
 ];
-const STATS = { rank: 2, totalUsers: 12, totalPoints: 180, qualityScore: 71, pointsThisMonth: 35, reportsThisMonth: 3 };
+const MINE = { qualityScore: 71, pointsThisMonth: 35, reportsThisMonth: 3 };
 const lb = { ranks: RANKS, hold: false };
 
-// The Leaderboard reads getLeaderboard and getUserStats; the TopBar reads getUserScore.
+// The Leaderboard reads getLeaderboard, getUserScore and getMyReportStats;
+// the TopBar reads getUserScore.
 vi.mock('@/services/gamificationService', () => {
   const svc = {
-    getUserScore: async () => ({ total_points: 120, current_streak: 3, level: 2 }),
+    getUserScore: async () => ({ total_points: 180, current_streak: 3, level: 2 }),
     getLeaderboard: async () => (lb.hold ? new Promise(() => {}) : lb.ranks),
-    getUserStats: async () => STATS,
+    getMyReportStats: async () => MINE,
     getAllBadges: async () => [],
     getUserBadges: async () => [],
   };
@@ -90,35 +94,37 @@ describe('Leaderboard', () => {
     beforeAll(installDomShims);
     beforeEach(() => { try { window.localStorage.clear(); } catch { /* storage unavailable */ } });
 
-    it('shows the rankings with quality words, the trend words, the current user and mono numbers', async () => {
+    it('shows the rankings, the current user, n/a for missing figures and mono numbers', async () => {
       renderLayout();
       await ready();
-      expect(screen.getByText('good').closest('div').className).toContain('bg-pl-success-bg');
-      expect(screen.getByText('fair').closest('div').className).toContain('bg-pl-warning-bg');
-      expect(screen.getByText('low').closest('div').className).toContain('bg-pl-danger-bg');
-      expect(screen.getAllByText('Rising').length).toBe(2);
-      expect(screen.getAllByText('No change').length).toBe(2);
       expect(screen.getByText('You').className).toContain('border-pl-primary');
       expect(screen.getByText('Test Lead').closest('tr').className).toContain('bg-pl-primary/10');
       expect(screen.getByText('#4').className).toContain('font-pl-mono');
-      // missing values read n/a
+      // reports and quality per person are not recorded: they read n/a
       const last = screen.getAllByRole('row').at(-1);
       expect(within(last).getAllByText('n/a')).toHaveLength(2);
       expect(screen.getByText('Current Rank').parentElement.querySelector('h3')).toHaveTextContent('#2');
+      expect(screen.getByText('Quality Score').parentElement.querySelector('h3')).toHaveTextContent('71%');
       expectNoLegacyChrome();
     });
 
-    it('switches period on the kit tabs, shows the empty period, and the dark theme', async () => {
+    it('says why the week and month tabs have no ranking, on the kit tabs, and the dark theme', async () => {
       renderLayout();
       await ready();
-      lb.ranks = [];
       await clickTab(/This Week/);
-      await screen.findByText('No data available for this period.');
+      await screen.findByText(/need a points history/);
       expect(screen.getByRole('tab', { name: /This Week/ })).toHaveAttribute('data-state', 'active');
       expectNoLegacyChrome();
       toDark();
       await flush();
       expectTheme('dark');
+      expectNoLegacyChrome();
+    });
+
+    it('shows the empty ranking', async () => {
+      lb.ranks = [];
+      renderLayout();
+      await screen.findByText('No data available for this period.');
       expectNoLegacyChrome();
     });
 

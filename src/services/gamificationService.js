@@ -21,38 +21,89 @@ export const getUserScore = async (userId) => {
   }
 };
 
-// Helper to get leaderboard
+// Helper to get leaderboard.
+// Reads user_points_summary for the organisation, highest points first, then
+// looks the names up in user_profiles (and users for an e-mail fallback).
+// user_points_summary has no `ranking` column and its user_id points at
+// auth.users, which the API cannot embed, so the old single select with
+// `ranking` and `user:user_id(...)` always failed and returned [] (batch 4B).
+// Read only. Each row: { id, user_id, name, email, avatar, points,
+// total_points, current_streak, rank }.
 export const getLeaderboard = async (orgId, limit = 10) => {
   try {
     if (!orgId) return [];
+    const size = Number.isFinite(limit) && limit > 0 ? limit : 10;
 
     const { data, error } = await supabase
       .from('user_points_summary')
-      .select(`
-        total_points,
-        ranking,
-        user:user_id (
-          email,
-          raw_user_meta_data
-        )
-      `)
+      .select('user_id, total_points, current_streak')
       .eq('organization_id', orgId)
       .order('total_points', { ascending: false })
-      .limit(limit);
+      .limit(size);
 
     if (error) throw error;
-    
-    // Map to friendly format
-    return data.map((entry, index) => ({
-      id: entry.user_id || index,
-      name: entry.user?.raw_user_meta_data?.full_name || entry.user?.email?.split('@')[0] || 'Unknown',
-      points: entry.total_points,
-      rank: index + 1,
-      avatar: entry.user?.raw_user_meta_data?.avatar_url
-    }));
+    const rows = data || [];
+    const ids = rows.map((r) => r.user_id).filter(Boolean);
+
+    const people = {};
+    if (ids.length) {
+      const [{ data: profiles }, { data: users }] = await Promise.all([
+        supabase.from('user_profiles').select('id, full_name, avatar_url').in('id', ids),
+        supabase.from('users').select('id, email, raw_user_meta_data').in('id', ids),
+      ]);
+      (users || []).forEach((u) => { people[u.id] = { ...people[u.id], email: u.email, meta: u.raw_user_meta_data || {} }; });
+      (profiles || []).forEach((p) => { people[p.id] = { ...people[p.id], full_name: p.full_name, avatar_url: p.avatar_url }; });
+    }
+
+    return rows.map((entry, index) => {
+      const who = people[entry.user_id] || {};
+      const meta = who.meta || {};
+      return {
+        id: entry.user_id || index,
+        user_id: entry.user_id,
+        name: who.full_name || meta.full_name || who.email?.split('@')[0] || 'Unknown',
+        email: who.email || null,
+        avatar: who.avatar_url || meta.avatar_url,
+        points: entry.total_points ?? 0,
+        total_points: entry.total_points ?? 0,
+        current_streak: entry.current_streak ?? 0,
+        rank: index + 1,
+      };
+    });
   } catch (error) {
     console.error('Error fetching leaderboard:', error);
     return [];
+  }
+};
+
+// The current user's own report figures for the Leaderboard tiles: the
+// average quality score of their submitted reports, and the reports and
+// points they submitted this calendar month. A read-only query on
+// quick_reports (the table stores each report's quality_score and
+// leaderboard_points); the reporter can always read their own reports.
+export const getMyReportStats = async (userId, orgId, now = new Date()) => {
+  const empty = { qualityScore: null, pointsThisMonth: null, reportsThisMonth: null };
+  try {
+    if (!userId || !orgId) return empty;
+    const { data, error } = await supabase
+      .from('quick_reports')
+      .select('quality_score, leaderboard_points, created_at, status')
+      .eq('created_by_user_id', userId)
+      .eq('organization_id', orgId)
+      .neq('status', 'draft');
+    if (error) throw error;
+    const rows = data || [];
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const thisMonth = rows.filter((r) => r.created_at && new Date(r.created_at) >= monthStart);
+    const scored = rows.map((r) => Number(r.quality_score)).filter((v) => Number.isFinite(v) && v > 0);
+    return {
+      qualityScore: scored.length ? Math.round(scored.reduce((a, b) => a + b, 0) / scored.length) : null,
+      pointsThisMonth: thisMonth.reduce((a, r) => a + (Number(r.leaderboard_points) || 0), 0),
+      reportsThisMonth: thisMonth.length,
+    };
+  } catch (error) {
+    console.warn('Error fetching report stats:', error);
+    return empty;
   }
 };
 
@@ -92,6 +143,7 @@ export const getUserBadges = async (userId, orgId) => {
 export const gamificationService = {
   getUserScore,
   getLeaderboard,
+  getMyReportStats,
   getAllBadges,
   getUserBadges
 };

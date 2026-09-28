@@ -84,6 +84,8 @@ const OrganizationSettings = () => {
       <AccountPage>
         <AccountHeader
           eyebrow="Organization"
+          backTo="/dashboard"
+          backLabel="Back to dashboard"
           icon={Settings}
           title="Organization Settings"
           description="Manage your organization, team, and assets"

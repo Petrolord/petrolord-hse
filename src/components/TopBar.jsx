@@ -25,6 +25,9 @@ const TopBar = ({ toggleMobileMenu, onToggleSidebar }) => {
   const { user, signOut } = useAuth();
   const { currentUser, currentOrganization } = useHSE();
   const [isQuickReportOpen, setIsQuickReportOpen] = useState(false);
+  // The account menu is controlled so its phone Quick Report button can close
+  // it before the report opens (batch 4B).
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const [points, setPoints] = useState(0);
   const [streak, setStreak] = useState(0);
 
@@ -121,7 +124,7 @@ const TopBar = ({ toggleMobileMenu, onToggleSidebar }) => {
         <NotificationCenter />
 
         {/* User Profile */}
-        <DropdownMenu>
+        <DropdownMenu open={accountMenuOpen} onOpenChange={setAccountMenuOpen}>
           <DropdownMenuTrigger asChild>
             <button className="flex items-center gap-2 ml-1 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pl-focus" aria-label="Account menu">
               <Avatar className="h-9 w-9 border border-pl-border cursor-pointer hover:border-pl-accent transition-colors">
@@ -148,7 +151,11 @@ const TopBar = ({ toggleMobileMenu, onToggleSidebar }) => {
                <AppSwitcher />
             </div>
             <div className="sm:hidden p-2">
-               <Button onClick={() => setIsQuickReportOpen(true)} variant="accent" className="w-full h-8 text-xs font-semibold mb-2">
+               <Button
+                 onClick={() => { setAccountMenuOpen(false); setIsQuickReportOpen(true); }}
+                 variant="accent"
+                 className="w-full h-8 text-xs font-semibold mb-2"
+               >
                   <Zap className="h-3 w-3 mr-1" /> Quick Report
                </Button>
             </div>

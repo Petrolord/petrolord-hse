@@ -9,6 +9,27 @@ import { supabase } from '@/lib/customSupabaseClient';
 
 // Design family (batch 2C): the Leaderboard renders inside the signed-in
 // scope (src/design/SignedInScope.jsx) on the theme roles.
+// How many ranked members the page reads: enough to find the current user's
+// rank in any HSE organisation.
+export const LEADERBOARD_SIZE = 200;
+
+// Points are kept as running totals (user_points_summary); nothing records
+// when a point was earned, so the week and month tabs have no data to rank.
+export const PERIOD_NOTE = 'Rankings for this period need a points history, which is not recorded yet. All Time shows the running totals.';
+
+// A leaderboard row (gamificationService.getLeaderboard) in the shape the
+// rankings table reads. Reports and quality per person are not in the
+// totals table, so they read n/a.
+export const toTableRow = (row) => ({
+  user_id: row.user_id,
+  rank: row.rank,
+  total_points: row.total_points ?? row.points ?? 0,
+  period_points: 0,
+  total_reports: null,
+  quality_score: null,
+  user: { email: row.email || undefined, raw_user_meta_data: { full_name: row.name, avatar_url: row.avatar } },
+});
+
 export default function LeaderboardModule() {
   const { currentOrganization, currentUser } = useHSE();
   const [leaderboardData, setLeaderboardData] = useState([]);
@@ -20,12 +41,22 @@ export default function LeaderboardModule() {
     if (!currentOrganization || !currentUser) return;
     setLoading(true);
     try {
-      const [data, stats] = await Promise.all([
-        gamificationService.getLeaderboard(currentOrganization.id, period),
-        gamificationService.getUserStats(currentUser.id, currentOrganization.id)
+      const [ranks, score, mine] = await Promise.all([
+        gamificationService.getLeaderboard(currentOrganization.id, LEADERBOARD_SIZE),
+        gamificationService.getUserScore(currentUser.id, currentOrganization.id),
+        gamificationService.getMyReportStats(currentUser.id, currentOrganization.id),
       ]);
-      setLeaderboardData(data);
-      setMyStats(stats);
+      const rows = (ranks || []).map(toTableRow);
+      const me = rows.find((r) => r.user_id === currentUser.id);
+      setLeaderboardData(rows);
+      setMyStats({
+        rank: me ? me.rank : null,
+        totalUsers: rows.length || null,
+        totalPoints: score?.total_points ?? null,
+        qualityScore: mine?.qualityScore ?? null,
+        pointsThisMonth: mine?.pointsThisMonth ?? null,
+        reportsThisMonth: mine?.reportsThisMonth ?? null,
+      });
     } catch (e) {
       console.error(e);
     } finally {
@@ -33,9 +64,10 @@ export default function LeaderboardModule() {
     }
   };
 
+  // The period tabs do not change the query (see PERIOD_NOTE).
   useEffect(() => {
     fetchData();
-  }, [currentOrganization, currentUser, period]);
+  }, [currentOrganization, currentUser]);
 
   // Real-time subscription
   useEffect(() => {
@@ -61,7 +93,7 @@ export default function LeaderboardModule() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [currentOrganization, period]);
+  }, [currentOrganization]);
 
   if (!currentOrganization) return null;
 
@@ -91,6 +123,10 @@ export default function LeaderboardModule() {
         {loading ? (
           <div className="flex items-center justify-center h-full text-pl-muted">
             <Loader2 className="h-8 w-8 animate-spin text-pl-muted mr-2" aria-hidden="true" /> Loading ranking...
+          </div>
+        ) : period !== 'all_time' ? (
+          <div className="bg-pl-surface border border-pl-border shadow-pl-sm rounded-lg p-8 text-center text-sm text-pl-muted" role="status">
+            {PERIOD_NOTE}
           </div>
         ) : (
           <LeaderboardTable 

@@ -3,8 +3,9 @@
 // a signed-in page outside the HSE layout that opens its own scope through
 // AccountScope with the toggle in its header bar. Covers the organisation
 // list, every customizer tab, the select menus and template dialogs (portals
-// carry the theme), and the live preview, which keeps the organisation's
-// own colours as a document canvas. Only the data layer is stubbed.
+// carry the theme). Batch 4B hid the colour, typography and custom CSS
+// controls and the colour preview, as 4A did in Settings, and shows the same
+// note. Only the data layer is stubbed.
 import React from 'react';
 import { render, screen, fireEvent, act, within, configure } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
@@ -93,8 +94,7 @@ describe('Branding Manager on the design system (batch 3A, AccountScope)', () =>
     expect(screen.getByText('Branding Status')).toBeInTheDocument();
     expectNoLegacyChrome();
     for (const [tab, marker] of [
-      ['Colors', 'Brand Colors'], ['Typography', 'Font Settings'], ['Login Page', 'Login Experience'],
-      ['Footer', 'Footer Content'], ['Advanced', 'Custom CSS Injection'],
+      ['Login Page', 'Login Experience'], ['Footer', 'Footer Content'],
     ]) {
       await openTab(tab);
       await screen.findByText(marker);
@@ -102,12 +102,12 @@ describe('Branding Manager on the design system (batch 3A, AccountScope)', () =>
     }
   });
 
-  it('the font menu and the template dialogs carry the theme, in dark', async () => {
+  it('the select menu and the template dialogs carry the theme, in dark', async () => {
     window.localStorage.setItem('petrolord.theme.v1:anon', 'dark');
     await renderPage();
     expect(getScopeRoot(SCOPE)).toHaveAttribute('data-pl-theme', 'dark');
     await selectOrg();
-    await openTab('Typography');
+    await openTab('Login Page');
     click(screen.getAllByRole('combobox')[0]);
     const listbox = await screen.findByRole('listbox');
     expect(listbox.closest('[data-pl-theme]')).toHaveAttribute('data-pl-theme', 'dark');
@@ -122,13 +122,18 @@ describe('Branding Manager on the design system (batch 3A, AccountScope)', () =>
     expect(legacyChromeClasses()).toEqual([]);
   });
 
-  it('the live preview keeps the organisation colours inside a document canvas', async () => {
+  it('hides the theme, colour, typography and custom CSS controls and the colour preview, with the 4A note (4B)', async () => {
     await renderPage();
     await selectOrg();
-    expect(screen.getByText('Live Preview')).toBeInTheDocument();
-    const canvas = document.querySelector('[data-canvas="document"]');
-    expect(canvas).not.toBeNull();
-    expect(canvas.textContent).toContain('Create Report');
+    const tabs = screen.getAllByRole('tab').map((t) => t.textContent);
+    expect(tabs).toEqual(['Logo & Brand', 'Login Page', 'Footer']);
+    expect(screen.queryByText('Live Preview')).toBeNull();
+    expect(screen.queryByText('Brand Colors')).toBeNull();
+    expect(screen.queryByText('Custom CSS Injection')).toBeNull();
+    expect(document.querySelector('[data-canvas="document"]')).toBeNull();
+    const note = screen.getByText('Colors and theme').closest('[role="alert"]');
+    expect(note.className).toContain('bg-pl-info-bg');
+    expect(note).toHaveTextContent('Each person chooses light or dark from the header toggle.');
     expectNoLegacyChrome();
   });
 });
