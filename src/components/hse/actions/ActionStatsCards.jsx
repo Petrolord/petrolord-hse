@@ -2,15 +2,17 @@ import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle2, Clock, PlayCircle, ShieldQuestion, ListTodo } from 'lucide-react';
 
-const StatCard = ({ title, value, icon: Icon, color, bg }) => (
-  <Card className="bg-[#252541] border-[#3a3a5a]">
-    <CardContent className="p-4 flex items-center justify-between">
-      <div>
-        <p className="text-[#7a7a9a] text-xs font-bold uppercase tracking-wider mb-1">{title}</p>
-        <p className="text-2xl font-bold text-white">{value}</p>
+// A KPI tile on the theme roles (design family, batch 1B): label, mono value
+// and a neutral icon; the title names the status, so no hue is needed.
+const StatCard = ({ title, value, icon: Icon }) => (
+  <Card>
+    <CardContent className="p-4 flex items-center justify-between gap-2">
+      <div className="min-w-0">
+        <p className="text-pl-muted text-xs font-semibold uppercase tracking-wider mb-1">{title}</p>
+        <p className="font-pl-mono tabular-nums text-2xl font-semibold text-pl-text">{value}</p>
       </div>
-      <div className={`p-2 rounded-lg bg-[#1a1a2e] border border-[#3a3a5a]`}>
-        <Icon className={`h-5 w-5 ${color}`} />
+      <div className="hidden sm:block shrink-0 p-2 rounded-lg bg-pl-sunken border border-pl-border text-pl-muted">
+        <Icon className="h-5 w-5" aria-hidden="true" />
       </div>
     </CardContent>
   </Card>
@@ -31,31 +33,26 @@ export default function ActionStatsCards({ actions = [] }) {
         title="TOTAL ACTIONS" 
         value={counts.total} 
         icon={ListTodo} 
-        color="text-white" 
       />
       <StatCard 
         title="OPEN" 
         value={counts.open} 
         icon={Clock} 
-        color="text-blue-400" 
       />
       <StatCard 
         title="IN PROGRESS" 
         value={counts.inProgress} 
         icon={PlayCircle} 
-        color="text-yellow-400" 
       />
       <StatCard 
         title="PENDING APPROVAL" 
         value={counts.pending} 
         icon={ShieldQuestion} 
-        color="text-purple-400" 
       />
       <StatCard 
         title="CLOSED" 
         value={counts.closed} 
         icon={CheckCircle2} 
-        color="text-green-400" 
       />
     </div>
   );

@@ -13,6 +13,15 @@ import ActionStatsCards from './actions/ActionStatsCards';
 import { useToast } from "@/components/ui/use-toast";
 import ActionsEmpty from '@/components/EmptyStates/ActionsEmpty';
 
+// Design family (batch 1B): Action Tracker renders inside the signed-in scope
+// (src/design/rollout/w1b.js), so it uses the theme roles directly. The view
+// and quick filter chips use the Suite chip look; colour is kept for status.
+const chipClass = (active) => `h-9 px-4 border font-medium transition-colors ${
+  active
+    ? 'border-pl-primary bg-pl-primary/10 text-pl-primary-text hover:bg-pl-primary/15'
+    : 'border-pl-border bg-pl-surface text-pl-muted hover:bg-pl-sunken hover:text-pl-text'
+}`;
+
 export default function ActionTrackingModule() {
   const { currentOrganization, currentUser } = useHSE();
   const { toast } = useToast();
@@ -79,7 +88,7 @@ export default function ActionTrackingModule() {
   const isEmpty = !loading && actions.length === 0 && !filters.search;
 
   return (
-    <div className="flex h-full overflow-hidden bg-[#151521]">
+    <div className="flex h-full overflow-hidden bg-pl-bg text-pl-text">
       {/* Sidebar Filters */}
       <div className="hidden lg:block w-64 flex-shrink-0">
         <ActionFilters filters={filters} setFilters={setFilters} users={users} />
@@ -87,16 +96,16 @@ export default function ActionTrackingModule() {
 
       <div className="flex-1 flex flex-col min-w-0">
         {/* Module Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#3a3a5a] bg-[#1a1a2e]">
-          <div className="flex items-center gap-6 flex-1">
-            <h2 className="text-xl font-bold text-white tracking-tight">Action Tracker</h2>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 px-4 sm:px-6 py-4 border-b border-pl-border bg-pl-surface">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 flex-1 min-w-0">
+            <h2 className="font-pl-display text-2xl font-semibold text-pl-text tracking-tight whitespace-nowrap">Action Tracker</h2>
             <div className="relative max-w-lg w-full">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#7a7a9a]" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-pl-muted" aria-hidden="true" />
               <Input 
                 placeholder="Search by code, title or description..." 
                 value={filters.search}
                 onChange={(e) => setFilters(prev => ({...prev, search: e.target.value}))}
-                className="pl-10 bg-[#252541] border-[#3a3a5a] text-white focus:ring-[#FFC107] h-10 rounded-md placeholder:text-[#7a7a9a]"
+                className="pl-10"
               />
             </div>
           </div>
@@ -104,22 +113,24 @@ export default function ActionTrackingModule() {
              <Button 
                size="sm" 
                onClick={() => setViewMode('list')} 
-               className={`h-9 px-4 font-medium transition-all ${viewMode === 'list' ? 'bg-[#FFC107] text-black hover:bg-[#FFC107]/90' : 'bg-[#252541] text-[#b0b0c0] hover:text-white border border-[#3a3a5a]'}`}
+               aria-pressed={viewMode === 'list'}
+               className={chipClass(viewMode === 'list')}
              >
-               <List className="h-4 w-4 mr-2" /> List
+               <List className="h-4 w-4 mr-2" aria-hidden="true" /> List
              </Button>
              <Button 
                size="sm" 
                onClick={() => setViewMode('aging')} 
-               className={`h-9 px-4 font-medium transition-all ${viewMode === 'aging' ? 'bg-[#FFC107] text-black hover:bg-[#FFC107]/90' : 'bg-[#252541] text-[#b0b0c0] hover:text-white border border-[#3a3a5a]'}`}
+               aria-pressed={viewMode === 'aging'}
+               className={chipClass(viewMode === 'aging')}
              >
-               <Activity className="h-4 w-4 mr-2" /> Aging
+               <Activity className="h-4 w-4 mr-2" aria-hidden="true" /> Aging
              </Button>
           </div>
         </div>
 
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
             {/* Stats Cards */}
             <ActionStatsCards actions={actions} />
             
@@ -136,13 +147,10 @@ export default function ActionTrackingModule() {
                   key={f.id}
                   size="sm" 
                   onClick={() => setQuickFilter(f.id)}
-                  className={`h-9 px-4 border transition-all font-medium ${
-                    quickFilter === f.id 
-                      ? 'bg-[#FFC107] text-black border-[#FFC107] hover:bg-[#FFC107]/90' 
-                      : 'bg-[#1a1a2e] border-[#3a3a5a] text-[#b0b0c0] hover:text-white hover:border-[#7a7a9a]'
-                  }`}
+                  aria-pressed={quickFilter === f.id}
+                  className={chipClass(quickFilter === f.id)}
                 >
-                  {f.icon && <f.icon className="h-3.5 w-3.5 mr-2" />}
+                  {f.icon && <f.icon className="h-3.5 w-3.5 mr-2" aria-hidden="true" />}
                   {f.label}
                 </Button>
               ))}
@@ -151,8 +159,8 @@ export default function ActionTrackingModule() {
             {/* Main Content Area */}
             <div className="min-h-[400px] relative">
               {loading && (
-                <div className="absolute inset-0 flex items-center justify-center bg-[#151521]/50 z-20 backdrop-blur-sm rounded-lg">
-                  <Loader2 className="h-10 w-10 animate-spin text-[#FFC107]" />
+                <div className="absolute inset-0 flex items-center justify-center bg-pl-bg/50 z-20 backdrop-blur-sm rounded-lg">
+                  <Loader2 className="h-10 w-10 animate-spin text-pl-primary-text" aria-label="Loading actions" />
                 </div>
               )}
               

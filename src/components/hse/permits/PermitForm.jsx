@@ -134,7 +134,7 @@ export default function PermitForm({ onSuccess, onCancel, users }) {
       toast({
         title: isDraft ? "Draft Saved" : "Permit Submitted",
         description: isDraft ? "You can continue editing later." : "Your permit request has been submitted for approval.",
-        className: "bg-green-600 text-white border-none"
+        variant: "success"
       });
       onSuccess();
     } catch (error) {
@@ -156,12 +156,12 @@ export default function PermitForm({ onSuccess, onCancel, users }) {
 
   const renderStep1 = () => (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label className="text-gray-300">Permit Type <span className="text-red-500">*</span></Label>
+          <Label>Permit Type <span className="text-pl-danger-text" aria-hidden="true">*</span></Label>
           <Select value={formData.permit_type} onValueChange={(v) => handleInputChange('permit_type', v)}>
-            <SelectTrigger className="bg-[#252541] border-[#3a3a5a] text-white"><SelectValue placeholder="Select type" /></SelectTrigger>
-            <SelectContent className="bg-[#252541] border-[#3a3a5a] text-white">
+            <SelectTrigger><SelectValue placeholder="Select type" /></SelectTrigger>
+            <SelectContent>
               <SelectItem value="Hot Work">Hot Work</SelectItem>
               <SelectItem value="Cold Work">Cold Work</SelectItem>
               <SelectItem value="Confined Space">Confined Space</SelectItem>
@@ -172,10 +172,10 @@ export default function PermitForm({ onSuccess, onCancel, users }) {
           </Select>
         </div>
         <div className="space-y-2">
-          <Label className="text-gray-300">Priority</Label>
+          <Label>Priority</Label>
           <Select value={formData.priority} onValueChange={(v) => handleInputChange('priority', v)}>
-            <SelectTrigger className="bg-[#252541] border-[#3a3a5a] text-white"><SelectValue placeholder="Select priority" /></SelectTrigger>
-            <SelectContent className="bg-[#252541] border-[#3a3a5a] text-white">
+            <SelectTrigger><SelectValue placeholder="Select priority" /></SelectTrigger>
+            <SelectContent>
               <SelectItem value="Low">Low</SelectItem>
               <SelectItem value="Medium">Medium</SelectItem>
               <SelectItem value="High">High</SelectItem>
@@ -186,42 +186,39 @@ export default function PermitForm({ onSuccess, onCancel, users }) {
       </div>
 
       <div className="space-y-2">
-        <Label className="text-gray-300">Title <span className="text-red-500">*</span></Label>
+        <Label>Title <span className="text-pl-danger-text" aria-hidden="true">*</span></Label>
         <Input 
           placeholder="e.g., Welding on Pipeline B" 
           value={formData.title}
           onChange={(e) => handleInputChange('title', e.target.value)}
-          className="bg-[#252541] border-[#3a3a5a] text-white"
         />
       </div>
 
       <div className="space-y-2">
-        <Label className="text-gray-300">Description of Work <span className="text-red-500">*</span></Label>
+        <Label>Description of Work <span className="text-pl-danger-text" aria-hidden="true">*</span></Label>
         <Textarea 
           placeholder="Describe the task in detail..." 
-          className="h-24 bg-[#252541] border-[#3a3a5a] text-white"
+          className="h-24"
           value={formData.description}
           onChange={(e) => handleInputChange('description', e.target.value)}
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label className="text-gray-300">Location <span className="text-red-500">*</span></Label>
+          <Label>Location <span className="text-pl-danger-text" aria-hidden="true">*</span></Label>
           <Input 
             placeholder="Area / Site" 
             value={formData.location}
             onChange={(e) => handleInputChange('location', e.target.value)}
-            className="bg-[#252541] border-[#3a3a5a] text-white"
           />
         </div>
         <div className="space-y-2">
-          <Label className="text-gray-300">Department <span className="text-red-500">*</span></Label>
+          <Label>Department <span className="text-pl-danger-text" aria-hidden="true">*</span></Label>
           <Input 
             placeholder="Department" 
             value={formData.department}
             onChange={(e) => handleInputChange('department', e.target.value)}
-            className="bg-[#252541] border-[#3a3a5a] text-white"
           />
         </div>
       </div>
@@ -231,17 +228,16 @@ export default function PermitForm({ onSuccess, onCancel, users }) {
   const renderStep2 = () => (
     <div className="space-y-6">
       <div className="space-y-3">
-        <Label className="text-base text-gray-300">Identified Hazards</Label>
-        <div className="grid grid-cols-2 gap-3">
+        <Label className="text-base">Identified Hazards</Label>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {HAZARDS_LIST.map(hazard => (
             <div key={hazard} className="flex items-center space-x-2">
               <Checkbox 
                 id={`hz-${hazard}`} 
                 checked={formData.hazards.includes(hazard)}
                 onCheckedChange={() => handleArrayToggle('hazards', hazard)}
-                className="border-gray-500 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
               />
-              <label htmlFor={`hz-${hazard}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-gray-300">
+              <label htmlFor={`hz-${hazard}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-pl-text">
                 {hazard}
               </label>
             </div>
@@ -249,20 +245,19 @@ export default function PermitForm({ onSuccess, onCancel, users }) {
         </div>
       </div>
 
-      <Separator className="bg-[#3a3a5a]" />
+      <Separator />
 
       <div className="space-y-3">
-        <Label className="text-base text-gray-300">Required PPE</Label>
-        <div className="grid grid-cols-2 gap-3">
+        <Label className="text-base">Required PPE</Label>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {PPE_LIST.map(ppe => (
             <div key={ppe} className="flex items-center space-x-2">
               <Checkbox 
                 id={`ppe-${ppe}`} 
                 checked={formData.ppe_requirements.includes(ppe)}
                 onCheckedChange={() => handleArrayToggle('ppe_requirements', ppe)}
-                className="border-gray-500 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
               />
-              <label htmlFor={`ppe-${ppe}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-gray-300">
+              <label htmlFor={`ppe-${ppe}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-pl-text">
                 {ppe}
               </label>
             </div>
@@ -271,10 +266,10 @@ export default function PermitForm({ onSuccess, onCancel, users }) {
       </div>
 
       <div className="space-y-2">
-        <Label className="text-gray-300">Risk Level Assessment</Label>
+        <Label>Risk Level Assessment</Label>
         <Select value={formData.risk_level} onValueChange={(v) => handleInputChange('risk_level', v)}>
-          <SelectTrigger className="bg-[#252541] border-[#3a3a5a] text-white"><SelectValue /></SelectTrigger>
-          <SelectContent className="bg-[#252541] border-[#3a3a5a] text-white">
+          <SelectTrigger><SelectValue /></SelectTrigger>
+          <SelectContent>
             <SelectItem value="Low">Low Risk</SelectItem>
             <SelectItem value="Medium">Medium Risk</SelectItem>
             <SelectItem value="High">High Risk</SelectItem>
@@ -287,34 +282,32 @@ export default function PermitForm({ onSuccess, onCancel, users }) {
 
   const renderStep3 = () => (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label className="text-gray-300">Start Date & Time <span className="text-red-500">*</span></Label>
+          <Label>Start Date & Time <span className="text-pl-danger-text" aria-hidden="true">*</span></Label>
           <Input 
             type="datetime-local" 
             value={formData.start_date}
             onChange={(e) => handleInputChange('start_date', e.target.value)}
-            className="bg-[#252541] border-[#3a3a5a] text-white"
           />
         </div>
         <div className="space-y-2">
-          <Label className="text-gray-300">End Date & Time <span className="text-red-500">*</span></Label>
+          <Label>End Date & Time <span className="text-pl-danger-text" aria-hidden="true">*</span></Label>
           <Input 
             type="datetime-local" 
             value={formData.end_date}
             onChange={(e) => handleInputChange('end_date', e.target.value)}
-            className="bg-[#252541] border-[#3a3a5a] text-white"
           />
         </div>
       </div>
 
       <div className="space-y-2">
-        <Label className="text-gray-300">Site Supervisor (Approver) <span className="text-red-500">*</span></Label>
+        <Label>Site Supervisor (Approver) <span className="text-pl-danger-text" aria-hidden="true">*</span></Label>
         <Select value={formData.supervisor_id} onValueChange={(v) => handleInputChange('supervisor_id', v)}>
-          <SelectTrigger className={`bg-[#252541] border-[#3a3a5a] text-white ${!formData.supervisor_id ? 'border-amber-500/50' : ''}`}>
+          <SelectTrigger className={!formData.supervisor_id ? 'border-pl-warning' : ''}>
             <SelectValue placeholder="Select supervisor" />
           </SelectTrigger>
-          <SelectContent className="bg-[#252541] border-[#3a3a5a] text-white">
+          <SelectContent>
             {users.length === 0 ? (
                <SelectItem value="no-users" disabled>No users found in organization</SelectItem>
             ) : (
@@ -327,25 +320,24 @@ export default function PermitForm({ onSuccess, onCancel, users }) {
           </SelectContent>
         </Select>
         {!formData.supervisor_id && (
-            <p className="text-xs text-amber-500">Required for approval workflow.</p>
+            <p className="text-xs text-pl-warning-text">Required for approval workflow.</p>
         )}
       </div>
 
       <div className="space-y-2">
-        <Label className="text-gray-300">Contractor Company (Optional)</Label>
+        <Label>Contractor Company (Optional)</Label>
         <Input 
           placeholder="Contractor Name" 
           value={formData.contractor_name}
           onChange={(e) => handleInputChange('contractor_name', e.target.value)}
-          className="bg-[#252541] border-[#3a3a5a] text-white"
         />
       </div>
 
       <div className="space-y-2">
-        <Label className="text-gray-300">Emergency Procedures</Label>
+        <Label>Emergency Procedures</Label>
         <Textarea 
           placeholder="Emergency contact numbers, evacuation route..." 
-          className="h-24 bg-[#252541] border-[#3a3a5a] text-white"
+          className="h-24"
           value={formData.emergency_procedures}
           onChange={(e) => handleInputChange('emergency_procedures', e.target.value)}
         />
@@ -354,32 +346,32 @@ export default function PermitForm({ onSuccess, onCancel, users }) {
   );
 
   return (
-    <div className="flex flex-col h-full bg-[var(--bg-card)]">
-      <div className="flex-1 overflow-y-auto p-6">
+    <div className="flex flex-col h-full bg-pl-bg text-pl-text">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6">
         <div className="max-w-2xl mx-auto">
           {/* Progress Steps */}
           <div className="flex items-center justify-between mb-8">
             {[1, 2, 3].map((s) => (
               <div key={s} className="flex items-center">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${step === s ? 'bg-blue-600 text-white' : step > s ? 'bg-green-600 text-white' : 'bg-gray-700 text-gray-400'}`}>
-                  {step > s ? <CheckCircle size={16} /> : s}
+                <div className={`w-8 h-8 shrink-0 rounded-full flex items-center justify-center font-bold text-sm font-pl-mono ${step === s ? 'bg-pl-primary text-pl-primary-fg' : step > s ? 'bg-pl-success text-pl-success-fg' : 'bg-pl-sunken text-pl-muted border border-pl-border'}`} aria-current={step === s ? 'step' : undefined}>
+                  {step > s ? <CheckCircle size={16} aria-label={`Step ${s} done`} /> : s}
                 </div>
-                {s < 3 && <div className={`w-24 h-1 mx-2 ${step > s ? 'bg-green-600' : 'bg-gray-700'}`} />}
+                {s < 3 && <div className={`w-12 sm:w-24 h-1 mx-2 rounded-full ${step > s ? 'bg-pl-success' : 'bg-pl-border'}`} />}
               </div>
             ))}
           </div>
 
           {errorMsg && (
-            <Alert variant="destructive" className="mb-4 bg-red-900/20 border-red-900 text-white">
+            <Alert variant="danger" className="mb-4">
               <AlertCircle className="h-4 w-4" />
               <AlertTitle>Error</AlertTitle>
               <AlertDescription>{errorMsg}</AlertDescription>
             </Alert>
           )}
 
-          <Card className="border-[var(--border-color)] bg-[var(--bg-app)]">
+          <Card>
             <CardHeader>
-              <CardTitle className="text-xl text-white">
+              <CardTitle className="text-xl text-pl-text">
                 {step === 1 && "General Information"}
                 {step === 2 && "Hazards & Controls"}
                 {step === 3 && "Schedule & Team"}
@@ -394,24 +386,24 @@ export default function PermitForm({ onSuccess, onCancel, users }) {
         </div>
       </div>
 
-      <div className="p-4 border-t border-[var(--border-color)] bg-[#1a1a2e] flex justify-between items-center">
-        <Button variant="ghost" onClick={onCancel} disabled={loading} className="text-gray-400 hover:text-white">Cancel</Button>
-        <div className="flex gap-2">
+      <div className="p-4 border-t border-pl-border bg-pl-surface flex flex-wrap justify-between items-center gap-2">
+        <Button variant="ghost" onClick={onCancel} disabled={loading}>Cancel</Button>
+        <div className="flex flex-wrap justify-end gap-2">
           {step > 1 && (
-            <Button variant="outline" onClick={() => setStep(s => s - 1)} disabled={loading} className="border-[#3a3a5a] text-white hover:bg-[#252541]">
+            <Button variant="outline" onClick={() => setStep(s => s - 1)} disabled={loading}>
               <ArrowLeft className="mr-2 h-4 w-4" /> Back
             </Button>
           )}
           {step < 3 ? (
-            <Button onClick={() => setStep(s => s + 1)} className="bg-blue-600 hover:bg-blue-700 text-white">
+            <Button onClick={() => setStep(s => s + 1)}>
               Next <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           ) : (
             <>
-              <Button variant="secondary" onClick={() => handleSubmit(true)} disabled={loading} className="bg-[#252541] hover:bg-[#3a3a5a] text-white">
+              <Button variant="secondary" onClick={() => handleSubmit(true)} disabled={loading}>
                 <Save className="mr-2 h-4 w-4" /> Save Draft
               </Button>
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white" onClick={() => handleSubmit(false)} disabled={loading}>
+              <Button onClick={() => handleSubmit(false)} disabled={loading}>
                 {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Submit Permit
               </Button>

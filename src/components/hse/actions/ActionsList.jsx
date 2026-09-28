@@ -5,18 +5,21 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import { MoreHorizontal, ArrowUpDown, Clock, CheckCircle, Hourglass, ShieldQuestion, AlertTriangle } from 'lucide-react';
 
-const priorityColors = {
-  low: 'bg-green-500/20 text-green-400 border-green-500/30',
-  medium: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
-  high: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
-  critical: 'bg-red-500/20 text-red-400 border-red-500/30',
+// Design family (batch 1B): priority is a status, so it takes the Badge
+// status variants with the word inside; the status icons sit beside their
+// word and stay neutral apart from closed (success).
+const priorityVariants = {
+  low: 'success',
+  medium: 'warning',
+  high: 'danger',
+  critical: 'danger',
 };
 
 const statusIcons = {
-  open: <Clock className="h-4 w-4 text-blue-400" />,
-  in_progress: <Hourglass className="h-4 w-4 text-yellow-400 animate-spin" />,
-  pending_approval: <ShieldQuestion className="h-4 w-4 text-purple-400" />,
-  closed: <CheckCircle className="h-4 w-4 text-green-400" />,
+  open: <Clock className="h-4 w-4 text-pl-muted" aria-hidden="true" />,
+  in_progress: <Hourglass className="h-4 w-4 text-pl-info-text" aria-hidden="true" />,
+  pending_approval: <ShieldQuestion className="h-4 w-4 text-pl-warning-text" aria-hidden="true" />,
+  closed: <CheckCircle className="h-4 w-4 text-pl-success-text" aria-hidden="true" />,
 };
 
 const isOverdue = (dueDate, status) => {
@@ -49,17 +52,17 @@ export default function ActionsList({ actions, onViewDetails }) {
   };
   
   const SortIcon = ({ colKey }) => (
-    <ArrowUpDown className={`ml-2 h-3 w-3 inline cursor-pointer ${sortConfig.key === colKey ? 'text-[#FFC107]' : 'text-[#7a7a9a] hover:text-white'}`} />
+    <ArrowUpDown className={`ml-2 h-3 w-3 inline cursor-pointer ${sortConfig.key === colKey ? 'text-pl-primary-text' : 'text-pl-muted hover:text-pl-text'}`} />
   );
 
   return (
-    <div className="h-full flex flex-col bg-[#1f1f35] rounded-lg border border-[#3a3a5a] overflow-hidden">
-      <div className="bg-[#252541] px-4 py-2 border-b border-[#3a3a5a] text-xs text-[#b0b0c0] flex justify-between items-center">
-        <span>{actions.length} Actions found</span>
+    <div className="h-full flex flex-col bg-pl-surface text-pl-text rounded-lg border border-pl-border shadow-pl-sm overflow-hidden">
+      <div className="bg-pl-sunken/60 px-4 py-2 border-b border-pl-border text-xs text-pl-muted flex justify-between items-center">
+        <span><span className="font-pl-mono tabular-nums">{actions.length}</span> Actions found</span>
       </div>
       <div className="overflow-auto flex-1">
         <table className="w-full text-sm text-left border-collapse">
-          <thead className="bg-[#1a1a2e] text-[#7a7a9a] uppercase text-xs font-medium sticky top-0 z-10 shadow-sm">
+          <thead className="bg-pl-sunken text-pl-muted uppercase text-xs font-semibold sticky top-0 z-10">
             <tr>
               <th className="px-6 py-4 cursor-pointer" onClick={() => requestSort('action_code')}>Code <SortIcon colKey="action_code"/></th>
               <th className="px-6 py-4 cursor-pointer" onClick={() => requestSort('title')}>Title <SortIcon colKey="title"/></th>
@@ -73,29 +76,29 @@ export default function ActionsList({ actions, onViewDetails }) {
               <th className="px-6 py-4 text-right"></th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#3a3a5a]">
+          <tbody className="divide-y divide-pl-border">
             {sortedData.map((action) => {
               const overdue = isOverdue(action.due_date, action.status);
               return (
                 <tr 
                   key={action.id} 
-                  className={`hover:bg-[#2d2d4a] transition-colors group cursor-pointer ${overdue ? 'bg-red-900/10 hover:bg-red-900/20' : ''}`}
+                  className={`transition-colors group cursor-pointer ${overdue ? 'bg-pl-danger-bg/60 hover:bg-pl-danger-bg' : 'hover:bg-pl-sunken/60'}`}
                   onClick={() => onViewDetails(action)}
                 >
-                  <td className="px-6 py-4 font-mono text-[#b0b0c0]">{action.action_code || '---'}</td>
+                  <td className="px-6 py-4 font-pl-mono text-pl-muted whitespace-nowrap">{action.action_code || 'n/a'}</td>
                   <td className="px-6 py-4 max-w-[250px]">
-                    <div className="font-medium text-white truncate" title={action.title}>{action.title}</div>
-                    <div className="text-xs text-[#7a7a9a] truncate">{action.description}</div>
+                    <div className="font-medium text-pl-text truncate" title={action.title}>{action.title}</div>
+                    <div className="text-xs text-pl-muted truncate">{action.description}</div>
                   </td>
-                  <td className="px-6 py-4 text-[#b0b0c0] capitalize">{action.category || 'General'}</td>
+                  <td className="px-6 py-4 text-pl-muted capitalize">{action.category || 'General'}</td>
                   <td className="px-6 py-4">
-                    <Badge variant="outline" className={`capitalize ${priorityColors[action.priority] || ''}`}>
+                    <Badge variant={priorityVariants[action.priority] || 'neutral'} className="capitalize">
                       {action.priority}
                     </Badge>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      {statusIcons[action.status] || <Clock className="h-4 w-4" />}
+                    <div className="flex items-center gap-2 whitespace-nowrap">
+                      {statusIcons[action.status] || <Clock className="h-4 w-4 text-pl-muted" aria-hidden="true" />}
                       <span className="capitalize">{action.status?.replace('_', ' ')}</span>
                     </div>
                   </td>
@@ -103,30 +106,31 @@ export default function ActionsList({ actions, onViewDetails }) {
                     {action.assignee ? (
                       <div className="flex items-center gap-2">
                         <Avatar className="h-6 w-6">
-                           <AvatarFallback className="text-xs bg-[#2d2d4a]">{action.assignee.raw_user_meta_data?.full_name?.[0] || 'U'}</AvatarFallback>
+                           <AvatarFallback className="text-xs">{action.assignee.raw_user_meta_data?.full_name?.[0] || 'U'}</AvatarFallback>
                         </Avatar>
-                        <span className="text-xs text-white">{action.assignee.raw_user_meta_data?.full_name}</span>
+                        <span className="text-xs text-pl-text">{action.assignee.raw_user_meta_data?.full_name}</span>
                       </div>
-                    ) : <span className="text-xs text-[#7a7a9a]">Unassigned</span>}
+                    ) : <span className="text-xs text-pl-muted">Unassigned</span>}
                   </td>
-                  <td className={`px-6 py-4 text-xs ${overdue ? 'text-red-400 font-bold' : 'text-[#b0b0c0]'}`}>
+                  <td className={`px-6 py-4 text-xs ${overdue ? 'text-pl-danger-text font-semibold' : 'text-pl-muted'}`}>
                      <div className="flex items-center gap-2">
-                        {overdue && <AlertTriangle className="h-3.5 w-3.5" />}
-                        {action.due_date ? new Date(action.due_date).toLocaleDateString() : 'N/A'}
+                        {overdue && <AlertTriangle className="h-3.5 w-3.5" aria-hidden="true" />}
+                        <span className="font-pl-mono tabular-nums whitespace-nowrap">{action.due_date ? new Date(action.due_date).toLocaleDateString() : 'n/a'}</span>
+                        {overdue && <span className="sr-only">Overdue</span>}
                      </div>
                   </td>
                   <td className="px-6 py-4 w-[140px]">
                     <div className="flex items-center gap-2">
-                      <Progress value={action.progress_percentage || 0} className="h-1.5 w-16 bg-[#3a3a5a]" />
-                      <span className="text-xs text-[#b0b0c0] w-8 text-right">{action.progress_percentage || 0}%</span>
+                      <Progress value={action.progress_percentage || 0} className="h-1.5 w-16 bg-pl-sunken" />
+                      <span className="text-xs text-pl-muted w-8 text-right font-pl-mono tabular-nums">{action.progress_percentage || 0}%</span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-xs text-[#7a7a9a]">
+                  <td className="px-6 py-4 text-xs text-pl-muted font-pl-mono tabular-nums whitespace-nowrap">
                     {new Date(action.created_at).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 text-right" onClick={(e) => e.stopPropagation()}>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-[#7a7a9a] hover:text-white">
-                      <MoreHorizontal className="h-4 w-4" />
+                    <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="More">
+                      <MoreHorizontal className="h-4 w-4" aria-hidden="true" />
                     </Button>
                   </td>
                 </tr>

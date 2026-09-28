@@ -17,7 +17,9 @@ const fromReport = (r) => ({
   occurred_on: r.occurred_on || '',
 });
 
-const selectClass = 'w-full bg-[#252541] border border-[#3a3a5a] rounded-md p-2 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500';
+// Supervisor View is on the design family (src/design/rollout/w1b.js), so the
+// native fields take the Suite field styling on the theme roles.
+const selectClass = 'w-full rounded-md border border-pl-border-strong bg-pl-surface p-2 text-xs text-pl-text focus:outline-none focus-visible:ring-2 focus-visible:ring-pl-focus';
 
 const toDays = (v) => (v === '' || v === null ? null : Number(v));
 
@@ -67,18 +69,18 @@ export default function ReportClassificationPanel({ report, organizationId, onSa
   };
 
   return (
-    <div className="mt-6 pt-4 border-t border-[#2d2d4a] space-y-3">
-      <div className="flex items-center justify-between">
-        <div className="text-xs uppercase text-slate-500">Safety statistics classification</div>
+    <div className="mt-6 pt-4 border-t border-pl-border space-y-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="text-xs font-semibold uppercase tracking-wide text-pl-muted">Safety statistics classification</div>
         {report.classified_at ? (
-          <div className="text-[10px] text-green-400">Classified {format(new Date(report.classified_at), 'PP')}</div>
+          <div className="text-[11px] text-pl-success-text">Classified {format(new Date(report.classified_at), 'PP')}</div>
         ) : (
-          <div className="text-[10px] text-amber-300">Not classified: counted as unclassified in Safety Statistics</div>
+          <div className="text-[11px] text-pl-warning-text">Not classified: counted as unclassified in Safety Statistics</div>
         )}
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
-        <label className="col-span-2 text-[11px] text-slate-500 space-y-1">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <label className="sm:col-span-2 text-[11px] text-pl-muted space-y-1">
           <span>Outcome (the most serious that applies)</span>
           <select value={cls} onChange={set('injury_classification')} className={selectClass}>
             <option value={NONE}>Not classified yet</option>
@@ -86,23 +88,23 @@ export default function ReportClassificationPanel({ report, organizationId, onSa
               <option key={c.id} value={c.id}>{c.label}{c.recordable ? ' (recordable)' : ''}</option>
             ))}
           </select>
-          {classInfo && <span className="block text-slate-400">{classInfo.help}</span>}
+          {classInfo && <span className="block text-pl-muted">{classInfo.help}</span>}
         </label>
 
         {showDaysAway && (
-          <label className="text-[11px] text-slate-500 space-y-1">
+          <label className="text-[11px] text-pl-muted space-y-1">
             <span>Calendar days away from work</span>
             <input type="number" min="0" step="1" value={form.days_away} onChange={set('days_away')} className={selectClass} />
           </label>
         )}
         {showDaysRestricted && (
-          <label className="text-[11px] text-slate-500 space-y-1">
+          <label className="text-[11px] text-pl-muted space-y-1">
             <span>Days restricted or transferred</span>
             <input type="number" min="0" step="1" value={form.days_restricted} onChange={set('days_restricted')} className={selectClass} />
           </label>
         )}
 
-        <label className="text-[11px] text-slate-500 space-y-1">
+        <label className="text-[11px] text-pl-muted space-y-1">
           <span>Workforce</span>
           <select value={form.workforce} onChange={set('workforce')} className={selectClass}>
             <option value={NONE}>Not recorded</option>
@@ -110,12 +112,12 @@ export default function ReportClassificationPanel({ report, organizationId, onSa
             <option value="contractor">Contractor</option>
           </select>
         </label>
-        <label className="text-[11px] text-slate-500 space-y-1">
+        <label className="text-[11px] text-pl-muted space-y-1">
           <span>Date it happened</span>
-          <input type="date" value={form.occurred_on} onChange={set('occurred_on')} className={`${selectClass} [color-scheme:dark]`} />
+          <input type="date" value={form.occurred_on} onChange={set('occurred_on')} className={selectClass} />
         </label>
 
-        <label className="col-span-2 text-[11px] text-slate-500 space-y-1">
+        <label className="sm:col-span-2 text-[11px] text-pl-muted space-y-1">
           <span>Process safety (API RP 754 tier, classified by your organization)</span>
           <select value={form.pse_classification} onChange={set('pse_classification')} className={selectClass}>
             <option value={NONE}>Not assessed</option>
@@ -124,14 +126,14 @@ export default function ReportClassificationPanel({ report, organizationId, onSa
         </label>
       </div>
 
-      <p className="text-[11px] text-slate-500">
+      <p className="text-[11px] text-pl-muted">
         When the date it happened is blank, the statistics use the date the report was filed.
         {cls === 'lost_time' && form.days_away === '' && ' A lost time case without days is flagged in the severity rate.'}
       </p>
-      {!daysOk && <p className="text-xs text-amber-300">Days must be whole numbers, zero or more.</p>}
-      {error && <p className="text-xs text-red-400">{error}</p>}
+      {!daysOk && <p className="text-xs text-pl-warning-text">Days must be whole numbers, zero or more.</p>}
+      {error && <p className="text-xs text-pl-danger-text">{error}</p>}
 
-      <Button size="sm" onClick={save} disabled={saving || !daysOk} className="bg-blue-600 hover:bg-blue-700 text-xs">
+      <Button size="sm" onClick={save} disabled={saving || !daysOk} className="text-xs">
         {saving ? 'Saving...' : 'Save classification'}
       </Button>
     </div>
