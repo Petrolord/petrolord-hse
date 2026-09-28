@@ -157,6 +157,12 @@ describe('HSE dashboard pilot', () => {
       expectNoLegacyChrome();
     });
 
+    it('never reaches the network: relative imports of the Supabase client get the stub too', async () => {
+      const viaRelative = await import('../../../lib/customSupabaseClient');
+      const { supabaseModule } = await import('@/design/testing/shellMocks');
+      expect(viaRelative.supabase).toBe(supabaseModule.supabase);
+    });
+
     it('paints a dark user dark from the first frame of a later visit', async () => {
       window.localStorage.setItem('petrolord.theme.v1:anon', 'dark');
       renderLayout();

@@ -247,7 +247,7 @@ export default function PredictiveInsightsDashboard({ isEmbedded = false }) {
                           risk.severity === 'High' ? 'bg-pl-danger' : 'bg-pl-warning'
                         }`} aria-hidden="true" />
                         <div className="min-w-0">
-                          <h4 className="text-sm font-semibold text-pl-text capitalize">{risk.type.replace('_', ' ')}</h4>
+                          <h4 className="text-sm font-semibold text-pl-text capitalize">{risk.type.replace(/_/g, ' ')}</h4>
                           <p className="text-xs text-pl-muted mt-1">{risk.message}</p>
                           {risk.severity && (
                             <Badge variant={risk.severity === 'High' ? 'danger' : 'warning'} className="mt-2">{risk.severity}</Badge>

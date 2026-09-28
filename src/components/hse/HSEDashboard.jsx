@@ -89,7 +89,7 @@ export default function HSEDashboard() {
       {currentOrganization && (
         <>
           <div className="mb-8">
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
               <h2 className="font-pl-display text-2xl sm:text-3xl font-semibold text-pl-text flex items-center gap-2">
                 <Brain className="h-6 w-6 text-pl-primary-text" aria-hidden="true" />
                 AI Safety Predictor
@@ -97,7 +97,7 @@ export default function HSEDashboard() {
               <Button 
                 onClick={handleGoToAI}
                 variant="outline"
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 whitespace-nowrap"
               >
                 Full AI Dashboard <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Button>
@@ -160,13 +160,13 @@ function KpiCard({ title, value, icon: Icon, loading }) {
   return (
     <div className="rounded-xl border border-pl-border bg-pl-surface p-4 flex items-center justify-between gap-2 shadow-pl-sm" aria-busy={loading || undefined}>
       <div className="min-w-0">
-        <p className="text-pl-muted text-xs font-semibold uppercase">{title}</p>
+        <p className="text-pl-muted text-xs font-semibold uppercase leading-snug">{title}</p>
         <p className={`font-pl-mono tabular-nums text-2xl font-semibold text-pl-text mt-1 ${loading ? 'opacity-50' : ''}`}>
           {loading ? '...' : value}
         </p>
       </div>
-      <div className="hidden sm:block shrink-0 p-3 rounded-full bg-pl-sunken text-pl-muted">
-        <Icon className="h-6 w-6" aria-hidden="true" />
+      <div className="hidden sm:block shrink-0 p-2 rounded-full bg-pl-sunken text-pl-muted">
+        <Icon className="h-5 w-5" aria-hidden="true" />
       </div>
     </div>
   );

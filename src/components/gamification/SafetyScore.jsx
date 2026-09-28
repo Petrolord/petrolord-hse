@@ -34,7 +34,7 @@ export default function SafetyScore() {
           </div>
         </div>
         <div className="flex flex-col items-end">
-          <div className="flex items-center gap-1.5 rounded-full border border-pl-accent/40 bg-pl-accent/10 px-2 py-1 text-pl-accent-text">
+          <div className="flex items-center gap-1.5 whitespace-nowrap rounded-full border border-pl-accent/40 bg-pl-accent/10 px-2 py-1 text-pl-accent-text">
             <Flame className="h-3.5 w-3.5 fill-current" aria-hidden="true" />
             <span className="text-xs font-bold">{stats?.current_streak || 0} Day Streak</span>
           </div>

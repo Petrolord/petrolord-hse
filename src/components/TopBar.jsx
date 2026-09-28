@@ -71,11 +71,13 @@ const TopBar = ({ toggleMobileMenu, onToggleSidebar }) => {
         >
           <Menu className="h-6 w-6" />
         </button>
-        <PetroLordLogo />
+        {/* inside the scope the wordmark shrinks on a phone so the theme toggle,
+            notifications and the account menu all fit */}
+        <PetroLordLogo className={tc(undefined, '[&_img]:h-7 sm:[&_img]:h-10')} />
       </div>
 
       {/* Center Section: Search Bar (Hidden on small screens) */}
-      <div className="flex-1 flex justify-center max-w-2xl px-2 lg:px-8">
+      <div className={tc('flex-1 flex justify-center max-w-2xl px-2 lg:px-8', 'hidden md:flex flex-1 justify-center max-w-2xl px-2 lg:px-8')}>
         <div className="hidden md:flex items-center relative w-full">
           <Search className={tc('absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500', 'absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-pl-muted')} />
           <input
@@ -87,7 +89,7 @@ const TopBar = ({ toggleMobileMenu, onToggleSidebar }) => {
       </div>
 
       {/* Right Section: User Controls & Actions */}
-      <div className="flex items-center gap-2 md:gap-4 justify-end min-w-fit">
+      <div className={tc('flex items-center gap-2 md:gap-4 justify-end min-w-fit', 'flex items-center gap-1.5 sm:gap-2 md:gap-4 justify-end min-w-fit')}>
         {/* Safety Score Display */}
         <div className={tc('hidden xl:flex items-center gap-3 mr-2 bg-[#252541] px-3 py-1.5 rounded-full border border-[#3a3a5a]', 'hidden xl:flex items-center gap-3 mr-2 bg-pl-sunken px-3 py-1.5 rounded-full border border-pl-border')}>
            <div className={tc('flex items-center gap-1 text-[#FFC107]', 'flex items-center gap-1 text-pl-accent-text')}>
