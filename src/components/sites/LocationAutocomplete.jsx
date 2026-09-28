@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, MapPin, Building, Loader2, PlusCircle } from 'lucide-react';
@@ -13,8 +13,12 @@ export default function LocationAutocomplete({ onSelect, onAddNew, placeholder =
   const [results, setResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showResults, setShowResults] = useState(false);
+  // The text a pick wrote into the box. Searching for it again would reopen
+  // the list the pick just closed (batch 4B), so it is not searched.
+  const pickedRef = useRef(null);
 
   useEffect(() => {
+    if (pickedRef.current !== null && query === pickedRef.current) return undefined;
     const timer = setTimeout(() => {
       if (query.length > 1) {
         handleSearch();
@@ -39,6 +43,7 @@ export default function LocationAutocomplete({ onSelect, onAddNew, placeholder =
   };
 
   const handleSelect = (item) => {
+    pickedRef.current = item.name;
     setQuery(item.name);
     setShowResults(false);
     if (onSelect) onSelect(item);
@@ -52,8 +57,8 @@ export default function LocationAutocomplete({ onSelect, onAddNew, placeholder =
           className="pl-9"
           placeholder={placeholder}
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onFocus={() => query.length > 1 && setShowResults(true)}
+          onChange={(e) => { pickedRef.current = null; setQuery(e.target.value); }}
+          onFocus={() => query.length > 1 && query !== pickedRef.current && setShowResults(true)}
         />
         {isLoading && <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 animate-spin text-pl-muted" />}
       </div>

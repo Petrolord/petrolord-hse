@@ -140,7 +140,7 @@ export const benefitsData = {
     heroImage: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070&auto=format&fit=crop",
     problem: {
       title: "Drowning in Data, Starving for Wisdom",
-      description: "Collecting safety data is useless if it sits in spreadsheets. Manual reporting takes days of effort, meaning you're always looking at the past instead of predicting the future.",
+      description: "Collecting safety data is useless if it sits in spreadsheets. Manual reporting takes days of effort, meaning you're always looking at the past when you could be predicting the future.",
       stats: [
         { value: "Manual", label: "Monthly reporting" },
         { value: "Lagging", label: "Indicators only" },

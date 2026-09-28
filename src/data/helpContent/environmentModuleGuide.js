@@ -11,18 +11,18 @@ export const environmentModuleGuide = {
       title: 'Overview',
       description: 'What the Environment module does and how it is organised.',
       content: [
-        { type: 'paragraph', text: 'The Environment module is your single place to manage environmental compliance — regulatory permits, monitoring data, emissions, waste, spill incidents, asset decommissioning, and the reports regulators ask for.' },
+        { type: 'paragraph', text: 'The Environment module is your single place to manage environmental compliance: regulatory permits, monitoring data, emissions, waste, spill incidents, asset decommissioning, and the reports regulators ask for.' },
         { type: 'paragraph', text: 'It opens on the Dashboard and is organised into tabs across the top. All data is scoped to your organization.' },
         { type: 'list', items: [
-          'Dashboard — compliance health score, key counts, and Quick Actions',
-          'Obligations & Permits — your permit register',
-          'Studies & EMP — environmental studies and Environmental Management Plan actions',
-          'Monitoring — environmental sample results vs. regulatory limits',
-          'Emissions & Flaring — flaring/emissions logs',
-          'Waste & Chemicals — waste manifests',
-          'Spills — spill incident register',
-          'Decommissioning — facility closure / lifecycle status',
-          'Reporting — export-ready compliance packs',
+          'Dashboard: compliance health score, key counts, and Quick Actions',
+          'Obligations & Permits: your permit register',
+          'Studies & EMP: environmental studies and Environmental Management Plan actions',
+          'Monitoring: environmental sample results vs. regulatory limits',
+          'Emissions & Flaring: flaring/emissions logs',
+          'Waste & Chemicals: waste manifests',
+          'Spills: spill incident register',
+          'Decommissioning: facility closure / lifecycle status',
+          'Reporting: export-ready compliance packs',
         ]},
       ],
     },
@@ -31,7 +31,7 @@ export const environmentModuleGuide = {
       title: 'Dashboard',
       description: 'Compliance health at a glance, plus one-click Quick Actions.',
       content: [
-        { type: 'paragraph', text: 'The Dashboard shows a Compliance Health score (calculated from valid permits and on-track EMP actions, minus open spills) and KPI tiles: permits due within 90 days, overdue actions, spills, flaring volume and waste generated. When there is no data yet, values show "--" rather than a fabricated number.' },
+        { type: 'paragraph', text: 'The Dashboard shows a Compliance Health score (calculated from valid permits and on-track EMP actions, minus open spills) and KPI tiles: permits due within 90 days, overdue actions, spills, flaring volume and waste generated. When there is no data yet, values show "--". The module does not fabricate a number.' },
         { type: 'paragraph', text: 'The Quick Actions panel lets you jump straight into the most common tasks:' },
         { type: 'step-list', items: [
           { title: 'Log New Spill', description: 'Switches to the Spills tab and opens the spill form so you can record an incident immediately.' },
@@ -116,7 +116,7 @@ export const environmentModuleGuide = {
       title: 'Decommissioning',
       description: 'Facility closure and lifecycle status.',
       content: [
-        { type: 'paragraph', text: 'The Decommissioning tab summarises your facilities by lifecycle status — Operating, Decommissioning, and Decommissioned — with a count of each and a table of facilities (name, type, location and status) so you can track closure planning.' },
+        { type: 'paragraph', text: 'The Decommissioning tab summarises your facilities by lifecycle status (Operating, Decommissioning, and Decommissioned) with a count of each and a table of facilities (name, type, location and status) so you can track closure planning.' },
       ],
     },
     {
@@ -126,11 +126,11 @@ export const environmentModuleGuide = {
       content: [
         { type: 'paragraph', text: 'The Reporting tab is an export centre. Each card shows how many records exist and exports that register to CSV.' },
         { type: 'list', items: [
-          'NUPRC Monthly Pack — this calendar month\'s monitoring results',
-          'Annual Environmental Report — a consolidated year-to-date view of spills, waste and monitoring',
-          'Per-register exports — Permits, Monitoring, Spills, Waste and Studies',
+          'NUPRC Monthly Pack: this calendar month\'s monitoring results',
+          'Annual Environmental Report: a consolidated year-to-date view of spills, waste and monitoring',
+          'Per-register exports: Permits, Monitoring, Spills, Waste and Studies',
         ]},
-        { type: 'alert', variant: 'info', title: 'Empty exports', text: 'If a register has no records yet, the export button tells you there is nothing to export rather than producing an empty file.' },
+        { type: 'alert', variant: 'info', title: 'Empty exports', text: 'If a register has no records yet, the export button tells you there is nothing to export. It does not produce an empty file.' },
       ],
     },
   ],

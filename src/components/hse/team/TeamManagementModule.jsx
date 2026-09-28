@@ -2,8 +2,10 @@ import React from 'react';
 import InviteTeamMember from './InviteTeamMember';
 import OrganizationMembers from '@/components/organization/OrganizationMembers';
 import { Users } from 'lucide-react';
+import { useHSE } from '@/context/HSEContext';
 
 export default function TeamManagementModule() {
+  const { currentOrganization } = useHSE();
   return (
     <div className="space-y-6 p-4 sm:p-6">
       <div className="flex items-center justify-between">
@@ -21,8 +23,9 @@ export default function TeamManagementModule() {
         
         {/* OrganizationMembers draws its own "Team Members" card; the
             outer "Active Members" card around it is gone, so the page no
-            longer shows a card inside a card. */}
-        <OrganizationMembers />
+            longer shows a card inside a card. It needs the organisation to
+            load the members (batch 4B). */}
+        <OrganizationMembers organization={currentOrganization} />
       </div>
     </div>
   );

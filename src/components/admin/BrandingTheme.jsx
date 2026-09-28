@@ -45,7 +45,10 @@ const DEFAULT_CONFIG = {
 
 export default function BrandingTheme() {
   const { currentOrganization, currentUser } = useHSE();
-  const { updateOrgSettings } = useTheme();
+  // GlobalThemeContext never had updateOrgSettings, so calling it threw after
+  // a successful write and the save reported failure (batch 4B). After the
+  // same write, re-read the branding row through refreshTheme.
+  const { refreshTheme } = useTheme() || {};
   const { toast } = useToast();
   
   const [loading, setLoading] = useState(false);
@@ -98,7 +101,7 @@ export default function BrandingTheme() {
     setSaving(true);
     try {
       await settingsService.upsertOrgSettings(currentOrganization.id, settings, currentUser.id);
-      updateOrgSettings(settings); // Update context
+      if (typeof refreshTheme === 'function') refreshTheme();
       toast({ 
         title: "Settings Saved", 
         description: "Branding updated successfully.",

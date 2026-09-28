@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
 import { Brain, TrendingUp, AlertTriangle, Activity, ShieldCheck, BarChart3, LayoutGrid, RotateCw, Sparkles } from 'lucide-react';
-import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid, Legend } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid, Legend } from 'recharts';
+import ChartFrame from '@/components/charts/ChartFrame';
 import RecommendationDashboard from './RecommendationDashboard';
 import AdvancedDashboard from './AdvancedDashboard';
 import ContinuousLearningDashboard from './ContinuousLearningDashboard';
@@ -202,8 +203,7 @@ export default function PredictiveInsightsDashboard({ isEmbedded = false }) {
               title="Incident and Near Miss Trends"
               subtitle="Historical data pattern analysis"
             >
-              <div className="h-[300px]">
-                <ResponsiveContainer width="100%" height="100%">
+              <ChartFrame height={300}>
                   <AreaChart data={trends}>
                     <defs>
                       <linearGradient id="colorIncidents" x1="0" y1="0" x2="0" y2="1">
@@ -227,8 +227,7 @@ export default function PredictiveInsightsDashboard({ isEmbedded = false }) {
                     <Area type="monotone" dataKey="incidents" stroke={INCIDENT_COLOR} strokeWidth={2} fillOpacity={1} fill="url(#colorIncidents)" name="Incidents" />
                     <Area type="monotone" dataKey="nearmisses" stroke={NEAR_MISS_COLOR} strokeWidth={2} fillOpacity={1} fill="url(#colorNM)" name="Near Misses" />
                   </AreaChart>
-                </ResponsiveContainer>
-              </div>
+              </ChartFrame>
             </ChartPanel>
 
             <Card>

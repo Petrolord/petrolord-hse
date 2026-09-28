@@ -4,8 +4,9 @@ import { ChartPanel } from "@/components/ui/chart-panel";
 import { Users, Activity, Syringe, AlertOctagon } from 'lucide-react';
 import {
   PieChart, Pie, Cell, LineChart, Line, XAxis, YAxis, CartesianGrid,
-  Tooltip, ResponsiveContainer, Legend,
+  Tooltip, Legend,
 } from 'recharts';
+import ChartFrame from '@/components/charts/ChartFrame';
 import { healthService } from '@/services/healthService';
 import { useHSE } from '@/context/HSEContext';
 import { AXIS_PROPS, CHART_COLORS, CHART_SERIES, GRID_STYLE, LEGEND_PROPS, TOOLTIP_STYLE } from '@/utils/chartTheme';
@@ -40,9 +41,9 @@ export default function HealthDashboard() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <ChartPanel title="Health Status Distribution" bodyClassName="h-64">
+        <ChartPanel title="Health Status Distribution">
           {charts.statusDistribution.length > 0 ? (
-            <ResponsiveContainer width="100%" height="100%">
+            <ChartFrame height={256}>
               <PieChart>
                 <Pie
                   data={charts.statusDistribution}
@@ -61,14 +62,14 @@ export default function HealthDashboard() {
                 <Tooltip contentStyle={TOOLTIP_STYLE} />
                 <Legend {...LEGEND_PROPS} formatter={legendText} />
               </PieChart>
-            </ResponsiveContainer>
+            </ChartFrame>
           ) : (
-            <div className="h-full flex items-center justify-center text-pl-muted text-sm">No health records yet.</div>
+            <div className="h-64 flex items-center justify-center text-pl-muted text-sm">No health records yet.</div>
           )}
         </ChartPanel>
-        <ChartPanel title="Exposure Levels Trend" bodyClassName="h-64">
+        <ChartPanel title="Exposure Levels Trend">
           {hasExposureData ? (
-            <ResponsiveContainer width="100%" height="100%">
+            <ChartFrame height={256}>
               <LineChart data={charts.exposureTrend} margin={{ top: 8, right: 16, left: -16, bottom: 0 }}>
                 <CartesianGrid {...GRID_STYLE} />
                 <XAxis dataKey="month" {...AXIS_PROPS} />
@@ -76,9 +77,9 @@ export default function HealthDashboard() {
                 <Tooltip contentStyle={TOOLTIP_STYLE} />
                 <Line type="monotone" dataKey="exposures" name="Exposure records" stroke={CHART_SERIES[0]} strokeWidth={2} dot={{ r: 3 }} />
               </LineChart>
-            </ResponsiveContainer>
+            </ChartFrame>
           ) : (
-            <div className="h-full flex items-center justify-center text-pl-muted text-sm">No exposure records in the last 6 months.</div>
+            <div className="h-64 flex items-center justify-center text-pl-muted text-sm">No exposure records in the last 6 months.</div>
           )}
         </ChartPanel>
       </div>

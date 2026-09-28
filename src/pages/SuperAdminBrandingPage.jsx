@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import OrganizationSelector from '@/components/admin/branding/OrganizationSelector';
 import SuperAdminBrandingCustomizer from '@/components/admin/branding/SuperAdminBrandingCustomizer';
-import SuperAdminBrandingPreview from '@/components/admin/branding/SuperAdminBrandingPreview';
 import { superAdminBrandingService } from '@/services/superAdminBrandingService';
 import { useToast } from '@/components/ui/use-toast';
 import { Button } from "@/components/ui/button";
@@ -110,8 +109,8 @@ export default function SuperAdminBrandingPage() {
   // /dashboard/super-admin/branding sits outside the signed-in layout, so it
   // opens its own design-system scope (AccountScope) with the light/dark
   // toggle in its header bar (docs/scope/DesignSystem-Rollout.md section
-  // 4.2, batch 3A). The live preview keeps the organisation's own colours
-  // (a document canvas in SuperAdminBrandingPreview).
+  // 4.2, batch 3A). Batch 4B hid the colour, typography and custom CSS
+  // controls and the colour preview: those values no longer render anywhere.
   return (
     <AccountScope testId="branding-manager-theme-scope" className="h-screen flex flex-col text-pl-text">
       {/* Header */}
@@ -151,11 +150,6 @@ export default function SuperAdminBrandingPage() {
               isLoading={isSaving}
               selectedCount={selectedIds.length}
             />
-          </div>
-
-          {/* Right Panel: Preview (Hidden on small screens or toggleable) */}
-          <div className="hidden lg:block w-[400px] border-l border-pl-border bg-pl-sunken">
-            <SuperAdminBrandingPreview settings={currentSettings} />
           </div>
         </div>
       </div>

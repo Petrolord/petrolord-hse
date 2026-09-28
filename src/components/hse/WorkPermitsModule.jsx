@@ -85,8 +85,11 @@ export default function WorkPermitsModule() {
     <div className="flex h-[calc(100vh-64px)] overflow-hidden bg-pl-bg text-pl-text flex-col">
       {/* Header */}
       <div className="flex flex-col border-b border-pl-border bg-pl-surface">
-        <div className="flex items-center justify-between gap-3 p-4">
-          <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+        {/* One row on a desktop (title, search, New Permit). Below md the
+            search wraps to a full-width row of its own (batch 4B; it used to
+            be hidden there). */}
+        <div className="flex flex-wrap items-center gap-3 p-4">
+          <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
             <div className="hidden sm:block bg-pl-sunken p-2 rounded-lg">
               <FileText className="h-6 w-6 text-pl-muted" aria-hidden="true" />
             </div>
@@ -95,23 +98,22 @@ export default function WorkPermitsModule() {
               <p className="text-xs text-pl-muted">Control and monitor high-risk activities</p>
             </div>
           </div>
-          
-          <div className="flex items-center gap-3">
-            {activeTab === 'permits' && (
-              <div className="relative w-64 hidden md:block">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-pl-muted" aria-hidden="true" />
-                <Input 
-                  placeholder="Search permits..." 
-                  className="pl-9 h-9"
-                  value={filters.search}
-                  onChange={(e) => setFilters(prev => ({...prev, search: e.target.value}))}
-                />
-              </div>
-            )}
-            <Button className="shrink-0" onClick={() => setIsCreateOpen(true)}>
-              <Plus className="mr-2 h-4 w-4" aria-hidden="true" /> New Permit
-            </Button>
-          </div>
+
+          {activeTab === 'permits' && (
+            <div className="relative order-last w-full md:order-none md:w-64" data-testid="permits-search">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-pl-muted" aria-hidden="true" />
+              <Input 
+                placeholder="Search permits..." 
+                aria-label="Search permits"
+                className="pl-9 h-9"
+                value={filters.search}
+                onChange={(e) => setFilters(prev => ({...prev, search: e.target.value}))}
+              />
+            </div>
+          )}
+          <Button className="shrink-0" onClick={() => setIsCreateOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" aria-hidden="true" /> New Permit
+          </Button>
         </div>
 
         <div className="px-4 pb-0 overflow-x-auto">

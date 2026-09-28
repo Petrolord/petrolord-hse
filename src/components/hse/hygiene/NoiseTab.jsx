@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react';
 import {
-  ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
 } from 'recharts';
+import ChartFrame from '@/components/charts/ChartFrame';
 import { noiseInputs, noiseRowFromForm, blankNoiseForm } from '@/lib/hygiene/forms';
 import {
   evaluateNoise, isRefusal, PROTECTOR_METHODS, PROTECTOR_TYPES, EU_NOISE_VALUES, NOISE_CRITERIA,
@@ -212,7 +213,7 @@ export default function NoiseTab({ orgId, form, setForm, sites, canSave, saveBlo
 
             {chartData.length > 0 && (
               <ChartCard title="Dose contribution by period" subtitle="Percent of each criterion's 100% dose that each period adds. A period below a criterion's threshold adds nothing.">
-                <ResponsiveContainer width="100%" height={260}>
+                <ChartFrame height={260}>
                   <BarChart data={chartData} margin={{ top: 8, right: 16, bottom: 8, left: 0 }} barGap={2}>
                     <CartesianGrid stroke={CHART.grid} vertical={false} />
                     <XAxis dataKey="name" tick={{ fill: CHART.textSecondary, fontSize: 11 }} axisLine={{ stroke: CHART.grid }} tickLine={false} />
@@ -227,7 +228,7 @@ export default function NoiseTab({ orgId, form, setForm, sites, canSave, saveBlo
                       <Bar key={id} dataKey={id} fill={SERIES[i]} radius={[4, 4, 0, 0]} maxBarSize={28} />
                     ))}
                   </BarChart>
-                </ResponsiveContainer>
+                </ChartFrame>
               </ChartCard>
             )}
           </>

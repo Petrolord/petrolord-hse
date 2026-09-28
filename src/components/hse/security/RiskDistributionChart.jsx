@@ -1,5 +1,6 @@
 import React from 'react';
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
+import ChartFrame from '@/components/charts/ChartFrame';
 import { CHART_COLORS, CHART_SERIES, LEGEND_PROPS, TOOLTIP_STYLE } from '@/utils/chartTheme';
 
 // Design family (batch 2B): the Suite chart standard on a white ChartPanel.
@@ -17,8 +18,7 @@ const legendText = (value) => <span style={{ color: CHART_COLORS.legendText }}>{
 
 export default function RiskDistributionChart({ data }) {
   return (
-    <div className="h-[300px] w-full">
-      <ResponsiveContainer width="100%" height="100%">
+    <ChartFrame height={300}>
         <PieChart>
           <Pie
             data={data}
@@ -36,7 +36,6 @@ export default function RiskDistributionChart({ data }) {
           <Tooltip contentStyle={TOOLTIP_STYLE} />
           <Legend {...LEGEND_PROPS} formatter={legendText} />
         </PieChart>
-      </ResponsiveContainer>
-    </div>
+    </ChartFrame>
   );
 }

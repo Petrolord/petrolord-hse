@@ -40,9 +40,9 @@ export const teamManagementGuide = {
         { type: 'paragraph', text: 'Every member has a role. The role determines how much of the app a person can access, so assign the lowest level that still lets someone do their job.' },
         { type: 'paragraph', text: 'When inviting a new member, you can choose from these roles:' },
         { type: 'list', items: [
-          'Member — standard access for everyday users.',
-          'Admin — elevated access for managing the organization and its settings.',
-          'Supervisor — oversight access for people who manage teams or work areas.'
+          'Member: standard access for everyday users.',
+          'Admin: elevated access for managing the organization and its settings.',
+          'Supervisor: oversight access for people who manage teams or work areas.'
         ]},
         { type: 'alert', variant: 'info', title: 'Roles control which modules a user can see', text: 'A member\'s role decides which modules and features appear for them in the app. Changing a member\'s role changes what they can access.' },
         { type: 'paragraph', text: 'In the Active Members list, each person\'s role is shown as a coloured badge so you can tell at a glance who has elevated access. You can change a member\'s role at any time by editing the member.' }
@@ -63,8 +63,8 @@ export const teamManagementGuide = {
             { type: 'list', items: [
               'First Name',
               'Last Name',
-              'Team — assign the member to a team or set "No Team".',
-              'Role — change the member\'s role.'
+              'Team: assign the member to a team or set "No Team".',
+              'Role: change the member\'s role.'
             ]},
             { type: 'step-list', items: [
               { title: 'Open the member', description: 'Find the person in the Active Members list and open their Edit Member details dialog.' },

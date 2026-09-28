@@ -11,18 +11,18 @@ export const riskManagementGuide = {
       title: 'Overview',
       description: 'How the Enterprise Risk Management module is organised.',
       content: [
-        { type: 'paragraph', text: 'The Risk module follows the standard risk lifecycle — identify, assess, treat, monitor, report — across a row of tabs. All data is scoped to your organization.' },
+        { type: 'paragraph', text: 'The Risk module follows the standard risk lifecycle (identify, assess, treat, monitor, report) across a row of tabs. All data is scoped to your organization.' },
         { type: 'list', items: [
-          'Dashboard — risk counts, average score and a heat map',
-          'Risk Register — the master list of risks',
-          'Assessment — likelihood × impact scoring',
-          'Mitigation — the treatment action plan',
-          'Monitoring & Control — Key Risk Indicators (KRIs)',
-          'Reporting — summaries with CSV/print export',
-          'Analytics — charts and the exposure heat map',
-          'Appetite & Tolerance — per-category tolerance vs. live exposure',
-          'Scenario Planning — what-if financial exposure modelling',
-          'Culture & Training — risk-process maturity and training',
+          'Dashboard: risk counts, average score and a heat map',
+          'Risk Register: the master list of risks',
+          'Assessment: likelihood × impact scoring',
+          'Mitigation: the treatment action plan',
+          'Monitoring & Control: Key Risk Indicators (KRIs)',
+          'Reporting: summaries with CSV/print export',
+          'Analytics: charts and the exposure heat map',
+          'Appetite & Tolerance: per-category tolerance vs. live exposure',
+          'Scenario Planning: what-if financial exposure modelling',
+          'Culture & Training: risk-process maturity and training',
         ]},
       ],
     },
@@ -34,7 +34,7 @@ export const riskManagementGuide = {
         { type: 'paragraph', text: 'Every risk lives here with its ID, title, category, score, status and owner. Search by keyword, page through results, and export the whole register to CSV from the toolbar.' },
         { type: 'step-list', items: [
           { title: 'Click "Add Risk"', description: 'Opens the risk form.' },
-          { title: 'Describe the risk', description: 'Give it a title and category, then set Likelihood (1-5) and Impact (1-5) — the score and rating are calculated live as you choose.' },
+          { title: 'Describe the risk', description: 'Give it a title and category, then set Likelihood (1-5) and Impact (1-5). The score and rating are calculated live as you choose.' },
           { title: 'Add context', description: 'Record the root cause and potential consequences. You are set as the initial owner.' },
           { title: 'Submit', description: 'The risk joins the register. Use the row ⋯ menu to Edit or Delete it later.' },
         ]},
@@ -48,7 +48,7 @@ export const riskManagementGuide = {
       content: [
         { type: 'paragraph', text: 'Petrolord uses a standard 5×5 matrix mapping Likelihood against Impact; the score is Likelihood × Impact (1-25) and sets the rating:' },
         { type: 'list', items: [
-          'Low (1-4): acceptable — monitor.',
+          'Low (1-4): acceptable; monitor.',
           'Medium (5-9): manage to ALARP (As Low As Reasonably Practicable).',
           'High (10-14): requires a mitigation plan.',
           'Critical (15-25): urgent treatment required.',
@@ -64,7 +64,7 @@ export const riskManagementGuide = {
         { type: 'paragraph', text: 'The Mitigation tab consolidates the treatment actions for every risk, with KPI tiles for total / in-progress / completed / overdue actions. Each action shows its parent risk, strategy, due date and a progress bar.' },
         { type: 'step-list', items: [
           { title: 'Click "Add Action"', description: 'Pick the risk it treats.' },
-          { title: 'Define the action', description: 'Describe what will be done and choose a strategy — Avoid, Reduce, Transfer or Accept — plus due date, progress and budget.' },
+          { title: 'Define the action', description: 'Describe what will be done and choose a strategy (Avoid, Reduce, Transfer or Accept), plus due date, progress and budget.' },
           { title: 'Track to completion', description: 'Update status inline from the table (marking it Completed sets progress to 100%); edit or delete via the row ⋯ menu.' },
         ]},
       ],
@@ -90,7 +90,7 @@ export const riskManagementGuide = {
       title: 'Analytics',
       description: 'Visual analysis of your risk profile.',
       content: [
-        { type: 'paragraph', text: 'Analytics renders a 5×5 exposure heat map plus charts: severity distribution (pie) and risks by category and by status (bars) — all computed live from the register.' },
+        { type: 'paragraph', text: 'Analytics renders a 5×5 exposure heat map plus charts: severity distribution (pie) and risks by category and by status (bars), all computed live from the register.' },
       ],
     },
     {

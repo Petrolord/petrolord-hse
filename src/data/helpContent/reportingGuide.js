@@ -13,11 +13,11 @@ export const reportingGuide = {
       content: [
         { type: 'paragraph', text: 'Petrolord HSE doesn’t bury reporting in one screen. Depending on what you need, you’ll use:' },
         { type: 'list', items: [
-          'My Reports — track the reports you have submitted',
-          'Supervisor View — triage, investigate and resolve incoming reports (supervisors/managers)',
-          'Module Reporting tabs — purpose-built exports inside Environment and Risk',
-          'Export / Print buttons — on most registers and tables, for ad-hoc CSV or PDF',
-          'Analytics & the AI Safety Predictor — trends and forward-looking insight',
+          'My Reports: track the reports you have submitted',
+          'Supervisor View: triage, investigate and resolve incoming reports (supervisors/managers)',
+          'Module Reporting tabs: purpose-built exports inside Environment and Risk',
+          'Export / Print buttons: on most registers and tables, for ad-hoc CSV or PDF',
+          'Analytics & the AI Safety Predictor: trends and forward-looking insight',
         ]},
       ],
     },
@@ -52,7 +52,7 @@ export const reportingGuide = {
         { type: 'step-list', items: [
           { title: 'Open the register', description: 'e.g. the Risk Register, or an Environment register such as Permits.' },
           { title: 'Apply any filters / search', description: 'The export reflects what is currently shown where applicable.' },
-          { title: 'Click Export', description: 'A CSV downloads. If the register is empty, you’ll be told there is nothing to export rather than getting a blank file.' },
+          { title: 'Click Export', description: 'A CSV downloads. If the register is empty, you’ll be told there is nothing to export. You will not get a blank file.' },
         ]},
         { type: 'alert', variant: 'info', title: 'On-demand', text: 'Exports are generated on demand when you click. Open the relevant module to pull the latest data whenever you need it.' },
       ],
@@ -74,7 +74,7 @@ export const reportingGuide = {
       title: 'Analytics & AI Forecasts',
       description: 'From reporting to foresight.',
       content: [
-        { type: 'paragraph', text: 'For trends and prediction rather than record-keeping, use the Analytics view and the AI Safety Predictor. The predictor turns your submitted reports into a 30-day forecast of likely incidents and preventive actions — see the AI Safety Predictor & Analytics guide.' },
+        { type: 'paragraph', text: 'For trends and prediction, use the Analytics view and the AI Safety Predictor. The predictor turns your submitted reports into a 30-day forecast of likely incidents and preventive actions. See the AI Safety Predictor & Analytics guide.' },
       ],
     },
   ],

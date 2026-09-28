@@ -1,16 +1,21 @@
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Loader2, Wand2 } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Info, Loader2, Wand2 } from 'lucide-react';
 
 // Customizer Tabs
 import LogoTab from './SuperAdminLogoUpload';
-import ColorsTab from './SuperAdminColorCustomizer';
-import TypographyTab from './SuperAdminTypographyCustomizer';
 import LoginTab from './SuperAdminLoginPageCustomizer';
 import FooterTab from './SuperAdminFooterCustomizer';
-import AdvancedTab from './SuperAdminAdvancedCSSEditor';
 import BrandingTemplates from './BrandingTemplates';
+
+// Design family end state (batch 4B, as 4A did in the Settings branding
+// editor): the Petrolord family look wins over an organisation's theme,
+// colours, fonts and custom CSS, and each person picks light or dark from
+// the header toggle. Those values no longer render anywhere, so the Colors,
+// Typography and Advanced (custom CSS) tabs are hidden. The saved values are
+// untouched: Apply Changes writes back what it loaded, and no column changes.
 
 export default function SuperAdminBrandingCustomizer({ 
   settings, 
@@ -57,11 +62,8 @@ export default function SuperAdminBrandingCustomizer({
           <div className="px-4 pt-4">
             <TabsList className="w-full justify-start overflow-x-auto">
               <TabsTrigger value="logo">Logo & Brand</TabsTrigger>
-              <TabsTrigger value="colors">Colors</TabsTrigger>
-              <TabsTrigger value="typography">Typography</TabsTrigger>
               <TabsTrigger value="login">Login Page</TabsTrigger>
               <TabsTrigger value="footer">Footer</TabsTrigger>
-              <TabsTrigger value="advanced">Advanced</TabsTrigger>
             </TabsList>
           </div>
 
@@ -70,14 +72,6 @@ export default function SuperAdminBrandingCustomizer({
               <LogoTab settings={settings} onChange={handleChange} />
             </TabsContent>
             
-            <TabsContent value="colors" className="mt-0">
-              <ColorsTab settings={settings} onChange={handleChange} />
-            </TabsContent>
-
-            <TabsContent value="typography" className="mt-0">
-              <TypographyTab settings={settings} onChange={handleChange} />
-            </TabsContent>
-
             <TabsContent value="login" className="mt-0">
               <LoginTab settings={settings} onChange={handleChange} />
             </TabsContent>
@@ -86,9 +80,11 @@ export default function SuperAdminBrandingCustomizer({
               <FooterTab settings={settings} onChange={handleChange} />
             </TabsContent>
 
-            <TabsContent value="advanced" className="mt-0">
-              <AdvancedTab settings={settings} onChange={handleChange} />
-            </TabsContent>
+            <Alert variant="info">
+              <Info className="h-4 w-4" aria-hidden="true" />
+              <AlertTitle>Colors and theme</AlertTitle>
+              <AlertDescription>The workspace uses the Petrolord design family. Each person chooses light or dark from the header toggle.</AlertDescription>
+            </Alert>
           </div>
         </Tabs>
       </div>
