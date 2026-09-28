@@ -5,6 +5,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Trophy, Medal, Zap, AlertCircle, Loader2 } from 'lucide-react';
 import { gamificationService } from '@/services/gamificationService';
 
+// Design system (wave 0 pilot): dashboard only, so theme roles directly.
+// Role chips are neutral tags (a role is not a status).
 export default function TeamLeaderboard({ organizationId }) {
   const [leaderboard, setLeaderboard] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -48,50 +50,30 @@ export default function TeamLeaderboard({ organizationId }) {
   const getMedalIcon = (position) => {
     switch (position) {
       case 0:
-        return <Trophy className="w-5 h-5 text-yellow-500" />;
+        return <Trophy className="w-5 h-5 text-pl-accent-text" aria-label="First" />;
       case 1:
-        return <Medal className="w-5 h-5 text-gray-400" />;
+        return <Medal className="w-5 h-5 text-pl-muted" aria-label="Second" />;
       case 2:
-        return <Medal className="w-5 h-5 text-orange-600" />;
+        return <Medal className="w-5 h-5 text-pl-muted" aria-label="Third" />;
       default:
-        return <span className="text-gray-400 font-semibold text-sm">#{position + 1}</span>;
+        return <span className="text-pl-muted font-semibold text-sm font-pl-mono tabular-nums">#{position + 1}</span>;
     }
   };
 
-  // Get role color
-  const getRoleColor = (role) => {
-    if (!role || typeof role !== 'string') {
-      return 'bg-gray-700 text-gray-100';
-    }
-
-    const roleLower = role.toLowerCase();
-    switch (roleLower) {
-      case 'admin':
-      case 'org_admin':
-      case 'super_admin':
-        return 'bg-red-900 text-red-100';
-      case 'manager':
-        return 'bg-blue-900 text-blue-100';
-      case 'safety_officer':
-        return 'bg-purple-900 text-purple-100';
-      default:
-        return 'bg-gray-700 text-gray-100';
-    }
-  };
 
   if (loading) {
     return (
-      <Card className="bg-[#252541] border-[#3a3a5a] text-white">
+      <Card className="h-full">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Trophy className="h-5 w-5 text-[#FFC107]" /> Team Leaderboard
+            <Trophy className="h-5 w-5 text-pl-accent-text" aria-hidden="true" /> Team Leaderboard
           </CardTitle>
-          <CardDescription className="text-[#b0b0c0]">Top performers by total points</CardDescription>
+          <CardDescription>Top performers by total points</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-center justify-center py-8">
-            <Loader2 className="h-8 w-8 animate-spin text-[#FFC107] mb-4" />
-            <p className="text-[#b0b0c0]">Loading leaderboard...</p>
+            <Loader2 className="h-8 w-8 animate-spin text-pl-primary-text mb-4" aria-hidden="true" />
+            <p className="text-pl-muted">Loading leaderboard...</p>
           </div>
         </CardContent>
       </Card>
@@ -100,16 +82,16 @@ export default function TeamLeaderboard({ organizationId }) {
 
   if (error) {
     return (
-      <Card className="bg-[#252541] border-red-700 text-white">
+      <Card className="h-full border-pl-danger/40">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <AlertCircle className="h-5 w-5 text-red-500" /> Leaderboard Error
+            <AlertCircle className="h-5 w-5 text-pl-danger-text" aria-hidden="true" /> Leaderboard Error
           </CardTitle>
-          <CardDescription className="text-red-300">Could not load leaderboard data.</CardDescription>
+          <CardDescription className="text-pl-danger-text">Could not load leaderboard data.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-center justify-center py-8">
-            <p className="text-red-400 text-sm">{error}</p>
+            <p className="text-pl-danger-text text-sm">{error}</p>
           </div>
         </CardContent>
       </Card>
@@ -118,17 +100,17 @@ export default function TeamLeaderboard({ organizationId }) {
 
   if (!leaderboard || leaderboard.length === 0) {
     return (
-      <Card className="bg-[#252541] border-[#3a3a5a] text-white">
+      <Card className="h-full">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Trophy className="h-5 w-5 text-[#FFC107]" /> Team Leaderboard
+            <Trophy className="h-5 w-5 text-pl-accent-text" aria-hidden="true" /> Team Leaderboard
           </CardTitle>
-          <CardDescription className="text-[#b0b0c0]">Top performers by total points</CardDescription>
+          <CardDescription>Top performers by total points</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-center justify-center py-8">
-            <Medal className="h-12 w-12 text-[#7a7a9a] mb-4" />
-            <p className="text-[#b0b0c0] text-sm">No leaderboard data available. Be the first to score!</p>
+            <Medal className="h-12 w-12 text-pl-muted mb-4" aria-hidden="true" />
+            <p className="text-pl-muted text-sm">No leaderboard data available. Be the first to score!</p>
           </div>
         </CardContent>
       </Card>
@@ -136,37 +118,37 @@ export default function TeamLeaderboard({ organizationId }) {
   }
 
   return (
-    <Card className="bg-[#252541] border-[#3a3a5a] rounded-xl p-0 shadow-lg overflow-hidden flex flex-col h-full">
-      <CardHeader className="p-5 border-b border-[#3a3a5a]">
-        <CardTitle className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-          <Trophy className="h-4 w-4 text-[#FFC107]" /> Team Leaderboard
+    <Card className="rounded-xl p-0 overflow-hidden flex flex-col h-full">
+      <CardHeader className="p-5 border-b border-pl-border">
+        <CardTitle className="text-sm font-semibold uppercase tracking-wider flex items-center gap-2">
+          <Trophy className="h-4 w-4 text-pl-accent-text" aria-hidden="true" /> Team Leaderboard
         </CardTitle>
-        <CardDescription className="text-[#b0b0c0]">Top performers based on safety contributions.</CardDescription>
+        <CardDescription>Top performers based on safety contributions.</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 overflow-y-auto p-0">
         {leaderboard.map((member, index) => (
           <div
             key={member.id || member.user_id || index}
-            className="flex items-center justify-between px-5 py-3 border-b border-[#3a3a5a] last:border-0 hover:bg-[#2a2a4a] transition-colors"
+            className="flex items-center justify-between px-5 py-3 border-b border-pl-border last:border-0 hover:bg-pl-sunken/60 transition-colors"
           >
             {/* Position & Avatar */}
             <div className="flex items-center gap-4">
               <div className="flex items-center justify-center w-8 text-sm">
                 {getMedalIcon(index)}
               </div>
-              <Avatar className="h-8 w-8 border border-[#3a3a5a]">
+              <Avatar className="h-8 w-8 border border-pl-border">
                 <AvatarImage src={member.avatar || ''} />
-                <AvatarFallback className="text-xs bg-[#1a1a2e] text-white">
+                <AvatarFallback className="text-xs">
                   {member.name ? member.name.charAt(0).toUpperCase() : 'U'}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-white truncate">
+                <p className="text-sm font-medium text-pl-text truncate">
                   {member.name || 'Unknown User'}
                 </p>
                 <div className="flex gap-2">
                   {member.role && (
-                    <Badge className={`${getRoleColor(member.role)} mt-1`}>
+                    <Badge variant="neutral" className="mt-1">
                       {capitalize(member.role)}
                     </Badge>
                   )}
@@ -176,12 +158,12 @@ export default function TeamLeaderboard({ organizationId }) {
 
             {/* Points & Streak */}
             <div className="text-right">
-              <p className="font-bold text-base text-[#FFC107]">
+              <p className="font-semibold text-base text-pl-text font-pl-mono tabular-nums">
                 {member.total_points ? member.total_points.toLocaleString() : 0} pts
               </p>
               {member.current_streak > 0 && (
-                <p className="text-xs text-orange-400 flex items-center gap-1 justify-end">
-                  <Zap className="h-3 w-3" />
+                <p className="text-xs text-pl-accent-text flex items-center gap-1 justify-end">
+                  <Zap className="h-3 w-3" aria-hidden="true" />
                   {member.current_streak} day streak
                 </p>
               )}
@@ -190,9 +172,9 @@ export default function TeamLeaderboard({ organizationId }) {
         ))}
 
         {/* Footer */}
-        <div className="mt-4 p-5 border-t border-[#3a3a5a]">
-          <p className="text-xs text-[#7a7a9a] text-center">
-            Updated daily • Points reset monthly
+        <div className="mt-4 p-5 border-t border-pl-border">
+          <p className="text-xs text-pl-muted text-center">
+            Updated daily. Points reset monthly.
           </p>
         </div>
       </CardContent>

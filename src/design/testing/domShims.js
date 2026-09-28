@@ -7,15 +7,15 @@ import { MotionGlobalConfig } from 'framer-motion';
 
 export function installDomShims() {
   MotionGlobalConfig.skipAnimations = true;
-  if (!global.ResizeObserver) {
-    global.ResizeObserver = class { observe() {} unobserve() {} disconnect() {} };
+  if (!globalThis.ResizeObserver) {
+    globalThis.ResizeObserver = class { observe() {} unobserve() {} disconnect() {} };
   }
-  if (!global.DOMRect) {
-    global.DOMRect = class {
+  if (!globalThis.DOMRect) {
+    globalThis.DOMRect = class {
       constructor(x = 0, y = 0, w = 0, h = 0) {
         Object.assign(this, { x, y, width: w, height: h, top: y, left: x, right: x + w, bottom: y + h });
       }
-      static fromRect(r = {}) { return new global.DOMRect(r.x, r.y, r.width, r.height); }
+      static fromRect(r = {}) { return new globalThis.DOMRect(r.x, r.y, r.width, r.height); }
     };
   }
   if (!window.matchMedia) {

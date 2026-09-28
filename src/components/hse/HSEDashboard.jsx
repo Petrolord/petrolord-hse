@@ -27,6 +27,9 @@ import { contractorService } from '../../services/contractorService';
 import { auditService } from '../../services/auditService';
 import { trainingService } from '../../services/trainingService';
 
+// Design system (wave 0 pilot): the HSE dashboard renders inside the
+// signed-in scope (src/design/rollout/w0.js), so it uses the theme roles
+// directly. KPI icons are neutral; colour is kept for status.
 export default function HSEDashboard() {
   const { setActiveModule, currentOrganization } = useHSE();
 
@@ -77,7 +80,7 @@ export default function HSEDashboard() {
   };
 
   return (
-    <div className="h-[calc(100vh-64px)] overflow-y-auto bg-[var(--bg-app)] p-6 pb-24">
+    <div className="h-[calc(100vh-64px)] overflow-y-auto bg-pl-bg text-pl-text p-4 sm:p-6 pb-24">
       {/* Setup checklist for org admins until setup_completed is persisted */}
       <LaunchChecklist />
 
@@ -87,24 +90,25 @@ export default function HSEDashboard() {
         <>
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-                <Brain className="h-6 w-6 text-[#8b5cf6]" />
+              <h2 className="font-pl-display text-2xl sm:text-3xl font-semibold text-pl-text flex items-center gap-2">
+                <Brain className="h-6 w-6 text-pl-primary-text" aria-hidden="true" />
                 AI Safety Predictor
               </h2>
               <Button 
                 onClick={handleGoToAI}
-                className="bg-[#8b5cf6] hover:bg-[#7c3aed] text-white flex items-center gap-2"
+                variant="outline"
+                className="flex items-center gap-2"
               >
-                Full AI Dashboard <ArrowRight className="h-4 w-4" />
+                Full AI Dashboard <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Button>
             </div>
             
-            <div className="w-full bg-[#131320] border-2 border-[#8b5cf6] rounded-xl p-1 min-h-[400px]">
+            <div className="w-full rounded-xl border border-pl-border bg-pl-sunken/40 p-3 sm:p-4 min-h-[400px]">
               <PredictiveInsightsDashboard isEmbedded={true} />
             </div>
           </div>
 
-          <div className="my-8 h-px bg-[#3a3a5a]" />
+          <div className="my-8 h-px bg-pl-border" />
         </>
       )}
 
@@ -122,14 +126,14 @@ export default function HSEDashboard() {
         
         {/* KPI Cards — every pillar, each backed by a real aggregation */}
         <div className="md:col-span-8 grid grid-cols-2 md:grid-cols-4 gap-4">
-           <KpiCard title="Health Score"       value={fmtPct(metrics?.healthScore)}      color="text-green-500"  icon={Activity}       loading={dataLoading} />
-           <KpiCard title="Security Incidents"  value={fmtNum(metrics?.securityCount)}    color="text-red-500"    icon={Shield}         loading={dataLoading} />
-           <KpiCard title="Env Score"           value={fmtPct(metrics?.envScore)}         color="text-blue-500"   icon={Droplet}        loading={dataLoading} />
-           <KpiCard title="Permits Active"      value={fmtNum(metrics?.permitsActive)}    color="text-orange-500" icon={FileText}       loading={dataLoading} />
-           <KpiCard title="Critical Risks"      value={fmtNum(metrics?.criticalRisks)}    color="text-yellow-500" icon={AlertTriangle}  loading={dataLoading} />
-           <KpiCard title="Active Contractors"  value={fmtNum(metrics?.activeContractors)} color="text-cyan-500"  icon={Users}          loading={dataLoading} />
-           <KpiCard title="Open Findings"       value={fmtNum(metrics?.openFindings)}     color="text-purple-500" icon={ClipboardCheck} loading={dataLoading} />
-           <KpiCard title="Training Records"    value={fmtNum(metrics?.trainingRecords)}  color="text-pink-500"   icon={GraduationCap}  loading={dataLoading} />
+           <KpiCard title="Health Score"       value={fmtPct(metrics?.healthScore)}       icon={Activity}       loading={dataLoading} />
+           <KpiCard title="Security Incidents"  value={fmtNum(metrics?.securityCount)}     icon={Shield}         loading={dataLoading} />
+           <KpiCard title="Env Score"           value={fmtPct(metrics?.envScore)}          icon={Droplet}        loading={dataLoading} />
+           <KpiCard title="Permits Active"      value={fmtNum(metrics?.permitsActive)}     icon={FileText}       loading={dataLoading} />
+           <KpiCard title="Critical Risks"      value={fmtNum(metrics?.criticalRisks)}     icon={AlertTriangle}  loading={dataLoading} />
+           <KpiCard title="Active Contractors"  value={fmtNum(metrics?.activeContractors)} icon={Users}          loading={dataLoading} />
+           <KpiCard title="Open Findings"       value={fmtNum(metrics?.openFindings)}      icon={ClipboardCheck} loading={dataLoading} />
+           <KpiCard title="Training Records"    value={fmtNum(metrics?.trainingRecords)}   icon={GraduationCap}  loading={dataLoading} />
         </div>
       </div>
 
@@ -151,17 +155,18 @@ export default function HSEDashboard() {
 const fmtNum = (v) => (v == null ? '--' : v);
 const fmtPct = (v) => (v == null ? '--' : `${v}%`);
 
-function KpiCard({ title, value, color, icon: Icon, loading }) {
+// A KPI tile on the roles: label, mono value and a neutral icon.
+function KpiCard({ title, value, icon: Icon, loading }) {
   return (
-    <div className="bg-[#252541] border-[#3a3a5a] p-4 rounded-xl flex items-center justify-between shadow-sm">
-      <div>
-        <p className="text-[#7a7a9a] text-xs font-bold uppercase">{title}</p>
-        <p className={`text-2xl font-bold text-white mt-1 ${loading ? 'opacity-50' : ''}`}>
+    <div className="rounded-xl border border-pl-border bg-pl-surface p-4 flex items-center justify-between gap-2 shadow-pl-sm" aria-busy={loading || undefined}>
+      <div className="min-w-0">
+        <p className="text-pl-muted text-xs font-semibold uppercase">{title}</p>
+        <p className={`font-pl-mono tabular-nums text-2xl font-semibold text-pl-text mt-1 ${loading ? 'opacity-50' : ''}`}>
           {loading ? '...' : value}
         </p>
       </div>
-      <div className={`p-3 rounded-full bg-[#1a1a2e] ${color}`}>
-        <Icon className="h-6 w-6" />
+      <div className="hidden sm:block shrink-0 p-3 rounded-full bg-pl-sunken text-pl-muted">
+        <Icon className="h-6 w-6" aria-hidden="true" />
       </div>
     </div>
   );

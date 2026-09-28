@@ -17,18 +17,18 @@ import { orgAdminService } from '@/services/orgAdminService';
 const Step = ({ done, title, description, actionLabel, onAction }) => (
   <div className="flex items-start gap-3 py-3">
     {done ? (
-      <CheckCircle2 className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+      <CheckCircle2 className="w-5 h-5 text-pl-success-text flex-shrink-0 mt-0.5" aria-label="Done" />
     ) : (
-      <Circle className="w-5 h-5 text-slate-600 flex-shrink-0 mt-0.5" />
+      <Circle className="w-5 h-5 text-pl-border-strong flex-shrink-0 mt-0.5" aria-label="To do" />
     )}
     <div className="flex-1 min-w-0">
-      <div className={`text-sm font-medium ${done ? 'text-slate-400 line-through' : 'text-white'}`}>{title}</div>
-      {!done && <div className="text-xs text-slate-400 mt-0.5">{description}</div>}
+      <div className={`text-sm font-medium ${done ? 'text-pl-muted line-through' : 'text-pl-text'}`}>{title}</div>
+      {!done && <div className="text-xs text-pl-muted mt-0.5">{description}</div>}
     </div>
     {!done && (
       <button
         onClick={onAction}
-        className="flex items-center gap-1 text-xs font-semibold text-blue-400 hover:text-blue-300 flex-shrink-0 mt-0.5"
+        className="flex items-center gap-1 rounded-sm text-xs font-semibold text-pl-primary-text hover:text-pl-primary-text-hover flex-shrink-0 mt-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pl-focus"
       >
         {actionLabel} <ChevronRight className="w-3 h-3" />
       </button>
@@ -82,16 +82,16 @@ export default function LaunchChecklist() {
   const goTo = (id, label) => setActiveModule({ id, label });
 
   return (
-    <div className="bg-[#1f1f35] border border-blue-500/30 rounded-xl p-5 mb-6">
+    <div className="rounded-xl border border-pl-border bg-pl-surface p-5 mb-6 shadow-pl-sm">
       <div className="flex items-center gap-2 mb-1">
-        <Rocket className="w-5 h-5 text-blue-400" />
-        <h3 className="font-bold text-white">Get your organization up and running</h3>
+        <Rocket className="w-5 h-5 text-pl-primary-text" aria-hidden="true" />
+        <h3 className="font-semibold text-pl-text">Get your organization up and running</h3>
       </div>
-      <p className="text-xs text-slate-400 mb-2">
+      <p className="text-xs text-pl-muted mb-2">
         Complete these steps so reports are organized from day one.
       </p>
 
-      <div className="divide-y divide-[#2d2d4a]">
+      <div className="divide-y divide-pl-border">
         <Step
           done={status.siteCount > 0}
           title="Add your first site"
@@ -122,11 +122,11 @@ export default function LaunchChecklist() {
         />
       </div>
 
-      <div className="mt-3 pt-3 border-t border-[#2d2d4a] flex items-center gap-2 text-xs text-slate-400">
-        <QrCode className="w-4 h-4 text-yellow-400 flex-shrink-0" />
+      <div className="mt-3 pt-3 border-t border-pl-border flex items-center gap-2 text-xs text-pl-muted">
+        <QrCode className="w-4 h-4 text-pl-accent-text flex-shrink-0" aria-hidden="true" />
         <span>
           Tip: open a site in{' '}
-          <button onClick={() => goTo('admin-sites', 'Sites')} className="text-blue-400 hover:text-blue-300 font-semibold">
+          <button onClick={() => goTo('admin-sites', 'Sites')} className="rounded-sm text-pl-primary-text hover:text-pl-primary-text-hover font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pl-focus">
             Sites
           </button>{' '}
           and print its QR poster so anyone on location can report without logging in.

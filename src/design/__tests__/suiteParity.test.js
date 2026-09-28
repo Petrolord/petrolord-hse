@@ -8,8 +8,10 @@
  * test then says which values moved. The only allowed difference is the
  * documented alias rename (HSE_ALIAS_RENAMES).
  */
-import * as hse from '@/design/tokens';
+import * as tokens from '@/design/tokens';
 import suite from './suiteTokens.json';
+
+const hse = { ...tokens };
 
 const VALUE_EXPORTS = [
   'BRAND', 'THEMES', 'CHART_SURFACE', 'FONTS', 'TYPE_SCALE', 'SPACING', 'RADII',
