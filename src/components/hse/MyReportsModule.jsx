@@ -66,7 +66,7 @@ export default function MyReportsModule() {
             />
           </div>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-[140px] h-9" aria-label="Filter by status">
+            <SelectTrigger className="w-[168px] h-9" aria-label="Filter by status">
               <Filter className="w-3 h-3 mr-2" />
               <SelectValue placeholder="Filter Status" />
             </SelectTrigger>

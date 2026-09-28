@@ -521,7 +521,7 @@ export const CaptureStep = ({ onNext, error }) => {
           <div className="p-4">
             {!audioBlob ? (
               <div className="flex flex-col gap-4">
-                <div className="flex items-center justify-between">
+                <div className={tc('flex items-center justify-between', 'flex flex-wrap items-center justify-between gap-3')}>
                   <div className="flex items-center gap-4">
                     <div className={tc(`
                       h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0 transition-all
@@ -589,7 +589,7 @@ export const CaptureStep = ({ onNext, error }) => {
             ) : (
               // State: Recorded - Show Player
               <div className="flex flex-col gap-3">
-                <div className="flex items-center justify-between">
+                <div className={tc('flex items-center justify-between', 'flex flex-wrap items-center justify-between gap-3')}>
                   <div className="flex items-center gap-3">
                     <div className={tc('h-8 w-8 bg-emerald-500/20 rounded-full flex items-center justify-center', 'h-8 w-8 bg-pl-surface rounded-full flex items-center justify-center')}>
                       <CheckCircle2 className={tc('h-4 w-4 text-emerald-500', 'h-4 w-4 text-pl-success-text')} />

@@ -147,10 +147,10 @@ export default function QuickReport({ isOpen, onClose }) {
               ⚡ Quick Report
             </h1>
             )}
-            <p className={tc('text-black/80 text-xs font-medium', 'text-pl-muted text-xs font-medium mt-1')}>
+            <p className={tc('text-black/80 text-xs font-medium', 'text-pl-muted text-xs font-medium mt-1 flex flex-wrap items-center gap-x-2 gap-y-1')}>
               AI-Powered Safety Assistant
               {aiUsage && (
-                <span className={tc('ml-2 inline-block bg-black/10 rounded-full px-2 py-0.5', 'ml-2 inline-block bg-pl-sunken border border-pl-border rounded-full px-2 py-0.5 font-pl-mono tabular-nums')}>
+                <span className={tc('ml-2 inline-block bg-black/10 rounded-full px-2 py-0.5', 'inline-block bg-pl-sunken border border-pl-border rounded-full px-2 py-0.5 font-pl-mono tabular-nums')}>
                   AI analyses this month: {aiUsage.used}/{aiUsage.quota}
                 </span>
               )}

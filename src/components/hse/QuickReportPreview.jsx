@@ -163,8 +163,8 @@ export default function QuickReportPreview({ reportData, onEdit, onSubmit, onCan
     <div className="space-y-6">
       {/* Header */}
       <div className={tc('flex items-start justify-between border-b pb-6', 'flex flex-wrap items-start justify-between gap-4 border-b border-pl-border pb-6')}>
-        <div className="flex items-center gap-4">
-          <img src={PETROLORD_BRANDING.logoUrl} alt="Petrolord" className="h-12 w-auto" />
+        <div className={tc('flex items-center gap-4', 'flex flex-wrap items-center gap-x-4 gap-y-2 min-w-0')}>
+          <img src={PETROLORD_BRANDING.logoUrl} alt="Petrolord" className={tc('h-12 w-auto', 'h-10 w-auto')} />
           <div>
             <h2 className={tc('text-2xl font-bold text-slate-900 leading-none', 'text-xl sm:text-2xl font-semibold text-pl-text leading-none')}>Safety Observation</h2>
             <p className={tc('text-sm text-slate-500 mt-1', 'text-sm text-pl-muted mt-1')}>Generated via Quick Report AI</p>
