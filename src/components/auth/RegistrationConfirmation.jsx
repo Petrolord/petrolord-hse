@@ -109,7 +109,7 @@ function RegistrationConfirmation() {
               </span>
             ) : cooldown > 0 ? (
               <span className="flex items-center text-pl-muted">
-                Resend available in <span className="font-pl-mono tabular-nums">{cooldown}</span>s
+                <span>Resend available in <span className="font-pl-mono tabular-nums">{cooldown}</span>s</span>
               </span>
             ) : (
               <span className="flex items-center">

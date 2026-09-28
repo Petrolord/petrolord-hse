@@ -42,7 +42,7 @@ const ConfirmationPage = () => {
         <div className="space-y-4">
           <div className="text-sm text-pl-muted flex items-center justify-center gap-2" role="status">
             <Loader2 className="h-4 w-4 animate-spin text-pl-primary-text" aria-hidden="true" />
-            Redirecting to login in <span className="font-pl-mono tabular-nums">{countdown}</span> seconds...
+            <span>Redirecting to login in <span className="font-pl-mono tabular-nums">{countdown}</span> seconds...</span>
           </div>
 
           <Button
