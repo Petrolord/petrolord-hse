@@ -421,6 +421,33 @@ the Online pill. Phone: the layout starts with the nav drawer closed below
 the lg breakpoint (where the drawer covers the page and the menu button
 shows) and open on a desktop.
 
+**As built (4B, `feat/hse-ds-4b`).** Cleanup: 129 unreachable component
+files deleted (the plan's 124 plus the five branding editors 4A orphaned),
+each proven unreachable from `src/main.jsx` by a `@babel/parser` import walk
+(static imports, re-exports, `import()`/lazy, `require`, worker `new URL`,
+`import.meta.glob`, the `@/` alias in vite's extension order), a vite build
+with a `moduleParsed` recorder (395 modules, the same set) and a walk from
+every tracked code file plus a text search (tests, tools, scripts, plugins,
+supabase). None was kept. Still unreachable and left alone because they
+are not components: 16 services, 3 hooks, one help metadata file and the
+`src/design` test helpers.
+Charts: `ChartLogo` and `ChartFrame` are ported from the Suite with the
+same watermark (`public/petrolord-chart-watermark.png`); every live
+Recharts chart (18 in 12 files) draws inside `ChartFrame`, and
+`chartMark.test.jsx` fails on a bare `ResponsiveContainer`. The two
+Benchmarking and Feedback charts behind `SHOW_PREVIEW_TABS = false` keep
+their legacy card until those tabs are rebuilt. Copy: the help guides, FAQ,
+safety moments and benefit pages follow the copy rule
+(`src/data/__tests__/copyStyle.test.js`); the legal pages are the owner's.
+Owner-approved fixes: Members loads its organisation, the Leaderboard reads
+the service's real functions (period tabs explain that points carry no
+dates), `/organization` has a back link, the phone Quick Report closes the
+account menu, a location pick keeps the list closed, Work Permits search
+shows on a phone, the Settings branding save reports success, and the
+Branding Manager hides the colour, typography and custom CSS controls with
+the 4A note. The Report Wizard stays: `PetrolordHSE` still imports and
+mounts it (closed; nothing calls `openReportWizard`).
+
 
 ## 8. Test strategy
 
