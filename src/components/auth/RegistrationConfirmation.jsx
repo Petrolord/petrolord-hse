@@ -4,8 +4,9 @@ import { Button } from '@/components/ui/button';
 import { CheckCircle2, Mail, ArrowLeft, Loader2, RefreshCcw } from 'lucide-react';
 import { supabase } from '@/lib/customSupabaseClient';
 import { useToast } from '@/components/ui/use-toast';
+import { PublicPage, AUTH_CARD, AUTH_COLUMN, AUTH_ICON_TILE, AUTH_TITLE } from '@/components/public/PublicPage';
 
-export default function RegistrationConfirmation() {
+function RegistrationConfirmation() {
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -38,7 +39,7 @@ export default function RegistrationConfirmation() {
       toast({
         title: "Email Sent",
         description: "Check your inbox for the setup link.",
-        className: "bg-green-600 text-white border-none"
+        variant: "success"
       });
       setCooldown(30);
     } catch (error) {
@@ -54,61 +55,61 @@ export default function RegistrationConfirmation() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-gray-800 border border-gray-700 rounded-lg p-8 text-center shadow-2xl animate-in fade-in zoom-in-95">
-        <div className="mx-auto w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mb-6">
-          <CheckCircle2 className="h-10 w-10 text-green-400" />
+    <div className={AUTH_COLUMN}>
+      <div className={`w-full max-w-md text-center animate-in fade-in zoom-in-95 ${AUTH_CARD}`}>
+        <div className={`${AUTH_ICON_TILE} h-16 w-16 bg-pl-success-bg`}>
+          <CheckCircle2 className="h-9 w-9 text-pl-success-text" aria-hidden="true" />
         </div>
 
-        <h1 className="text-2xl font-bold text-white mb-2">Organization Created!</h1>
-        <p className="text-gray-400 mb-6">
-          <span className="text-white font-semibold">{orgName}</span> has been successfully registered.
+        <h1 className={`${AUTH_TITLE} mb-2`}>Organization Created!</h1>
+        <p className="text-pl-muted mb-6">
+          <span className="text-pl-text font-semibold">{orgName}</span> has been successfully registered.
         </p>
 
-        <div className="bg-gray-900/50 rounded-lg p-6 border border-gray-700 mb-8">
-          <Mail className="h-8 w-8 text-yellow-500 mx-auto mb-3" />
-          <h3 className="text-white font-medium mb-2">Check your email</h3>
-          <p className="text-sm text-gray-400 mb-4">
+        <div className="bg-pl-sunken rounded-lg p-6 border border-pl-border mb-8">
+          <Mail className="h-8 w-8 text-pl-accent-text mx-auto mb-3" aria-hidden="true" />
+          <h2 className="text-pl-text font-medium mb-2">Check your email</h2>
+          <p className="text-sm text-pl-muted mb-4">
             We sent setup instructions to <br/>
-            <span className="text-yellow-500">{email}</span>
+            <span className="font-medium text-pl-text break-all">{email}</span>
           </p>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-pl-muted">
             Check your spam folder if you don't see it within a few minutes.
           </p>
         </div>
 
         <div className="space-y-4">
-          <Button 
-            onClick={() => navigate('/login')} 
-            className="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold"
+          <Button
+            onClick={() => navigate('/login')}
+            className="w-full h-11 font-semibold"
           >
             Go to Login
           </Button>
-          
-          <Button 
-            variant="ghost" 
+
+          <Button
+            variant="ghost"
             onClick={() => navigate('/')}
-            className="w-full text-gray-400 hover:text-white"
+            className="w-full"
           >
             <ArrowLeft className="mr-2 h-4 w-4" /> Back to Home
           </Button>
         </div>
 
-        <div className="mt-8 pt-6 border-t border-gray-700">
-          <p className="text-sm text-gray-400 mb-2">Email not received?</p>
+        <div className="mt-8 pt-6 border-t border-pl-border">
+          <p className="text-sm text-pl-muted mb-2">Email not received?</p>
           <Button
             variant="link"
             onClick={handleResend}
             disabled={cooldown > 0 || resending}
-            className="text-yellow-500 hover:text-yellow-400 p-0 h-auto font-medium"
+            className="p-0 h-auto font-medium"
           >
             {resending ? (
               <span className="flex items-center">
                 <Loader2 className="mr-2 h-3 w-3 animate-spin" /> Sending...
               </span>
             ) : cooldown > 0 ? (
-              <span className="flex items-center text-gray-500">
-                Resend available in {cooldown}s
+              <span className="flex items-center text-pl-muted">
+                Resend available in <span className="font-pl-mono tabular-nums">{cooldown}</span>s
               </span>
             ) : (
               <span className="flex items-center">
@@ -119,5 +120,14 @@ export default function RegistrationConfirmation() {
         </div>
       </div>
     </div>
+  );
+}
+
+// Batch 3B: the page wraps itself in the public frame (always light, ink brand bar).
+export default function RegistrationConfirmationPage() {
+  return (
+    <PublicPage testId="registration-confirmation-theme-scope">
+      <RegistrationConfirmation />
+    </PublicPage>
   );
 }

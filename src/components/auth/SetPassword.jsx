@@ -5,9 +5,10 @@ import { Input } from '@/components/ui/input';
 import { Lock, Loader2, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '@/lib/customSupabaseClient';
 import { useToast } from '@/components/ui/use-toast';
-import { PETROLORD_BRANDING } from '@/components/branding/BrandingGuide';
+import { Label } from '@/components/ui/label';
+import { PublicPage, AUTH_CARD, AUTH_COLUMN, AUTH_TITLE, TEXT_LINK } from '@/components/public/PublicPage';
 
-export default function SetPassword() {
+function SetPassword() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [password, setPassword] = useState('');
@@ -44,7 +45,6 @@ export default function SetPassword() {
       toast({ 
         title: "Password Set Successfully", 
         description: "You are now logged in.",
-        className: "bg-green-600 text-white"
       });
       navigate('/dashboard');
     } catch (error) {
@@ -81,77 +81,74 @@ export default function SetPassword() {
   };
 
   return (
-    <div className="min-h-screen bg-[#1a1a2e] flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-[#252541] border border-[#3a3a5a] rounded-lg p-8 shadow-xl">
+    <div className={AUTH_COLUMN}>
+      <div className={`w-full max-w-md ${AUTH_CARD}`}>
         <div className="text-center mb-8">
-          <img
-            src={PETROLORD_BRANDING.logoUrl}
-            alt={PETROLORD_BRANDING.companyName}
-            className="h-14 w-auto mx-auto mb-4 object-contain"
-          />
-          <h2 className="text-2xl font-bold text-white">Set Your Password</h2>
-          <p className="text-gray-400 mt-2">Secure your account to continue</p>
+          <h1 className={AUTH_TITLE}>Set Your Password</h1>
+          <p className="text-pl-muted mt-2">Secure your account to continue</p>
         </div>
 
         <form onSubmit={handleUpdatePassword} className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">New Password</label>
+          <div className="space-y-2">
+            <Label htmlFor="new-password">New Password</Label>
             <div className="relative">
-              <Lock className="absolute left-3 top-3 w-5 h-5 text-gray-500" />
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-pl-muted" aria-hidden="true" />
               <Input
+                id="new-password"
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="pl-10 pr-10 bg-white border-0 text-black focus:ring-2 focus:ring-[#FFC107]"
+                className="pl-10 pr-10 h-11"
                 required
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
-                className="absolute right-3 top-3 text-[#7a7a9a] hover:text-[#505068]"
+                className="absolute right-3 top-1/2 -translate-y-1/2 rounded-sm text-pl-muted hover:text-pl-text"
               >
                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
             </div>
           </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Confirm Password</label>
+
+          <div className="space-y-2">
+            <Label htmlFor="confirm-password">Confirm Password</Label>
             <div className="relative">
-              <Lock className="absolute left-3 top-3 w-5 h-5 text-gray-500" />
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-pl-muted" aria-hidden="true" />
               <Input
+                id="confirm-password"
                 type={showConfirm ? 'text' : 'password'}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="••••••••"
-                className="pl-10 pr-10 bg-white border-0 text-black focus:ring-2 focus:ring-[#FFC107]"
+                className="pl-10 pr-10 h-11"
                 required
               />
               <button
                 type="button"
                 onClick={() => setShowConfirm(!showConfirm)}
                 aria-label={showConfirm ? 'Hide password' : 'Show password'}
-                className="absolute right-3 top-3 text-[#7a7a9a] hover:text-[#505068]"
+                className="absolute right-3 top-1/2 -translate-y-1/2 rounded-sm text-pl-muted hover:text-pl-text"
               >
                 {showConfirm ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
             </div>
           </div>
 
-          <Button type="submit" className="w-full bg-[#FFC107] text-black hover:bg-[#ffb300]" disabled={loading}>
+          <Button type="submit" className="w-full h-11 font-semibold" disabled={loading}>
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Update Password'}
           </Button>
         </form>
 
         <div className="mt-6 text-center text-sm">
-          <p className="text-gray-500">
+          <p className="text-pl-muted">
             Didn't receive the email?{' '}
-            <button 
+            <button
               onClick={handleResendLink}
               disabled={cooldown > 0}
-              className="text-[#FFC107] hover:underline disabled:opacity-50"
+              className={`rounded-sm ${TEXT_LINK} disabled:opacity-50 disabled:no-underline`}
             >
               {cooldown > 0 ? `Wait ${cooldown}s` : 'Resend Invitation'}
             </button>
@@ -159,5 +156,14 @@ export default function SetPassword() {
         </div>
       </div>
     </div>
+  );
+}
+
+// Batch 3B: the page wraps itself in the public frame (always light, ink brand bar).
+export default function SetPasswordPage() {
+  return (
+    <PublicPage testId="set-password-theme-scope">
+      <SetPassword />
+    </PublicPage>
   );
 }
