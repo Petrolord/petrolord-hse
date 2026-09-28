@@ -74,7 +74,7 @@ export default function PricingCards({ isAnnual }) {
 
           <CardContent className="flex-1 flex flex-col items-center">
             <div className="text-center mb-6">
-              <div className="font-pl-mono tabular-nums text-5xl font-bold text-pl-text mb-2">
+              <div className={cn("text-5xl font-bold text-pl-text mb-2", getPrice(tier).amount.startsWith('$') && "font-pl-mono tabular-nums")}>
                 {getPrice(tier).amount}
                 <span className="font-pl-sans text-lg font-normal text-pl-muted">{getPrice(tier).period}</span>
               </div>

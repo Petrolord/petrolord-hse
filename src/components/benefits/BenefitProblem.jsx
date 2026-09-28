@@ -22,7 +22,7 @@ export default function BenefitProblem({ data }) {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {data.stats.map((stat, idx) => (
               <div key={idx} className="bg-pl-raised p-6 rounded-xl border border-pl-border text-center">
-                <div className="font-pl-mono tabular-nums text-3xl font-bold text-pl-text mb-2">{stat.value}</div>
+                <div className="text-3xl font-bold text-pl-text mb-2">{stat.value}</div>
                 <div className="text-sm text-pl-muted font-medium uppercase tracking-wide">{stat.label}</div>
               </div>
             ))}
