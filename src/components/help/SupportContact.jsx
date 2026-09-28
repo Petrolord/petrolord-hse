@@ -10,6 +10,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { helpService } from '@/services/helpService';
 import { useHSE } from '@/context/HSEContext';
 
+// Design family (batch 2C): the support form in the kit's input styling.
 export default function SupportContact() {
   const { toast } = useToast();
   const { currentOrganization } = useHSE();
@@ -29,7 +30,7 @@ export default function SupportContact() {
       toast({
         title: "Ticket Submitted",
         description: "We've received your request and will respond shortly.",
-        className: "bg-green-600 text-white border-none"
+        variant: "success"
       });
       setTicket({ subject: '', category: '', priority: 'Medium', description: '' });
     } catch (error) {
@@ -46,26 +47,26 @@ export default function SupportContact() {
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-3xl font-bold mb-4">Contact Support</h2>
-        <p className="text-[#b0b0c0]">Can't find what you're looking for? Our team is here to help.</p>
+        <h2 className="font-pl-display text-2xl sm:text-3xl font-semibold text-pl-text mb-4">Contact Support</h2>
+        <p className="text-pl-muted">Can't find what you're looking for? Our team is here to help.</p>
       </div>
 
       <div className="grid grid-cols-1 gap-6 max-w-md mx-auto">
-        <Card className="bg-[#252541] border-[#3a3a5a]">
+        <Card>
           <CardContent className="pt-6 flex flex-col items-center text-center">
-            <Mail className="h-8 w-8 text-[#FFC107] mb-4" />
-            <h3 className="font-bold text-white mb-2">Email Us</h3>
-            <p className="text-sm text-gray-400 mb-4">support@petrolord.com</p>
-            <span className="text-xs text-gray-500">Response time: 24 hours</span>
+            <Mail className="h-8 w-8 text-pl-primary-text mb-4" aria-hidden="true" />
+            <h3 className="font-bold text-pl-text mb-2">Email Us</h3>
+            <p className="text-sm text-pl-text mb-4">support@petrolord.com</p>
+            <span className="text-xs text-pl-muted">Response time: 24 hours</span>
           </CardContent>
         </Card>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-12">
         {/* Ticket Form */}
-        <Card className="bg-[#252541] border-[#3a3a5a]">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-white">Submit a Support Ticket</CardTitle>
+            <CardTitle>Submit a Support Ticket</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -76,18 +77,17 @@ export default function SupportContact() {
                   onChange={e => setTicket({...ticket, subject: e.target.value})}
                   required
                   placeholder="Brief summary of the issue"
-                  className="bg-[#1a1a2e] border-[#3a3a5a] text-white"
                 />
               </div>
               
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Category</Label>
                   <Select value={ticket.category} onValueChange={v => setTicket({...ticket, category: v})}>
-                    <SelectTrigger className="bg-[#1a1a2e] border-[#3a3a5a] text-white">
+                    <SelectTrigger>
                       <SelectValue placeholder="Select..." />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#252541] border-[#3a3a5a] text-white">
+                    <SelectContent>
                       <SelectItem value="technical">Technical Issue</SelectItem>
                       <SelectItem value="billing">Billing</SelectItem>
                       <SelectItem value="feature">Feature Request</SelectItem>
@@ -98,10 +98,10 @@ export default function SupportContact() {
                 <div className="space-y-2">
                   <Label>Priority</Label>
                   <Select value={ticket.priority} onValueChange={v => setTicket({...ticket, priority: v})}>
-                    <SelectTrigger className="bg-[#1a1a2e] border-[#3a3a5a] text-white">
+                    <SelectTrigger>
                       <SelectValue placeholder="Select..." />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#252541] border-[#3a3a5a] text-white">
+                    <SelectContent>
                       <SelectItem value="Low">Low</SelectItem>
                       <SelectItem value="Medium">Medium</SelectItem>
                       <SelectItem value="High">High</SelectItem>
@@ -118,14 +118,14 @@ export default function SupportContact() {
                   onChange={e => setTicket({...ticket, description: e.target.value})}
                   required
                   placeholder="Detailed explanation..."
-                  className="bg-[#1a1a2e] border-[#3a3a5a] text-white h-32"
+                  className="h-32"
                 />
               </div>
 
               <Button 
                 type="submit" 
                 disabled={isSubmitting}
-                className="w-full bg-[#FFC107] text-black hover:bg-[#e0a800] font-bold"
+                className="w-full font-semibold"
               >
                 {isSubmitting ? 'Submitting...' : 'Submit Ticket'}
               </Button>
@@ -135,9 +135,9 @@ export default function SupportContact() {
 
         {/* Info Side */}
         <div className="space-y-6">
-          <div className="bg-[#1a1a2e] border border-[#3a3a5a] rounded-xl p-6">
-            <h3 className="font-bold text-white mb-2">Before you submit...</h3>
-            <ul className="list-disc pl-5 space-y-2 text-gray-400 text-sm">
+          <div className="bg-pl-surface border border-pl-border shadow-pl-sm rounded-xl p-6">
+            <h3 className="font-bold text-pl-text mb-2">Before you submit...</h3>
+            <ul className="list-disc pl-5 space-y-2 text-pl-muted text-sm">
               <li>Check the <strong>FAQs</strong> tab for quick answers.</li>
               <li>Ensure your browser is up to date (Chrome, Firefox, Edge).</li>
               <li>Clear your cache and cookies if experiencing loading issues.</li>
@@ -145,12 +145,12 @@ export default function SupportContact() {
             </ul>
           </div>
 
-          <div className="bg-[#1a1a2e] border border-[#3a3a5a] rounded-xl p-6">
-            <h3 className="font-bold text-white mb-2">Enterprise Support</h3>
-            <p className="text-gray-400 text-sm mb-4">
+          <div className="bg-pl-surface border border-pl-border shadow-pl-sm rounded-xl p-6">
+            <h3 className="font-bold text-pl-text mb-2">Enterprise Support</h3>
+            <p className="text-pl-muted text-sm mb-4">
               Premium enterprise clients have access to a dedicated account manager and expedited SLA.
             </p>
-            <Button variant="outline" className="border-[#3a3a5a] text-white hover:bg-[#252541]">
+            <Button variant="outline">
               Contact Account Manager
             </Button>
           </div>

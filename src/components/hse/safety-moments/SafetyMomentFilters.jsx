@@ -10,16 +10,16 @@ export default function SafetyMomentFilters({ filters, setFilters, categories = 
   };
 
   return (
-    <div className="w-full bg-[#1f1f35] border-b border-[#3a3a5a] p-4 flex flex-col md:flex-row gap-4 items-end md:items-center justify-between shadow-sm z-10 sticky top-0">
+    <div className="w-full bg-pl-surface border-b border-pl-border p-4 flex flex-col md:flex-row gap-4 items-end md:items-center justify-between shadow-sm z-10 sticky top-0">
       <div className="flex flex-col md:flex-row gap-4 flex-1 w-full">
         {/* Search */}
         <div className="relative w-full md:w-72">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-[#7a7a9a]" />
+          <Search className="absolute left-2 top-2.5 h-4 w-4 text-pl-muted" aria-hidden="true" />
           <Input 
             placeholder="Search topics..." 
             value={filters.search}
             onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
-            className="bg-[#1a1a2e] border-[#3a3a5a] pl-8 text-white h-10 focus-visible:ring-emerald-500 w-full placeholder:text-[#7a7a9a]"
+            className="pl-8 h-10 w-full"
           />
         </div>
 
@@ -29,10 +29,10 @@ export default function SafetyMomentFilters({ filters, setFilters, categories = 
             value={filters.category} 
             onValueChange={(val) => setFilters(prev => ({ ...prev, category: val }))}
           >
-            <SelectTrigger className="bg-[#1a1a2e] border-[#3a3a5a] text-[#e0e0e0] h-10 focus:ring-emerald-500">
+            <SelectTrigger className="h-10">
               <SelectValue placeholder="All Categories" />
             </SelectTrigger>
-            <SelectContent className="bg-[#1a1a2e] border-[#3a3a5a] text-[#e0e0e0]">
+            <SelectContent>
               <SelectItem value="all">All Categories</SelectItem>
               {categories.map(c => (
                 <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
@@ -47,10 +47,10 @@ export default function SafetyMomentFilters({ filters, setFilters, categories = 
             value={filters.duration} 
             onValueChange={(val) => setFilters(prev => ({ ...prev, duration: val }))}
           >
-            <SelectTrigger className="bg-[#1a1a2e] border-[#3a3a5a] text-[#e0e0e0] h-10 focus:ring-emerald-500">
+            <SelectTrigger className="h-10">
               <SelectValue placeholder="Any Duration" />
             </SelectTrigger>
-            <SelectContent className="bg-[#1a1a2e] border-[#3a3a5a] text-[#e0e0e0]">
+            <SelectContent>
               <SelectItem value="all">Any Duration</SelectItem>
               <SelectItem value="5">Up to 5 min</SelectItem>
               <SelectItem value="10">5 - 10 min</SelectItem>
@@ -64,10 +64,10 @@ export default function SafetyMomentFilters({ filters, setFilters, categories = 
         <Button 
           variant="ghost" 
           onClick={handleClear} 
-          className="text-[#7a7a9a] hover:text-white px-3 h-10"
+          className="px-3 h-10"
           title="Clear Filters"
         >
-          <X className="h-4 w-4 mr-2" /> Reset
+          <X className="h-4 w-4 mr-2" aria-hidden="true" /> Reset
         </Button>
       </div>
     </div>
