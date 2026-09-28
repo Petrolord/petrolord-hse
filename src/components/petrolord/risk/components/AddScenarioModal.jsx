@@ -68,23 +68,23 @@ export default function AddScenarioModal({ isOpen, onClose, onSuccess, record })
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px] bg-[#1e1e30] border-[#3a3a5a] text-white">
+      <DialogContent className="sm:max-w-[600px]">
         <DialogHeader><DialogTitle>{isEdit ? 'Edit Scenario' : 'Add Scenario'}</DialogTitle></DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-2">
           <div className="space-y-2">
             <Label>Scenario Title *</Label>
-            <Input value={form.title} onChange={e => set('title', e.target.value)} className="bg-[#252541] border-[#3a3a5a]" required placeholder="e.g. Extended Pipeline Shutdown" />
+            <Input value={form.title} onChange={e => set('title', e.target.value)} required placeholder="e.g. Extended Pipeline Shutdown" />
           </div>
           <div className="space-y-2">
             <Label>Description</Label>
-            <Textarea value={form.description} onChange={e => set('description', e.target.value)} className="bg-[#252541] border-[#3a3a5a]" placeholder="What unfolds in this scenario?" />
+            <Textarea value={form.description} onChange={e => set('description', e.target.value)} placeholder="What unfolds in this scenario?" />
           </div>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label>Type</Label>
               <Select value={form.type} onValueChange={v => set('type', v)}>
-                <SelectTrigger className="bg-[#252541] border-[#3a3a5a]"><SelectValue /></SelectTrigger>
-                <SelectContent className="bg-[#252541] border-[#3a3a5a] text-white">
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
                   {TYPES.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
                 </SelectContent>
               </Select>
@@ -92,21 +92,21 @@ export default function AddScenarioModal({ isOpen, onClose, onSuccess, record })
             <div className="space-y-2">
               <Label>Probability</Label>
               <Select value={form.probability} onValueChange={v => set('probability', v)}>
-                <SelectTrigger className="bg-[#252541] border-[#3a3a5a]"><SelectValue /></SelectTrigger>
-                <SelectContent className="bg-[#252541] border-[#3a3a5a] text-white">
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
                   {PROBABILITIES.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
               <Label>Financial Impact ($)</Label>
-              <Input type="number" step="any" value={form.impact_financial} onChange={e => set('impact_financial', e.target.value)} className="bg-[#252541] border-[#3a3a5a]" />
+              <Input type="number" step="any" value={form.impact_financial} onChange={e => set('impact_financial', e.target.value)} />
             </div>
           </div>
           <DialogFooter className="mt-4">
-            <Button type="button" variant="ghost" onClick={onClose} className="text-gray-400 hover:text-white">Cancel</Button>
-            <Button type="submit" disabled={loading} className="bg-amber-600 hover:bg-amber-700">
-              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} {isEdit ? 'Save Changes' : 'Add Scenario'}
+            <Button type="button" variant="ghost" onClick={onClose}>Cancel</Button>
+            <Button type="submit" disabled={loading}>
+              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />} {isEdit ? 'Save Changes' : 'Add Scenario'}
             </Button>
           </DialogFooter>
         </form>

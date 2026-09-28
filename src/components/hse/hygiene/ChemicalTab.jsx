@@ -12,6 +12,7 @@ import {
   evaluateChemicalAgent, evaluateMixture, isRefusal, EXPOSURE_SOURCES,
 } from '@/lib/hygiene/evaluate';
 import { hygieneService } from '@/services/hygieneService';
+import { TOOLTIP_STYLE } from '@/utils/chartTheme';
 import { ChartCard, CHART } from '../safety-stats/common';
 import {
   Panel, PeriodTable, Pick, TextField, Refusal, Warnings, Flag, Stat, SampleHeader, SERIES, fmt, Notice,
@@ -30,11 +31,11 @@ const sig = (v) => {
 function AgentEditor({ agent, index, onChange, onRemove, canRemove }) {
   const set = (k) => (v) => onChange({ ...agent, [k]: v });
   return (
-    <div className="rounded-lg border border-[#2d2d4a] bg-[#151524] p-3 space-y-3">
+    <div className="rounded-lg border border-pl-border bg-pl-sunken p-3 space-y-3">
       <div className="flex items-center justify-between">
-        <div className="text-sm font-semibold text-white">Agent {index + 1}</div>
-        <Button variant="ghost" size="sm" disabled={!canRemove} onClick={onRemove} className="text-gray-400 hover:text-red-400">
-          <Trash2 className="h-4 w-4 mr-1" /> Remove
+        <div className="text-sm font-semibold text-pl-text">Agent {index + 1}</div>
+        <Button variant="ghost" size="sm" disabled={!canRemove} onClick={onRemove} className="hover:text-pl-danger-text">
+          <Trash2 className="h-4 w-4 mr-1" aria-hidden="true" /> Remove
         </Button>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -49,7 +50,7 @@ function AgentEditor({ agent, index, onChange, onRemove, canRemove }) {
         <Pick label="Durations entered in" value={agent.durationUnit} onChange={set('durationUnit')} options={[{ value: 'h', label: 'hours' }, { value: 'min', label: 'minutes' }]} />
         <TextField label="Sampling method (optional)" value={agent.samplingMethod} onChange={set('samplingMethod')} className="sm:col-span-2" placeholder="For example: NIOSH 1501, charcoal tube" />
       </div>
-      <div className="text-xs text-gray-400">Full-shift periods (for the 8-hour TWA)</div>
+      <div className="text-xs text-pl-muted">Full-shift periods (for the 8-hour TWA)</div>
       <PeriodTable
         rows={agent.periods}
         onChange={set('periods')}
@@ -59,7 +60,7 @@ function AgentEditor({ agent, index, onChange, onRemove, canRemove }) {
           { key: 'duration', label: `Duration, ${agent.durationUnit === 'min' ? 'minutes' : 'hours'}` },
         ]}
       />
-      <div className="text-xs text-gray-400">Short-term periods within one 15-minute window (optional)</div>
+      <div className="text-xs text-pl-muted">Short-term periods within one 15-minute window (optional)</div>
       <PeriodTable
         rows={agent.stelPeriods}
         onChange={set('stelPeriods')}
@@ -75,8 +76,8 @@ function AgentEditor({ agent, index, onChange, onRemove, canRemove }) {
 
 function AgentResult({ agent, ev, units }) {
   return (
-    <div className="rounded-lg border border-[#2d2d4a] bg-[#151524] p-3 space-y-2">
-      <div className="text-sm font-semibold text-white">{agent.agentName}</div>
+    <div className="rounded-lg border border-pl-border bg-pl-sunken p-3 space-y-2">
+      <div className="text-sm font-semibold text-pl-text">{agent.agentName}</div>
       {isRefusal(ev.twa) ? <Refusal result={ev.twa} what="8-hour TWA" /> : (
         <div className="space-y-1">
           <div className="flex flex-wrap items-center gap-3">
@@ -96,7 +97,7 @@ function AgentResult({ agent, ev, units }) {
         </div>
       ))}
       {ev.briefScala && (isRefusal(ev.briefScala.result) ? <Refusal result={ev.briefScala.result} what="Brief and Scala" /> : (
-        <div className="space-y-1 border-t border-[#2d2d4a] pt-2">
+        <div className="space-y-1 border-t border-pl-border pt-2">
           <div className="flex flex-wrap items-center gap-3">
             <Stat
               label="Brief and Scala adjusted limit"
@@ -109,7 +110,7 @@ function AgentResult({ agent, ev, units }) {
             )}
             <Flag exceeds={ev.briefScala.exceeds} />
           </div>
-          <p className="text-[11px] text-gray-500">
+          <p className="text-[11px] text-pl-muted">
             The reduced limit is compared with the average over the shift worked. The 8-hour TWA above follows 1910.1000 and divides by 8;
             the two conventions are shown side by side and never combined.
           </p>
@@ -166,12 +167,12 @@ export default function ChemicalTab({ orgId, form, setForm, sites, canSave, save
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <TextField label="Shift length, hours (optional)" type="number" value={form.shiftHours} onChange={setField('shiftHours')} />
             <TextField label="Hours per week (optional)" type="number" value={form.weeklyHours} onChange={setField('weeklyHours')} />
-            <label className="flex items-center gap-2 text-xs text-gray-300 pt-5">
+            <label className="flex items-center gap-2 text-xs text-pl-text pt-5">
               <Checkbox checked={!!form.additive} onCheckedChange={(v) => setField('additive')(v === true)} />
               These agents have additive effects (mixture)
             </label>
           </div>
-          <p className="text-[11px] text-gray-500">
+          <p className="text-[11px] text-pl-muted">
             Shift and weekly hours give the Brief and Scala reduced limit for unusual schedules. The mixture index is only meaningful for agents
             that act on the same organ or system; that judgement is yours.
           </p>
@@ -191,10 +192,9 @@ export default function ChemicalTab({ orgId, form, setForm, sites, canSave, save
         <Button
           variant="outline"
           onClick={() => setForm((f) => ({ ...f, agents: [...f.agents, blankAgent()] }))}
-          className="bg-transparent border-[#3a3a5a] text-gray-300"
           disabled={form.agents.length >= 20}
         >
-          <Plus className="h-4 w-4 mr-2" /> Add agent
+          <Plus className="h-4 w-4 mr-2" aria-hidden="true" /> Add agent
         </Button>
 
         <Panel title="Record details">
@@ -221,7 +221,7 @@ export default function ChemicalTab({ orgId, form, setForm, sites, canSave, save
                   <AgentResult key={i} agent={a} ev={evals[i]} units={form.agents[i].units} />
                 ))}
               </div>
-              <div className="text-[10px] text-gray-500">
+              <div className="text-[10px] text-pl-muted">
                 Sources: {EXPOSURE_SOURCES.OSHA_1000_D1} (8-hour TWA); 15-minute TWA for the STEL; {EXPOSURE_SOURCES.BRIEF_SCALA}.
               </div>
             </Panel>
@@ -236,14 +236,14 @@ export default function ChemicalTab({ orgId, form, setForm, sites, canSave, save
                       <Stat label="Index" value={sig(mixture.result.index)} />
                       <Flag exceeds={mixture.result.exceeds} />
                     </div>
-                    <p className="text-[11px] text-gray-400">
+                    <p className="text-[11px] text-pl-muted">
                       {mixture.components.map((c, k) => `${c.name} ${sig(mixture.result.terms[k])}`).join(' + ')}
                     </p>
-                    <div className="text-[10px] text-gray-500">Source: {mixture.result.source}</div>
+                    <div className="text-[10px] text-pl-muted">Source: {mixture.result.source}</div>
                   </div>
                 )}
                 {mixture.excluded.length > 0 && (
-                  <p className="text-[11px] text-amber-200">
+                  <p className="text-[11px] text-pl-warning-text">
                     Left out of the index: {mixture.excluded.map((x) => `${x.name} (${x.reason})`).join(', ')}.
                   </p>
                 )}
@@ -259,7 +259,7 @@ export default function ChemicalTab({ orgId, form, setForm, sites, canSave, save
                     <YAxis type="category" dataKey="name" width={120} tick={{ fill: CHART.text, fontSize: 11 }} axisLine={false} tickLine={false} />
                     <Tooltip
                       formatter={(v) => [`${fmt(v, 1)}%`, 'of the TWA limit']}
-                      contentStyle={{ background: '#ffffff', border: `1px solid ${CHART.grid}`, borderRadius: 8, fontSize: 12, color: CHART.text }}
+                      contentStyle={TOOLTIP_STYLE}
                       cursor={{ fill: 'rgba(0,0,0,0.04)' }}
                     />
                     <ReferenceLine x={100} stroke={CHART.limit} strokeDasharray="4 3" label={{ value: 'limit', fill: CHART.textSecondary, fontSize: 11, position: 'top' }} />

@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Zap, ShieldCheck, AlertTriangle } from 'lucide-react';
 import { riskService } from '@/services/riskService';
 import { useHSE } from '@/context/HSEContext';
+import { tableHeadClass, tableBodyClass, tableRowClass } from '../common/ui';
 
 // Risk appetite statement: the maximum residual risk score the organisation is
 // willing to tolerate per category (1-25 scale). No appetite table exists yet, so
@@ -49,18 +50,18 @@ export default function RiskAppetite() {
 
   const breachedCount = rows.filter(r => r.breached).length;
 
-  if (loading) return <div className="p-10 text-center text-gray-500">Evaluating risk appetite...</div>;
+  if (loading) return <div className="p-10 text-center text-pl-muted">Evaluating risk appetite...</div>;
 
   return (
     <div className="space-y-4">
-      <Card className="bg-[#1e1e30] border-[#2a2a40] p-5">
+      <Card className="p-5">
         <div className="flex items-center gap-3">
-          <div className={`p-2 rounded-lg bg-[#252541] ${breachedCount ? 'text-red-400' : 'text-green-400'}`}>
-            {breachedCount ? <AlertTriangle className="h-5 w-5" /> : <ShieldCheck className="h-5 w-5" />}
+          <div className={`shrink-0 p-2 rounded-lg ${breachedCount ? 'bg-pl-danger-bg text-pl-danger-text' : 'bg-pl-success-bg text-pl-success-text'}`}>
+            {breachedCount ? <AlertTriangle className="h-5 w-5" aria-hidden="true" /> : <ShieldCheck className="h-5 w-5" aria-hidden="true" />}
           </div>
           <div>
-            <h3 className="text-white font-bold">Risk Appetite Statement</h3>
-            <p className="text-xs text-gray-400">
+            <h3 className="text-pl-text font-semibold">Risk Appetite Statement</h3>
+            <p className="text-xs text-pl-muted">
               {breachedCount === 0
                 ? 'All risk categories are currently operating within defined tolerance.'
                 : `${breachedCount} categor${breachedCount === 1 ? 'y is' : 'ies are'} exceeding the defined risk appetite.`}
@@ -69,9 +70,10 @@ export default function RiskAppetite() {
         </div>
       </Card>
 
-      <Card className="bg-[#1e1e30] border-[#2a2a40] overflow-hidden">
+      <Card className="overflow-hidden">
+        <div className="overflow-x-auto">
         <table className="w-full text-sm text-left">
-          <thead className="bg-[#252541] text-gray-400 uppercase text-xs">
+          <thead className={tableHeadClass}>
             <tr>
               <th className="px-6 py-4 font-medium">Category</th>
               <th className="px-6 py-4 font-medium text-center">Tolerance (max score)</th>
@@ -80,35 +82,36 @@ export default function RiskAppetite() {
               <th className="px-6 py-4 font-medium">Position</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#2a2a40]">
+          <tbody className={tableBodyClass}>
             {rows.map(r => {
               const pct = Math.min(100, Math.round((r.maxScore / 25) * 100));
               const tolPct = Math.min(100, Math.round((r.tolerance / 25) * 100));
               return (
-                <tr key={r.cat} className="hover:bg-[#252541]">
-                  <td className="px-6 py-4 text-white font-medium">{r.cat}</td>
-                  <td className="px-6 py-4 text-center text-gray-300">{r.tolerance}</td>
-                  <td className="px-6 py-4 text-center text-gray-400">{r.count}</td>
-                  <td className="px-6 py-4">
-                    <div className="relative h-3 bg-[#2a2a40] rounded-full overflow-hidden" title={`Highest risk score: ${r.maxScore}`}>
-                      <div className={`h-full rounded-full ${r.breached ? 'bg-red-500' : 'bg-green-500'}`} style={{ width: `${pct}%` }} />
+                <tr key={r.cat} className={tableRowClass}>
+                  <td className="px-6 py-4 text-pl-text font-medium">{r.cat}</td>
+                  <td className="px-6 py-4 text-center text-pl-text font-pl-mono tabular-nums">{r.tolerance}</td>
+                  <td className="px-6 py-4 text-center text-pl-muted font-pl-mono tabular-nums">{r.count}</td>
+                  <td className="px-6 py-4 min-w-[180px]">
+                    <div className="relative h-3 bg-pl-sunken rounded-full overflow-hidden" title={`Highest risk score: ${r.maxScore}`}>
+                      <div className={`h-full rounded-full ${r.breached ? 'bg-pl-danger' : 'bg-pl-success'}`} style={{ width: `${pct}%` }} />
                       {/* Tolerance marker */}
-                      <div className="absolute top-0 bottom-0 w-0.5 bg-white/60" style={{ left: `${tolPct}%` }} title={`Tolerance: ${r.tolerance}`} />
+                      <div className="absolute top-0 bottom-0 w-0.5 bg-pl-text/70" style={{ left: `${tolPct}%` }} title={`Tolerance: ${r.tolerance}`} />
                     </div>
-                    <div className="text-[11px] text-gray-500 mt-1">Peak score {r.maxScore} / tolerance {r.tolerance}</div>
+                    <div className="text-[11px] text-pl-muted mt-1">Peak score <span className="font-pl-mono tabular-nums">{r.maxScore}</span> / tolerance <span className="font-pl-mono tabular-nums">{r.tolerance}</span></div>
                   </td>
                   <td className="px-6 py-4">
                     {r.breached
-                      ? <Badge variant="outline" className="bg-red-500/10 text-red-400 border-red-500/20">Over Appetite ({r.breaching})</Badge>
-                      : <Badge variant="outline" className="bg-green-500/10 text-green-400 border-green-500/20">Within Appetite</Badge>}
+                      ? <Badge variant="danger" className="whitespace-nowrap">Over Appetite ({r.breaching})</Badge>
+                      : <Badge variant="success" className="whitespace-nowrap">Within Appetite</Badge>}
                   </td>
                 </tr>
               );
             })}
           </tbody>
         </table>
+        </div>
       </Card>
-      <p className="text-[11px] text-gray-600 flex items-center gap-1"><Zap className="h-3 w-3" /> Tolerance thresholds are framework defaults; exposure is computed live from the risk register.</p>
+      <p className="text-[11px] text-pl-muted flex items-center gap-1"><Zap className="h-3 w-3 shrink-0" aria-hidden="true" /> Tolerance thresholds are framework defaults; exposure is computed live from the risk register.</p>
     </div>
   );
 }

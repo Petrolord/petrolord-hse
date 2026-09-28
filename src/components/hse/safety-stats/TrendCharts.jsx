@@ -3,6 +3,7 @@ import {
   ResponsiveContainer, LineChart, Line, ComposedChart, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, ReferenceLine,
 } from 'recharts';
+import { TOOLTIP_STYLE } from '@/utils/chartTheme';
 import { ChartCard, CHART, fmtMonth, fmtRate, fmtHours, Notice } from './common';
 
 const axisProps = {
@@ -12,7 +13,7 @@ const axisProps = {
 };
 
 const tooltipStyle = {
-  contentStyle: { background: '#ffffff', border: `1px solid ${CHART.grid}`, borderRadius: 8, fontSize: 12, color: CHART.text },
+  contentStyle: TOOLTIP_STYLE,
   labelStyle: { color: CHART.text, fontWeight: 600 },
 };
 
@@ -46,12 +47,12 @@ export function RollingChart({ rolling, metric, baseLabel, from }) {
       footer={(
         <div className="space-y-1">
           <div>The dashed line is the mean of the monthly rates in the same window, shown for contrast. It is a different number: a month with few hours and one event swings it hard. The solid line is the rate to report.</div>
-          {rolling.excludedEvents > 0 && <div className="text-[#b54708]">{rolling.excludedEvents} {metric.kind === 'days' ? (rolling.excludedEvents === 1 ? 'day falls' : 'days fall') : (rolling.excludedEvents === 1 ? 'event falls' : 'events fall')} in months without hours and {rolling.excludedEvents === 1 ? 'is' : 'are'} left out.</div>}
+          {rolling.excludedEvents > 0 && <div className="text-pl-warning-text">{rolling.excludedEvents} {metric.kind === 'days' ? (rolling.excludedEvents === 1 ? 'day falls' : 'days fall') : (rolling.excludedEvents === 1 ? 'event falls' : 'events fall')} in months without hours and {rolling.excludedEvents === 1 ? 'is' : 'are'} left out.</div>}
         </div>
       )}
     >
       {empty ? (
-        <div className="h-[280px] flex items-center justify-center text-sm text-[#52514e]">No 12-month window in this range has exposure hours.</div>
+        <div className="h-[280px] flex items-center justify-center text-sm text-pl-muted">No 12-month window in this range has exposure hours.</div>
       ) : (
         <div className="h-[280px]">
           <ResponsiveContainer width="100%" height="100%">
@@ -86,12 +87,12 @@ const SignalDot = (props) => {
   if (payload.signal) {
     return (
       <g>
-        <circle cx={cx} cy={cy} r={6} fill={CHART.critical} stroke="#ffffff" strokeWidth={2} />
+        <circle cx={cx} cy={cy} r={6} fill={CHART.critical} stroke={CHART.surface} strokeWidth={2} />
         <text x={cx} y={cy - 10} textAnchor="middle" fontSize={10} fill={CHART.text}>{payload.signal === 'above' ? 'above UCL' : 'below LCL'}</text>
       </g>
     );
   }
-  return <circle cx={cx} cy={cy} r={4} fill={CHART.series1} stroke="#ffffff" strokeWidth={2} />;
+  return <circle cx={cx} cy={cy} r={4} fill={CHART.series1} stroke={CHART.surface} strokeWidth={2} />;
 };
 
 export function UChartView({ chart, metric, baseLabel }) {

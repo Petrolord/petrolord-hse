@@ -5,10 +5,11 @@ import RiskHeatMap from './components/RiskHeatMap';
 import { riskService } from '@/services/riskService';
 import { useHSE } from '@/context/HSEContext';
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from 'recharts';
-
-const COLORS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6'];
+import { ChartPanel } from '@/components/ui/chart-panel';
+import { CHART_COLORS, CHART_SERIES, GRID_STYLE, AXIS_PROPS, TOOLTIP_STYLE } from '@/utils/chartTheme';
+import { tableHeadClass, tableBodyClass, tableRowClass, RiskScoreBadge } from '../common/ui';
 
 export default function RiskDashboard() {
   const { currentOrganization } = useHSE();
@@ -32,89 +33,58 @@ export default function RiskDashboard() {
     }
   };
 
-  if (!stats) return <div className="p-8 text-center text-gray-500">Loading risk analytics...</div>;
+  if (!stats) return <div className="p-8 text-center text-pl-muted">Loading risk analytics...</div>;
 
   const categoryData = Object.keys(stats.byCategory).map(k => ({ name: k, value: stats.byCategory[k] }));
   const statusData = Object.keys(stats.byStatus).map(k => ({ name: k, value: stats.byStatus[k] }));
+  const topRisks = risks.filter(r => r.risk_score >= 12);
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500 pb-10">
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="bg-[#1e1e30] border-[#2a2a40] p-4 relative overflow-hidden group">
-          <div className="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-            <AlertTriangle className="h-16 w-16 text-blue-500" />
-          </div>
-          <p className="text-gray-400 text-xs font-bold uppercase">Total Risks Identified</p>
-          <h3 className="text-3xl font-bold text-white mt-2">{stats.total}</h3>
-          <p className="text-xs text-blue-400 mt-1 flex items-center"><Activity className="h-3 w-3 mr-1" /> Active Registry</p>
-        </Card>
-
-        <Card className="bg-[#1e1e30] border-[#2a2a40] p-4 relative overflow-hidden group">
-          <div className="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-            <ShieldAlert className="h-16 w-16 text-red-500" />
-          </div>
-          <p className="text-gray-400 text-xs font-bold uppercase">Critical Risks</p>
-          <h3 className="text-3xl font-bold text-white mt-2">{stats.critical}</h3>
-          <p className="text-xs text-red-400 mt-1 flex items-center">Requires immediate action</p>
-        </Card>
-
-        <Card className="bg-[#1e1e30] border-[#2a2a40] p-4 relative overflow-hidden group">
-          <div className="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-            <TrendingUp className="h-16 w-16 text-orange-500" />
-          </div>
-          <p className="text-gray-400 text-xs font-bold uppercase">Avg Risk Score</p>
-          <h3 className="text-3xl font-bold text-white mt-2">{stats.avgScore}</h3>
-          <p className="text-xs text-gray-500 mt-1">Out of 25 max</p>
-        </Card>
-
-        <Card className="bg-[#1e1e30] border-[#2a2a40] p-4 relative overflow-hidden group">
-          <div className="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-            <CheckCircle className="h-16 w-16 text-green-500" />
-          </div>
-          <p className="text-gray-400 text-xs font-bold uppercase">Mitigation Active</p>
-          <h3 className="text-3xl font-bold text-white mt-2">{statusData.find(d => d.name === 'Mitigated')?.value || 0}</h3>
-          <p className="text-xs text-green-400 mt-1">Risks controlled</p>
-        </Card>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        <DashTile icon={AlertTriangle} label="Total Risks Identified" value={stats.total} note={<><Activity className="h-3 w-3 mr-1" aria-hidden="true" /> Active Registry</>} />
+        <DashTile icon={ShieldAlert} label="Critical Risks" value={stats.critical} note="Requires immediate action" />
+        <DashTile icon={TrendingUp} label="Avg Risk Score" value={stats.avgScore} note="Out of 25 max" />
+        <DashTile icon={CheckCircle} label="Mitigation Active" value={statusData.find(d => d.name === 'Mitigated')?.value || 0} note="Risks controlled" />
       </div>
 
       {/* Main Visuals Row 1 */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Heatmap */}
-        <Card className="bg-[#1e1e30] border-[#2a2a40] lg:col-span-1">
-          <CardHeader><CardTitle className="text-white text-base">Risk Heat Map</CardTitle></CardHeader>
-          <CardContent className="h-[300px]">
+        <Card className="lg:col-span-1">
+          <CardHeader><CardTitle className="text-base">Risk Heat Map</CardTitle></CardHeader>
+          <CardContent className="h-[320px]">
             <RiskHeatMap risks={risks} />
           </CardContent>
         </Card>
 
         {/* Charts */}
-        <Card className="bg-[#1e1e30] border-[#2a2a40] lg:col-span-2">
-          <CardHeader><CardTitle className="text-white text-base">Risk Distribution by Category</CardTitle></CardHeader>
-          <CardContent className="h-[300px]">
+        <ChartPanel title="Risk Distribution by Category" className="lg:col-span-2">
+          <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={categoryData} layout="vertical" margin={{ left: 20 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#2a2a40" horizontal={false} />
-                <XAxis type="number" stroke="#6b7280" />
-                <YAxis dataKey="name" type="category" stroke="#9ca3af" width={100} />
+                <CartesianGrid {...GRID_STYLE} horizontal={false} />
+                <XAxis type="number" {...AXIS_PROPS} allowDecimals={false} />
+                <YAxis dataKey="name" type="category" {...AXIS_PROPS} width={100} />
                 <Tooltip 
-                  contentStyle={{ backgroundColor: '#1e1e30', borderColor: '#2a2a40', color: '#fff' }}
-                  cursor={{ fill: '#2a2a40' }}
+                  contentStyle={TOOLTIP_STYLE}
+                  cursor={{ fill: CHART_COLORS.grid, fillOpacity: 0.4 }}
                 />
-                <Bar dataKey="value" fill="#f59e0b" radius={[0, 4, 4, 0]} barSize={20} />
+                <Bar dataKey="value" name="Risks" fill={CHART_SERIES[0]} radius={[0, 4, 4, 0]} barSize={20} />
               </BarChart>
             </ResponsiveContainer>
-          </CardContent>
-        </Card>
+          </div>
+        </ChartPanel>
       </div>
 
       {/* Top Risks Table */}
-      <Card className="bg-[#1e1e30] border-[#2a2a40]">
-        <CardHeader><CardTitle className="text-white text-base">Top Critical Risks (Requiring Action)</CardTitle></CardHeader>
+      <Card>
+        <CardHeader><CardTitle className="text-base">Top Critical Risks (Requiring Action)</CardTitle></CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
             <table className="w-full text-sm text-left">
-              <thead className="bg-[#252541] text-gray-400 uppercase text-xs">
+              <thead className={tableHeadClass}>
                 <tr>
                   <th className="px-4 py-3">Risk ID</th>
                   <th className="px-4 py-3">Title</th>
@@ -125,24 +95,24 @@ export default function RiskDashboard() {
                   <th className="px-4 py-3">Owner</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#2a2a40]">
-                {risks.filter(r => r.risk_score >= 12).slice(0, 5).map(risk => (
-                  <tr key={risk.id} className="hover:bg-[#252541] transition-colors">
-                    <td className="px-4 py-3 font-mono text-xs text-gray-500">{risk.risk_id}</td>
-                    <td className="px-4 py-3 font-medium text-white">{risk.title}</td>
-                    <td className="px-4 py-3 text-gray-400">{risk.category}</td>
-                    <td className="px-4 py-3 text-center text-gray-400">{risk.likelihood}</td>
-                    <td className="px-4 py-3 text-center text-gray-400">{risk.impact}</td>
+              <tbody className={tableBodyClass}>
+                {topRisks.slice(0, 5).map(risk => (
+                  <tr key={risk.id} className={tableRowClass}>
+                    <td className="px-4 py-3 font-pl-mono text-xs text-pl-muted">{risk.risk_id}</td>
+                    <td className="px-4 py-3 font-medium text-pl-text">{risk.title}</td>
+                    <td className="px-4 py-3 text-pl-muted">{risk.category}</td>
+                    <td className="px-4 py-3 text-center text-pl-muted font-pl-mono tabular-nums">{risk.likelihood}</td>
+                    <td className="px-4 py-3 text-center text-pl-muted font-pl-mono tabular-nums">{risk.impact}</td>
                     <td className="px-4 py-3 text-center">
-                      <span className="px-2 py-1 rounded bg-red-500/20 text-red-400 font-bold text-xs">{risk.risk_score}</span>
+                      <RiskScoreBadge score={risk.risk_score} />
                     </td>
-                    <td className="px-4 py-3 text-gray-400 text-xs">
+                    <td className="px-4 py-3 text-pl-muted text-xs">
                       {risk.owner?.raw_user_meta_data?.full_name || 'Unassigned'}
                     </td>
                   </tr>
                 ))}
-                {risks.filter(r => r.risk_score >= 12).length === 0 && (
-                  <tr><td colSpan="7" className="p-4 text-center text-gray-500">No critical risks found. Excellent!</td></tr>
+                {topRisks.length === 0 && (
+                  <tr><td colSpan="7" className="p-4 text-center text-pl-muted">No critical risks found. Excellent!</td></tr>
                 )}
               </tbody>
             </table>
@@ -150,5 +120,19 @@ export default function RiskDashboard() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+// A dashboard KPI tile: neutral icon, mono value and a muted note.
+function DashTile({ icon: Icon, label, value, note }) {
+  return (
+    <Card className="p-4">
+      <div className="flex items-start justify-between gap-2">
+        <p className="text-pl-muted text-xs font-semibold uppercase">{label}</p>
+        <div className="shrink-0 p-1.5 rounded-md bg-pl-sunken border border-pl-border text-pl-muted"><Icon className="h-4 w-4" aria-hidden="true" /></div>
+      </div>
+      <h3 className="font-pl-mono tabular-nums text-3xl font-semibold text-pl-text mt-2">{value}</h3>
+      <p className="text-xs text-pl-muted mt-1 flex items-center">{note}</p>
+    </Card>
   );
 }

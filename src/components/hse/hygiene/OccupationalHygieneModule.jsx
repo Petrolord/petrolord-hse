@@ -16,7 +16,10 @@ import RecordsTab from './RecordsTab';
 /** Who sees the module (LeftNav) and who may save (the database decides too). */
 export const HYGIENE_ROLES = ['super_admin', 'org_admin', 'manager', 'supervisor', 'health_officer'];
 
-const tabClass = 'data-[state=active]:border-b-2 data-[state=active]:border-amber-500 data-[state=active]:text-amber-400 rounded-none bg-transparent px-0 py-3 text-gray-400 hover:text-white transition-all gap-2';
+// Design family (batch 2B): the module renders inside the signed-in scope
+// (src/design/rollout/w2b.js), so it uses the theme roles directly. The tabs
+// keep their underline look on the roles.
+const tabClass = 'gap-2 rounded-none border-b-2 border-transparent bg-transparent px-0 py-3 text-pl-muted shadow-none hover:text-pl-text data-[state=active]:border-pl-primary data-[state=active]:bg-transparent data-[state=active]:text-pl-primary-text data-[state=active]:shadow-none';
 
 export default function OccupationalHygieneModule() {
   const { currentOrganization, role } = useHSE();
@@ -77,28 +80,28 @@ export default function OccupationalHygieneModule() {
   const common = { orgId, sites, canSave: canEdit, saveBlockReason, onSaved };
 
   const header = (
-    <div className="flex flex-col border-b border-[#3a3a5a] bg-[#1a1a2e]">
+    <div className="flex flex-col border-b border-pl-border bg-pl-surface">
       <div className="flex flex-wrap items-center justify-between gap-3 p-4">
-        <div className="flex items-center gap-4">
-          <div className="bg-amber-500/20 p-2 rounded-lg">
-            <Ear className="h-6 w-6 text-amber-500" />
+        <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+          <div className="hidden sm:block bg-pl-sunken p-2 rounded-lg">
+            <Ear className="h-6 w-6 text-pl-muted" aria-hidden="true" />
           </div>
-          <div>
-            <h2 className="text-xl font-bold text-white">Occupational Hygiene</h2>
-            <p className="text-xs text-gray-400">Noise dose and TWA, chemical TWA, STEL and mixtures, and heat stress against published criteria</p>
+          <div className="min-w-0">
+            <h2 className="font-pl-display text-2xl font-semibold text-pl-text">Occupational Hygiene</h2>
+            <p className="text-xs text-pl-muted">Noise dose and TWA, chemical TWA, STEL and mixtures, and heat stress against published criteria</p>
           </div>
         </div>
-        <Button variant="outline" size="sm" onClick={load} disabled={loading} className="bg-transparent border-[#3a3a5a] text-gray-300">
-          <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} /> Refresh
+        <Button variant="outline" size="sm" onClick={load} disabled={loading}>
+          <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} aria-hidden="true" /> Refresh
         </Button>
       </div>
-      <div className="px-4">
+      <div className="px-4 overflow-x-auto">
         <Tabs value={tab} onValueChange={setTab}>
-          <TabsList className="bg-transparent border-b-0 h-auto p-0 space-x-6">
-            <TabsTrigger value="noise" className={tabClass}><Volume2 className="h-4 w-4" /> Noise</TabsTrigger>
-            <TabsTrigger value="chemical" className={tabClass}><FlaskConical className="h-4 w-4" /> Chemical</TabsTrigger>
-            <TabsTrigger value="heat" className={tabClass}><Thermometer className="h-4 w-4" /> Heat</TabsTrigger>
-            <TabsTrigger value="records" className={tabClass}><ClipboardList className="h-4 w-4" /> Records</TabsTrigger>
+          <TabsList className="h-auto justify-start gap-6 rounded-none border-0 bg-transparent p-0">
+            <TabsTrigger value="noise" className={tabClass}><Volume2 className="h-4 w-4" aria-hidden="true" /> Noise</TabsTrigger>
+            <TabsTrigger value="chemical" className={tabClass}><FlaskConical className="h-4 w-4" aria-hidden="true" /> Chemical</TabsTrigger>
+            <TabsTrigger value="heat" className={tabClass}><Thermometer className="h-4 w-4" aria-hidden="true" /> Heat</TabsTrigger>
+            <TabsTrigger value="records" className={tabClass}><ClipboardList className="h-4 w-4" aria-hidden="true" /> Records</TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
@@ -109,15 +112,15 @@ export default function OccupationalHygieneModule() {
   if (tab === 'noise') body = <NoiseTab {...common} form={noiseForm} setForm={setNoiseForm} />;
   else if (tab === 'chemical') body = <ChemicalTab {...common} form={chemicalForm} setForm={setChemicalForm} />;
   else if (tab === 'heat') body = <HeatTab {...common} form={heatForm} setForm={setHeatForm} />;
-  else if (loading) body = <div className="py-16 text-center text-gray-400">Loading hygiene records...</div>;
+  else if (loading) body = <div className="py-16 text-center text-pl-muted">Loading hygiene records...</div>;
   else if (schemaMissing) body = null;
   else if (loadError) body = <Notice tone="warn" title="Could not load">{loadError}</Notice>;
   else body = <RecordsTab orgId={orgId} records={records} sites={sites} canEdit={canEdit} onOpen={onOpen} onChanged={load} />;
 
   return (
-    <div className="flex h-[calc(100vh-64px)] overflow-hidden bg-[var(--bg-app)] flex-col">
+    <div className="flex h-[calc(100vh-64px)] overflow-hidden bg-pl-bg text-pl-text flex-col">
       {header}
-      <div className="flex-1 overflow-auto p-6 max-w-[1600px] w-full mx-auto space-y-4">
+      <div className="flex-1 overflow-auto p-4 sm:p-6 max-w-[1600px] w-full mx-auto space-y-4">
         {schemaMissing && (
           <Notice tone="warn" title="Hygiene records are not switched on yet">
             The database update that stores noise, chemical and heat records (HS2) has not been applied to this environment.

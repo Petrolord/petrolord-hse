@@ -10,6 +10,7 @@ import { exportToCsv } from '@/utils/exportCsv';
 import { useToast } from "@/components/ui/use-toast";
 import NewRiskModal from './components/NewRiskModal';
 import RowActions from '../common/RowActions';
+import { barClass, tableHeadClass, tableBodyClass, tableRowClass, RiskScoreBadge } from '../common/ui';
 
 const PAGE_SIZE = 10;
 
@@ -81,47 +82,42 @@ export default function RiskRegister() {
     if (!ok) toast({ title: "Nothing to export", description: "There are no risks to export.", variant: "destructive" });
   };
 
-  const getScoreBadge = (score) => {
-    if (score >= 15) return <Badge variant="outline" className="bg-red-500/10 text-red-500 border-red-500/20">{score} Critical</Badge>;
-    if (score >= 10) return <Badge variant="outline" className="bg-orange-500/10 text-orange-500 border-orange-500/20">{score} High</Badge>;
-    if (score >= 5) return <Badge variant="outline" className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20">{score} Medium</Badge>;
-    return <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/20">{score} Low</Badge>;
-  };
+  const getScoreBadge = (score) => <RiskScoreBadge score={score} />;
 
   return (
     <div className="h-full flex flex-col space-y-4">
       {/* Toolbar */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-[#1e1e30] p-4 rounded-lg border border-[#2a2a40]">
+      <div className={`flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 ${barClass}`}>
         <div className="relative w-full sm:w-96">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-pl-muted" aria-hidden="true" />
           <Input 
             placeholder="Search risks by ID, title or description..." 
-            className="pl-10 bg-[#252541] border-[#3a3a5a] text-white focus:border-amber-500"
+            className="pl-10"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && loadRisks()}
           />
         </div>
-        <div className="flex gap-2 w-full sm:w-auto">
-          <Button variant="outline" className="border-[#3a3a5a] bg-[#252541] text-gray-300 hover:text-white">
-            <Filter className="mr-2 h-4 w-4" /> Filter
+        <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+          <Button variant="outline">
+            <Filter className="mr-2 h-4 w-4" aria-hidden="true" /> Filter
           </Button>
-          <Button variant="outline" className="border-[#3a3a5a] bg-[#252541] text-gray-300 hover:text-white" onClick={handleExport}>
-            <Download className="mr-2 h-4 w-4" /> Export
+          <Button variant="outline" onClick={handleExport}>
+            <Download className="mr-2 h-4 w-4" aria-hidden="true" /> Export
           </Button>
-          <Button className="bg-amber-600 hover:bg-amber-700 text-white" onClick={openAdd}>
-            <Plus className="mr-2 h-4 w-4" /> Add Risk
+          <Button onClick={openAdd}>
+            <Plus className="mr-2 h-4 w-4" aria-hidden="true" /> Add Risk
           </Button>
         </div>
       </div>
 
       {/* Table */}
-      <Card className="flex-1 bg-[#1e1e30] border-[#2a2a40] overflow-hidden flex flex-col">
+      <Card className="flex-1 overflow-hidden flex flex-col">
         <div className="overflow-auto flex-1">
           <table className="w-full text-sm text-left">
-            <thead className="bg-[#252541] text-gray-400 uppercase text-xs sticky top-0 z-10">
+            <thead className={`${tableHeadClass} sticky top-0 z-10`}>
               <tr>
-                <th className="px-6 py-4 font-medium"><div className="flex items-center cursor-pointer">Risk ID <ArrowUpDown className="ml-1 h-3 w-3" /></div></th>
+                <th className="px-6 py-4 font-medium"><div className="flex items-center cursor-pointer">Risk ID <ArrowUpDown className="ml-1 h-3 w-3" aria-hidden="true" /></div></th>
                 <th className="px-6 py-4 font-medium">Title & Description</th>
                 <th className="px-6 py-4 font-medium">Category</th>
                 <th className="px-6 py-4 font-medium text-center">Score</th>
@@ -131,36 +127,34 @@ export default function RiskRegister() {
                 <th className="px-6 py-4 text-right">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#2a2a40]">
+            <tbody className={tableBodyClass}>
               {loading ? (
-                <tr><td colSpan="8" className="p-10 text-center text-gray-500">Loading registry...</td></tr>
+                <tr><td colSpan="8" className="p-10 text-center text-pl-muted">Loading registry...</td></tr>
               ) : risks.length === 0 ? (
-                <tr><td colSpan="8" className="p-10 text-center text-gray-500">No risks found matching your criteria.</td></tr>
+                <tr><td colSpan="8" className="p-10 text-center text-pl-muted">No risks found matching your criteria.</td></tr>
               ) : (
                 pageRisks.map((risk) => (
-                  <tr key={risk.id} className="hover:bg-[#252541] transition-colors group">
-                    <td className="px-6 py-4 font-mono text-gray-500 text-xs">{risk.risk_id}</td>
+                  <tr key={risk.id} className={`${tableRowClass} group`}>
+                    <td className="px-6 py-4 font-pl-mono text-pl-muted text-xs whitespace-nowrap">{risk.risk_id}</td>
                     <td className="px-6 py-4 max-w-md">
-                      <div className="font-bold text-white mb-1">{risk.title}</div>
-                      <div className="text-gray-400 text-xs truncate">{risk.description}</div>
+                      <div className="font-semibold text-pl-text mb-1">{risk.title}</div>
+                      <div className="text-pl-muted text-xs truncate">{risk.description}</div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#2a2a40] text-gray-300">
-                        {risk.category}
-                      </span>
+                      <Badge variant="neutral">{risk.category}</Badge>
                     </td>
                     <td className="px-6 py-4 text-center">
                       {getScoreBadge(risk.risk_score)}
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`text-xs font-medium ${risk.status === 'Open' ? 'text-blue-400' : 'text-gray-400'}`}>
+                      <span className={`text-xs font-medium ${risk.status === 'Open' ? 'text-pl-text' : 'text-pl-muted'}`}>
                         {risk.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-xs text-gray-400">
+                    <td className="px-6 py-4 text-xs text-pl-muted">
                       {risk.owner?.raw_user_meta_data?.full_name || 'Unassigned'}
                     </td>
-                    <td className="px-6 py-4 text-xs text-gray-500">
+                    <td className="px-6 py-4 text-xs text-pl-muted font-pl-mono tabular-nums whitespace-nowrap">
                       {new Date(risk.updated_at).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4 text-right">
@@ -177,15 +171,15 @@ export default function RiskRegister() {
             </tbody>
           </table>
         </div>
-        <div className="p-4 border-t border-[#2a2a40] bg-[#1e1e30] text-xs text-gray-500 flex justify-between items-center">
+        <div className="p-4 border-t border-pl-border bg-pl-surface text-xs text-pl-muted flex flex-wrap gap-2 justify-between items-center">
           <span>
             {risks.length === 0
               ? 'Showing 0 records'
               : `Showing ${(page - 1) * PAGE_SIZE + 1}–${Math.min(page * PAGE_SIZE, risks.length)} of ${risks.length} · Page ${page} of ${totalPages}`}
           </span>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" className="h-7 text-xs border-[#3a3a5a] bg-transparent" disabled={page <= 1} onClick={() => setPage(p => Math.max(1, p - 1))}>Previous</Button>
-            <Button variant="outline" size="sm" className="h-7 text-xs border-[#3a3a5a] bg-transparent" disabled={page >= totalPages} onClick={() => setPage(p => Math.min(totalPages, p + 1))}>Next</Button>
+            <Button variant="outline" size="xs" disabled={page <= 1} onClick={() => setPage(p => Math.max(1, p - 1))}>Previous</Button>
+            <Button variant="outline" size="xs" disabled={page >= totalPages} onClick={() => setPage(p => Math.min(totalPages, p + 1))}>Next</Button>
           </div>
         </div>
       </Card>

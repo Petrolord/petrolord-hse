@@ -68,46 +68,46 @@ export default function AddPermitModal({ isOpen, onClose, onSuccess, record }) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[560px] bg-[#1a1a2e] border-[#3a3a5a] text-white">
+      <DialogContent className="sm:max-w-[560px]">
         <DialogHeader><DialogTitle>{isEdit ? 'Edit Permit' : 'Add Permit'}</DialogTitle></DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-2">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-[#b0b0c0]">Permit # *</Label>
-              <Input value={form.permit_number} onChange={e => set('permit_number', e.target.value)} className="bg-[#252541] border-[#3a3a5a] text-white" required />
+              <Label>Permit # *</Label>
+              <Input value={form.permit_number} onChange={e => set('permit_number', e.target.value)} required />
             </div>
             <div className="space-y-2">
-              <Label className="text-[#b0b0c0]">Type *</Label>
-              <Input value={form.type} onChange={e => set('type', e.target.value)} placeholder="e.g. Air Emissions" className="bg-[#252541] border-[#3a3a5a] text-white" required />
-            </div>
-          </div>
-          <div className="space-y-2">
-            <Label className="text-[#b0b0c0]">Issuing Authority</Label>
-            <Input value={form.issuing_authority} onChange={e => set('issuing_authority', e.target.value)} className="bg-[#252541] border-[#3a3a5a] text-white" />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label className="text-[#b0b0c0]">Issue Date</Label>
-              <Input type="date" value={form.issue_date} onChange={e => set('issue_date', e.target.value)} className="bg-[#252541] border-[#3a3a5a] text-white" />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-[#b0b0c0]">Expiry Date</Label>
-              <Input type="date" value={form.expiry_date} onChange={e => set('expiry_date', e.target.value)} className="bg-[#252541] border-[#3a3a5a] text-white" />
+              <Label>Type *</Label>
+              <Input value={form.type} onChange={e => set('type', e.target.value)} placeholder="e.g. Air Emissions" required />
             </div>
           </div>
           <div className="space-y-2">
-            <Label className="text-[#b0b0c0]">Status</Label>
+            <Label>Issuing Authority</Label>
+            <Input value={form.issuing_authority} onChange={e => set('issuing_authority', e.target.value)} />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Issue Date</Label>
+              <Input type="date" value={form.issue_date} onChange={e => set('issue_date', e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label>Expiry Date</Label>
+              <Input type="date" value={form.expiry_date} onChange={e => set('expiry_date', e.target.value)} />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label>Status</Label>
             <Select value={form.status} onValueChange={v => set('status', v)}>
-              <SelectTrigger className="bg-[#252541] border-[#3a3a5a] text-white"><SelectValue /></SelectTrigger>
-              <SelectContent className="bg-[#252541] border-[#3a3a5a] text-white">
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
                 {['Active', 'Pending', 'Expired', 'Revoked'].map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
           <DialogFooter>
-            <Button type="button" variant="ghost" onClick={onClose} className="text-[#b0b0c0]">Cancel</Button>
-            <Button type="submit" disabled={loading} className="bg-blue-600 hover:bg-blue-700 text-white">
-              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} {isEdit ? 'Save Changes' : 'Add Permit'}
+            <Button type="button" variant="ghost" onClick={onClose}>Cancel</Button>
+            <Button type="submit" disabled={loading}>
+              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />} {isEdit ? 'Save Changes' : 'Add Permit'}
             </Button>
           </DialogFooter>
         </form>
