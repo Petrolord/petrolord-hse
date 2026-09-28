@@ -60,7 +60,8 @@ async function captureAll() {
   const out = {};
   const snapper = (prefix) => (name) => { out[`${prefix}.${name}`] = stableDom(document.body.innerHTML); };
 
-  resetShell({ activeModule: { id: 'permits', label: 'Work Permits' } });
+  // an id no rollout batch lists, so the layout stays legacy around the dialogs
+  resetShell({ activeModule: { id: 'legacy-probe', label: 'Legacy probe' } });
   qr.analyze = async () => ANALYSIS;
   render(<QuickReport isOpen onClose={noop} />);
   await walkQuickReport(snapper('quickReport'));
@@ -81,10 +82,12 @@ async function captureAll() {
   cleanup();
 
   // the layout's wizard dialog, open, on a module that has not migrated
+  // (only the dialog: the shell around it is pinned by shellLegacyDom)
   ui.wizardOpen = true;
   render(<MemoryRouter initialEntries={['/dashboard']}><TooltipProvider><PetrolordHSE /></TooltipProvider></MemoryRouter>);
   await flush();
-  out['layout.wizardDialog'] = stableDom(document.body.innerHTML);
+  expect(document.querySelector('[data-pl-root]')).toBeNull();
+  out['layout.wizardDialog'] = stableDom(document.querySelector('[role="dialog"]').outerHTML);
   cleanup();
   ui.wizardOpen = false;
   return out;
