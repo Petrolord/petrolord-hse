@@ -59,7 +59,7 @@ export default function SecurityDashboard({ setActiveTab }) {
         </Card>
 
         {/* Stats Cards: only metrics backed by real data are shown */}
-        <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-4 items-start">
           <StatsCard title="Incidents (YTD)" value={stats.incidentsYTD.toString()} icon={AlertTriangle} />
           <StatsCard title="Training Status" value={stats.pendingTrainings} unit="Pending" icon={CheckCircle} />
           <StatsCard title="Credential Health" value={stats.expiringCredentials} unit="Expiring" icon={Shield} />

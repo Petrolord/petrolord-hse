@@ -29,8 +29,8 @@ function SideResult({ label, side, siteName }) {
       {r.status === 'ok' ? (
         <>
           <div className="font-pl-mono text-xl font-semibold text-pl-text">{fmtRate(r.rate)} <span className="font-pl-sans text-xs font-normal text-pl-muted">{r.basis.baseLabel}</span></div>
-          <div className="font-pl-mono text-pl-text">{Math.round(r.interval.confidence * 100)}% interval {fmtRate(r.interval.lower)} to {fmtRate(r.interval.upper)}</div>
-          <div className="font-pl-mono text-pl-muted">{fmtInt(r.count)} events over {fmtHours(r.exposureHours)} h</div>
+          <div className="text-pl-text">{Math.round(r.interval.confidence * 100)}% interval {fmtRate(r.interval.lower)} to {fmtRate(r.interval.upper)}</div>
+          <div className="text-pl-muted">{fmtInt(r.count)} events over {fmtHours(r.exposureHours)} h</div>
         </>
       ) : (
         <div className="text-pl-text">{r.reason}</div>
@@ -85,7 +85,7 @@ export default function CompareRates({ reports, exposure, workforce, base, siteO
           <div className="font-pl-mono text-2xl font-semibold text-pl-text tabular-nums">
             {c.rateRatio === null ? 'unbounded' : fmtRate(c.rateRatio)}
           </div>
-          <div className="font-pl-mono text-pl-text tabular-nums">
+          <div className="text-pl-text tabular-nums">
             {Math.round(conf * 100)}% interval {fmtRate(c.rateRatioLower)} to {c.upperUnbounded ? 'unbounded' : fmtRate(c.rateRatioUpper)}
             {' '}· two-sided p = {c.pValue < 0.0001 ? '< 0.0001' : c.pValue.toFixed(4)}
           </div>

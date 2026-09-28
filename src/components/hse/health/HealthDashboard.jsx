@@ -8,11 +8,13 @@ import {
 } from 'recharts';
 import { healthService } from '@/services/healthService';
 import { useHSE } from '@/context/HSEContext';
-import { AXIS_PROPS, CHART_SERIES, GRID_STYLE, LEGEND_PROPS, TOOLTIP_STYLE } from '@/utils/chartTheme';
+import { AXIS_PROPS, CHART_COLORS, CHART_SERIES, GRID_STYLE, LEGEND_PROPS, TOOLTIP_STYLE } from '@/utils/chartTheme';
 
 // Design family (batch 2B): the Suite chart standard's series colours on a
 // white ChartPanel, in both themes.
 const STATUS_COLORS = CHART_SERIES;
+// Legend words wear the text colour; the swatch beside them carries identity.
+const legendText = (value) => <span style={{ color: CHART_COLORS.legendText }}>{value}</span>;
 
 export default function HealthDashboard() {
   const { currentOrganization } = useHSE();
@@ -57,7 +59,7 @@ export default function HealthDashboard() {
                   ))}
                 </Pie>
                 <Tooltip contentStyle={TOOLTIP_STYLE} />
-                <Legend {...LEGEND_PROPS} />
+                <Legend {...LEGEND_PROPS} formatter={legendText} />
               </PieChart>
             </ResponsiveContainer>
           ) : (

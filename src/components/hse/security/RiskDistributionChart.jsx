@@ -1,6 +1,6 @@
 import React from 'react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { CHART_SERIES, LEGEND_PROPS, TOOLTIP_STYLE } from '@/utils/chartTheme';
+import { CHART_COLORS, CHART_SERIES, LEGEND_PROPS, TOOLTIP_STYLE } from '@/utils/chartTheme';
 
 // Design family (batch 2B): the Suite chart standard on a white ChartPanel.
 // Each slice takes its colour from its severity name, so the legend word and
@@ -12,6 +12,8 @@ const SEVERITY_COLORS = {
   Low: CHART_SERIES[1],
 };
 const colorFor = (name) => SEVERITY_COLORS[name] || CHART_SERIES[4];
+// Legend words wear the text colour; the swatch beside them carries identity.
+const legendText = (value) => <span style={{ color: CHART_COLORS.legendText }}>{value}</span>;
 
 export default function RiskDistributionChart({ data }) {
   return (
@@ -32,7 +34,7 @@ export default function RiskDistributionChart({ data }) {
             ))}
           </Pie>
           <Tooltip contentStyle={TOOLTIP_STYLE} />
-          <Legend {...LEGEND_PROPS} />
+          <Legend {...LEGEND_PROPS} formatter={legendText} />
         </PieChart>
       </ResponsiveContainer>
     </div>

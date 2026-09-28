@@ -14,7 +14,7 @@ export default function RateCards({ rates }) {
       {rates.map((r) => (
         <div key={r.metric.id} className="rounded-xl border border-pl-border bg-pl-surface p-4 flex flex-col gap-2 shadow-pl-sm">
           <div className="flex items-baseline justify-between gap-2">
-            <span className="text-sm font-semibold text-pl-text">{r.metric.short}</span>
+            <span className="text-sm font-semibold text-pl-text whitespace-nowrap">{r.metric.short}</span>
             <span className="text-[11px] text-pl-muted text-right">{r.metric.name}</span>
           </div>
 
@@ -23,7 +23,7 @@ export default function RateCards({ rates }) {
               <div className="font-pl-mono text-3xl font-semibold text-pl-text tabular-nums">{fmtRate(r.rate)}</div>
               <div className="text-[11px] text-pl-muted">{r.basis.baseLabel}</div>
               {r.interval ? (
-                <div className="font-pl-mono text-xs text-pl-text tabular-nums">
+                <div className="text-xs text-pl-text tabular-nums">
                   {pct(r.interval.confidence)} interval {fmtRate(r.interval.lower)} to {fmtRate(r.interval.upper)}
                 </div>
               ) : (
@@ -39,7 +39,7 @@ export default function RateCards({ rates }) {
             </div>
           )}
 
-          <div className="mt-auto space-y-0.5 border-t border-pl-border pt-2 font-pl-mono text-[11px] tabular-nums">
+          <div className="mt-auto space-y-0.5 border-t border-pl-border pt-2 text-[11px] tabular-nums">
             <Line>
               {r.metric.kind === 'days' ? `${fmtInt(r.count)} days away` : `${fmtInt(r.count)} ${r.count === 1 ? 'event' : 'events'}`}
               {r.exposureHours > 0 && ` over ${fmtHours(r.exposureHours)} h`}
