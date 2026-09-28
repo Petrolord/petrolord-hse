@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2, Mail, Send, RefreshCw, Clock, CheckCircle2, AlertTriangle, ExternalLink, Key, ShieldCheck, Check } from "lucide-react";
@@ -135,7 +136,6 @@ export default function InviteTeamMember() {
           toast({
             title: "Invitation Warning",
             description: data.warning,
-            className: "bg-yellow-600 text-white border-none"
           });
           setEmail("");
           loadInvitations();
@@ -149,7 +149,7 @@ export default function InviteTeamMember() {
             toast({
               title: "Invitation Sent",
               description: `Invite sent to ${email}`,
-              className: "bg-green-600 text-white border-none"
+              variant: "success"
             });
           }
           setEmail("");
@@ -162,7 +162,7 @@ export default function InviteTeamMember() {
       toast({
         title: "Invitation Sent",
         description: `Invite sent to ${email}`,
-        className: "bg-green-600 text-white border-none"
+        variant: "success"
       });
 
       setEmail("");
@@ -228,7 +228,6 @@ export default function InviteTeamMember() {
            toast({
             title: "Resend Warning",
             description: data.warning,
-            className: "bg-yellow-600 text-white border-none"
           });
         } else if (data.emailSent === false && data.inviteLink) {
           await offerLinkFallback(invite.email, data.inviteLink);
@@ -236,14 +235,14 @@ export default function InviteTeamMember() {
           toast({
             title: "Invitation Resent",
             description: `Email sent to ${invite.email}`,
-            className: "bg-blue-600 text-white border-none"
+            variant: "success"
           });
         }
       } else {
         toast({ 
           title: "Invitation Resent", 
           description: `Email sent to ${invite.email}`,
-          className: "bg-blue-600 text-white border-none"
+          variant: "success"
         });
       }
       
@@ -273,7 +272,6 @@ export default function InviteTeamMember() {
       description: copied
         ? `The invite link for ${recipient} was copied to your clipboard. Share it with them directly.`
         : `Share this link with ${recipient}: ${inviteLink}`,
-      className: "bg-yellow-600 text-white border-none",
       duration: 15000
     });
   };
@@ -305,8 +303,7 @@ export default function InviteTeamMember() {
       toast({
         title: "Configuration Required",
         description: "The Email service needs to be configured.",
-        variant: "warning", 
-        className: "bg-yellow-600 text-white border-none"
+        variant: "warning"
       });
     } else {
       toast({
@@ -319,12 +316,12 @@ export default function InviteTeamMember() {
 
   return (
     <div className="space-y-6">
-      <Card className="bg-[#1f1f35] border-[#3a3a5a]">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-white flex items-center gap-2">
-            <Mail className="h-5 w-5 text-blue-400" /> Invite New Member
+          <CardTitle className="flex items-center gap-2">
+            <Mail className="h-5 w-5 text-pl-primary-text" aria-hidden="true" /> Invite New Member
           </CardTitle>
-          <CardDescription className="text-gray-400">
+          <CardDescription>
             Send an email invitation to join your organization via Brevo.
           </CardDescription>
         </CardHeader>
@@ -336,16 +333,15 @@ export default function InviteTeamMember() {
                 type="email" 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="bg-[#1a1a2e] border-[#3a3a5a] text-white focus:ring-blue-500"
                 required
               />
             </div>
             <div className="w-full md:w-40">
               <Select value={role} onValueChange={setRole}>
-                <SelectTrigger className="bg-[#1a1a2e] border-[#3a3a5a] text-white">
+                <SelectTrigger aria-label="Role">
                   <SelectValue placeholder="Role" />
                 </SelectTrigger>
-                <SelectContent className="bg-[#1a1a2e] border-[#3a3a5a] text-white">
+                <SelectContent>
                   <SelectItem value="member">Member</SelectItem>
                   <SelectItem value="admin">Admin</SelectItem>
                   <SelectItem value="supervisor">Supervisor</SelectItem>
@@ -355,7 +351,6 @@ export default function InviteTeamMember() {
             <Button 
               type="submit" 
               disabled={loading || !currentOrganization?.id} 
-              className="bg-blue-600 hover:bg-blue-700 text-white font-medium"
             >
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4 mr-2" />}
               Send Invite
@@ -365,9 +360,9 @@ export default function InviteTeamMember() {
       </Card>
 
       {invitations.length > 0 && (
-        <Card className="bg-[#1f1f35] border-[#3a3a5a]">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-white text-lg">Pending Invitations</CardTitle>
+            <CardTitle>Pending Invitations</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -376,20 +371,20 @@ export default function InviteTeamMember() {
                 const onCooldown = resendCooldowns[invite.id] > 0;
                 
                 return (
-                  <div key={invite.id} className="flex items-center justify-between p-3 bg-[#1a1a2e] rounded border border-[#3a3a5a] transition-all hover:border-blue-500/30">
-                    <div>
-                      <p className="text-white font-medium flex items-center gap-2">
+                  <div key={invite.id} className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between rounded-md border border-pl-border bg-pl-sunken p-3 transition-colors hover:border-pl-primary/40">
+                    <div className="min-w-0">
+                      <p className="text-pl-text font-medium flex flex-wrap items-center gap-2 break-all">
                         {invite.email}
                         {onCooldown && (
-                          <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full flex items-center gap-1">
-                            <CheckCircle2 className="h-3 w-3" /> Sent
-                          </span>
+                          <Badge variant="success" className="gap-1">
+                            <CheckCircle2 className="h-3 w-3" aria-hidden="true" /> Sent
+                          </Badge>
                         )}
                       </p>
-                      <div className="flex items-center gap-2 text-xs text-gray-500 mt-1">
-                        <span className="capitalize bg-blue-900/30 text-blue-400 px-2 py-0.5 rounded border border-blue-900/50">{invite.role}</span>
+                      <div className="flex flex-wrap items-center gap-2 text-xs text-pl-muted mt-1">
+                        <Badge variant="neutral" className="capitalize">{invite.role}</Badge>
                         <span className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" /> 
+                          <Clock className="h-3 w-3" aria-hidden="true" /> 
                           Last sent: {new Date(invite.created_at).toLocaleDateString()} {new Date(invite.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                         </span>
                       </div>
@@ -399,12 +394,12 @@ export default function InviteTeamMember() {
                       size="sm" 
                       onClick={() => handleResend(invite)}
                       disabled={isResending || onCooldown}
-                      className="text-gray-400 hover:text-white hover:bg-[#2d2d4a] transition-colors min-w-[100px]"
+                      className="self-start sm:self-auto min-w-[100px]"
                     >
                       {isResending ? (
-                        <Loader2 className="h-4 w-4 animate-spin text-blue-400" />
+                        <Loader2 className="h-4 w-4 animate-spin text-pl-primary-text" />
                       ) : onCooldown ? (
-                        <span className="text-xs font-mono text-blue-400">Wait {resendCooldowns[invite.id]}s</span>
+                        <span className="text-xs font-pl-mono tabular-nums text-pl-muted">Wait {resendCooldowns[invite.id]}s</span>
                       ) : (
                         <>
                           <RefreshCw className="h-4 w-4 mr-2" /> Resend
@@ -445,17 +440,26 @@ function BrevoConfigDialog({ open, onOpenChange, errorContext, onRetry }) {
     }
   };
 
+  const secret = (name, value) => (
+    <div className="grid grid-cols-[64px_1fr] sm:grid-cols-[160px_1fr] gap-2 my-2 text-xs font-pl-mono">
+      <span className="text-pl-muted">Name:</span>
+      <span className="text-pl-text font-semibold break-all">{name}</span>
+      <span className="text-pl-muted">Value:</span>
+      <span className="text-pl-text break-all">{value}</span>
+    </div>
+  );
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-[#1a1a2e] border-[#3a3a5a] text-white sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-yellow-500/20 rounded-full">
-              <AlertTriangle className="h-6 w-6 text-yellow-500" />
+            <div className="p-2 rounded-full bg-pl-warning-bg">
+              <AlertTriangle className="h-6 w-6 text-pl-warning-text" aria-hidden="true" />
             </div>
             <DialogTitle className="text-xl">Brevo Configuration Required</DialogTitle>
           </div>
-          <DialogDescription className="text-gray-400">
+          <DialogDescription>
             We couldn't send the email because the Brevo email service is missing credentials. Follow these steps to fix it.
           </DialogDescription>
         </DialogHeader>
@@ -463,7 +467,7 @@ function BrevoConfigDialog({ open, onOpenChange, errorContext, onRetry }) {
         <div className="py-4 space-y-6">
           {/* Error Context Display */}
           {errorContext && (
-            <div className="bg-red-950/30 border border-red-900/50 p-3 rounded text-sm text-red-200 font-mono break-all">
+            <div className="rounded border border-pl-danger/40 bg-pl-danger-bg p-3 text-sm text-pl-danger-text font-pl-mono break-all">
               Error: {errorContext}
             </div>
           )}
@@ -471,51 +475,31 @@ function BrevoConfigDialog({ open, onOpenChange, errorContext, onRetry }) {
           <div className="space-y-4">
             {/* Step 1 */}
             <div className="flex gap-4">
-              <div className="flex-none flex items-center justify-center w-8 h-8 rounded-full bg-blue-900/50 text-blue-400 font-bold border border-blue-800">1</div>
-              <div className="space-y-2 flex-1">
-                <h4 className="font-medium text-white flex items-center gap-2">
+              <div className="flex-none flex items-center justify-center w-8 h-8 rounded-full bg-pl-primary/10 text-pl-primary-text font-bold border border-pl-primary/30">1</div>
+              <div className="space-y-2 flex-1 min-w-0">
+                <h4 className="font-medium text-pl-text flex flex-wrap items-center gap-2">
                   Get your SMTP Credentials from Brevo
-                  <a href="https://app.brevo.com/settings/keys/smtp" target="_blank" rel="noreferrer" className="text-blue-400 hover:text-blue-300 inline-flex items-center text-xs">
-                    Open SMTP Settings <ExternalLink className="h-3 w-3 ml-1" />
+                  <a href="https://app.brevo.com/settings/keys/smtp" target="_blank" rel="noreferrer" className="text-pl-primary-text hover:text-pl-primary-text-hover inline-flex items-center text-xs">
+                    Open SMTP Settings <ExternalLink className="h-3 w-3 ml-1" aria-hidden="true" />
                   </a>
                 </h4>
-                <p className="text-sm text-gray-400">Log in to Brevo (Sendinblue) and generate a new SMTP key/password.</p>
+                <p className="text-sm text-pl-muted">Log in to Brevo (Sendinblue) and generate a new SMTP key/password.</p>
               </div>
             </div>
 
             {/* Step 2 */}
             <div className="flex gap-4">
-              <div className="flex-none flex items-center justify-center w-8 h-8 rounded-full bg-blue-900/50 text-blue-400 font-bold border border-blue-800">2</div>
-              <div className="space-y-2 flex-1">
-                <h4 className="font-medium text-white">Update Supabase Secrets</h4>
-                <div className="text-sm text-gray-400 space-y-2 bg-[#0f172a] p-3 rounded border border-[#3a3a5a]">
+              <div className="flex-none flex items-center justify-center w-8 h-8 rounded-full bg-pl-primary/10 text-pl-primary-text font-bold border border-pl-primary/30">2</div>
+              <div className="space-y-2 flex-1 min-w-0">
+                <h4 className="font-medium text-pl-text">Update Supabase Secrets</h4>
+                <div className="text-sm text-pl-muted space-y-2 rounded border border-pl-border bg-pl-sunken p-3">
                   <p>1. Go to your Supabase Project Dashboard.</p>
                   <p>2. Navigate to <strong>Settings</strong> {'>'} <strong>Edge Functions</strong> (or Secrets).</p>
                   <p>3. Add these new secrets:</p>
-                  <div className="grid grid-cols-[160px_1fr] gap-2 my-2 text-xs font-mono">
-                    <span className="text-gray-500">Name:</span>
-                    <span className="text-yellow-400">BREVO_SMTP_HOST</span>
-                    <span className="text-gray-500">Value:</span>
-                    <span className="text-blue-300">smtp-relay.brevo.com</span>
-                  </div>
-                  <div className="grid grid-cols-[160px_1fr] gap-2 my-2 text-xs font-mono">
-                    <span className="text-gray-500">Name:</span>
-                    <span className="text-yellow-400">BREVO_SMTP_PORT</span>
-                    <span className="text-gray-500">Value:</span>
-                    <span className="text-blue-300">587</span>
-                  </div>
-                  <div className="grid grid-cols-[160px_1fr] gap-2 my-2 text-xs font-mono">
-                    <span className="text-gray-500">Name:</span>
-                    <span className="text-yellow-400">BREVO_SMTP_USER</span>
-                    <span className="text-gray-500">Value:</span>
-                    <span className="text-blue-300">Your Login Email</span>
-                  </div>
-                  <div className="grid grid-cols-[160px_1fr] gap-2 my-2 text-xs font-mono">
-                    <span className="text-gray-500">Name:</span>
-                    <span className="text-yellow-400">BREVO_SMTP_PASSWORD</span>
-                    <span className="text-gray-500">Value:</span>
-                    <span className="text-blue-300">Your Master Password/SMTP Key</span>
-                  </div>
+                  {secret('BREVO_SMTP_HOST', 'smtp-relay.brevo.com')}
+                  {secret('BREVO_SMTP_PORT', '587')}
+                  {secret('BREVO_SMTP_USER', 'Your Login Email')}
+                  {secret('BREVO_SMTP_PASSWORD', 'Your Master Password/SMTP Key')}
                 </div>
               </div>
             </div>
@@ -523,13 +507,13 @@ function BrevoConfigDialog({ open, onOpenChange, errorContext, onRetry }) {
         </div>
 
         <DialogFooter className="sm:justify-between items-center gap-4">
-          <p className="text-xs text-gray-500 hidden sm:block">
-            <ShieldCheck className="h-3 w-3 inline mr-1" /> 
+          <p className="text-xs text-pl-muted hidden sm:block">
+            <ShieldCheck className="h-3 w-3 inline mr-1" aria-hidden="true" /> 
             Secrets are encrypted and safe.
           </p>
           <div className="flex gap-2">
             <Button variant="ghost" onClick={() => onOpenChange(false)}>Close</Button>
-            <Button onClick={onRetry} className="bg-green-600 hover:bg-green-700 text-white">
+            <Button onClick={onRetry}>
               <Check className="h-4 w-4 mr-2" /> I've Updated the Secret
             </Button>
           </div>

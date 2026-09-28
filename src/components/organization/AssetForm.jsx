@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { AlertCircle, CheckCircle } from 'lucide-react';
 import { ASSET_CATEGORIES } from '@/constants/assetConstants';
+import { accountNativeSelect } from '@/components/account/accountChrome';
 
 export const AssetForm = ({ template, asset, onSubmit, onCancel }) => {
   const [formData, setFormData] = useState({
@@ -50,25 +51,25 @@ export const AssetForm = ({ template, asset, onSubmit, onCancel }) => {
   };
 
   return (
-    <Card className="bg-gray-800 border-gray-700 mb-6 text-white">
+    <Card className="mb-6">
       <CardHeader>
         <CardTitle>{asset ? 'Edit Asset' : 'Add New Asset'}</CardTitle>
-        <CardDescription className="text-gray-400">
+        <CardDescription className="mt-1.5">
           {asset ? 'Update asset information' : 'Add a new asset to your organization'}
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6 text-pl-text">
           {message && (
-            <div className={`p-4 rounded-lg flex items-center gap-2 ${
+            <div role="status" className={`p-4 rounded-lg border flex items-center gap-2 ${
               message.type === 'success' 
-                ? 'bg-green-900 text-green-100' 
-                : 'bg-red-900 text-red-100'
+                ? 'border-pl-success/40 bg-pl-success-bg text-pl-success-text' 
+                : 'border-pl-danger/40 bg-pl-danger-bg text-pl-danger-text'
             }`}>
               {message.type === 'success' ? (
-                <CheckCircle className="w-5 h-5" />
+                <CheckCircle className="w-5 h-5 shrink-0" aria-hidden="true" />
               ) : (
-                <AlertCircle className="w-5 h-5" />
+                <AlertCircle className="w-5 h-5 shrink-0" aria-hidden="true" />
               )}
               {message.text}
             </div>
@@ -76,7 +77,7 @@ export const AssetForm = ({ template, asset, onSubmit, onCancel }) => {
 
           {/* Basic Information */}
           <div>
-            <h3 className="text-lg font-semibold mb-4 text-white">Basic Information</h3>
+            <h3 className="text-lg font-semibold mb-4 text-pl-text">Basic Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium mb-2">Asset Name *</label>
@@ -84,7 +85,6 @@ export const AssetForm = ({ template, asset, onSubmit, onCancel }) => {
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  className="bg-gray-700 border-gray-600 text-white"
                   required
                 />
               </div>
@@ -94,7 +94,6 @@ export const AssetForm = ({ template, asset, onSubmit, onCancel }) => {
                   name="asset_id"
                   value={formData.asset_id}
                   onChange={handleChange}
-                  className="bg-gray-700 border-gray-600 text-white"
                   placeholder="e.g., ASSET-001"
                   required
                 />
@@ -105,7 +104,7 @@ export const AssetForm = ({ template, asset, onSubmit, onCancel }) => {
                   name="category"
                   value={formData.category}
                   onChange={handleChange}
-                  className="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white"
+                  className={accountNativeSelect}
                   required
                 >
                   <option value="">Select Category</option>
@@ -122,7 +121,6 @@ export const AssetForm = ({ template, asset, onSubmit, onCancel }) => {
                   name="location"
                   value={formData.location}
                   onChange={handleChange}
-                  className="bg-gray-700 border-gray-600 text-white"
                   placeholder="e.g., Building A, Floor 2"
                 />
               </div>
@@ -134,7 +132,6 @@ export const AssetForm = ({ template, asset, onSubmit, onCancel }) => {
                 name="description"
                 value={formData.description}
                 onChange={handleChange}
-                className="bg-gray-700 border-gray-600 text-white"
                 rows={3}
               />
             </div>
@@ -142,7 +139,7 @@ export const AssetForm = ({ template, asset, onSubmit, onCancel }) => {
 
           {/* Assignment & Dates */}
           <div>
-            <h3 className="text-lg font-semibold mb-4 text-white">Assignment & Dates</h3>
+            <h3 className="text-lg font-semibold mb-4 text-pl-text">Assignment & Dates</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-medium mb-2">Assigned To</label>
@@ -150,7 +147,6 @@ export const AssetForm = ({ template, asset, onSubmit, onCancel }) => {
                   name="assigned_to"
                   value={formData.assigned_to}
                   onChange={handleChange}
-                  className="bg-gray-700 border-gray-600 text-white"
                   placeholder="Team member name"
                 />
               </div>
@@ -161,7 +157,6 @@ export const AssetForm = ({ template, asset, onSubmit, onCancel }) => {
                   type="date"
                   value={formData.purchase_date}
                   onChange={handleChange}
-                  className="bg-gray-700 border-gray-600 text-white"
                 />
               </div>
               <div>
@@ -171,7 +166,6 @@ export const AssetForm = ({ template, asset, onSubmit, onCancel }) => {
                   type="date"
                   value={formData.warranty_expiry}
                   onChange={handleChange}
-                  className="bg-gray-700 border-gray-600 text-white"
                 />
               </div>
             </div>
@@ -179,7 +173,7 @@ export const AssetForm = ({ template, asset, onSubmit, onCancel }) => {
 
           {/* Safety Information */}
           <div>
-            <h3 className="text-lg font-semibold mb-4 text-white">Safety Information</h3>
+            <h3 className="text-lg font-semibold mb-4 text-pl-text">Safety Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium mb-2">Safety Status</label>
@@ -187,7 +181,7 @@ export const AssetForm = ({ template, asset, onSubmit, onCancel }) => {
                   name="safety_status"
                   value={formData.safety_status}
                   onChange={handleChange}
-                  className="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white"
+                  className={accountNativeSelect}
                 >
                   <option value="safe">Safe</option>
                   <option value="warning">Warning</option>
@@ -200,7 +194,7 @@ export const AssetForm = ({ template, asset, onSubmit, onCancel }) => {
                   name="maintenance_schedule"
                   value={formData.maintenance_schedule}
                   onChange={handleChange}
-                  className="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white"
+                  className={accountNativeSelect}
                 >
                   <option value="weekly">Weekly</option>
                   <option value="monthly">Monthly</option>
@@ -216,7 +210,6 @@ export const AssetForm = ({ template, asset, onSubmit, onCancel }) => {
                 name="safety_notes"
                 value={formData.safety_notes}
                 onChange={handleChange}
-                className="bg-gray-700 border-gray-600 text-white"
                 placeholder="Any safety concerns or maintenance notes..."
                 rows={3}
               />
@@ -224,14 +217,14 @@ export const AssetForm = ({ template, asset, onSubmit, onCancel }) => {
           </div>
 
           {/* Form Actions */}
-          <div className="flex gap-2 pt-4 border-t border-gray-700">
-            <Button type="submit" disabled={loading} className="bg-green-600 hover:bg-green-700 text-white">
+          <div className="flex gap-2 pt-4 border-t border-pl-border">
+            <Button type="submit" disabled={loading}>
               {loading ? 'Saving...' : asset ? 'Update Asset' : 'Add Asset'}
             </Button>
             <Button 
               type="button" 
+              variant="outline"
               onClick={onCancel}
-              className="bg-gray-700 hover:bg-gray-600 text-white"
             >
               Cancel
             </Button>

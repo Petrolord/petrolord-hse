@@ -20,7 +20,9 @@ import { isThemedModule } from '@/design/rollout';
 // (SignedInScope) around the whole shell while the active module is
 // migrated; on every other module it renders exactly as before
 // (src/design/__tests__/shellLegacyDom.test.jsx). The rail is the fixed
-// dark ink frame (InkRail) inside the scope.
+// dark ink frame (InkRail) inside the scope. The Report Wizard dialog and
+// its success toast are scope-aware the same way (batch 1A,
+// src/components/hse/__tests__/reportingLegacyDom.test.jsx).
 function PetrolordHSE() {
   const { isAuthenticated, isLoading, setActiveModule, activeModule } = useHSE();
   const { persistedModule, setPersistedModule } = useAppState();
@@ -83,7 +85,7 @@ function SignedInLayout() {
     toast({
       title: "Success",
       description: "Report created successfully",
-      className: "bg-green-600 text-white border-none"
+      ...tc({ className: "bg-green-600 text-white border-none" }, { variant: 'success' })
     });
   };
 
@@ -116,11 +118,11 @@ function SignedInLayout() {
       <ChatBot />
 
       <Dialog open={isReportWizardOpen} onOpenChange={closeReportWizard}>
-        <DialogContent className="max-w-4xl bg-[var(--bg-app)] border-[var(--border-color)] text-[var(--text-primary)] p-0 overflow-hidden sm:max-h-[90vh] z-[100]">
-          <div className="max-h-[85vh] overflow-y-auto p-6 scrollbar-thin scrollbar-thumb-[var(--border-color)] scrollbar-track-transparent">
+        <DialogContent className={tc('max-w-4xl bg-[var(--bg-app)] border-[var(--border-color)] text-[var(--text-primary)] p-0 overflow-hidden sm:max-h-[90vh] z-[100]', 'max-w-4xl p-0 overflow-hidden sm:max-h-[90vh] z-[100]')}>
+          <div className={tc('max-h-[85vh] overflow-y-auto p-6 scrollbar-thin scrollbar-thumb-[var(--border-color)] scrollbar-track-transparent', 'max-h-[85vh] overflow-y-auto p-4 sm:p-6')}>
             <DialogHeader className="mb-6">
-              <DialogTitle className="text-xl font-bold text-[var(--text-primary)]">Create New Report</DialogTitle>
-              <DialogDescription className="text-[var(--text-muted)]">
+              <DialogTitle className={tc('text-xl font-bold text-[var(--text-primary)]', 'text-xl font-semibold')}>Create New Report</DialogTitle>
+              <DialogDescription className={tc('text-[var(--text-muted)]', undefined)}>
                 Submit a new observation, incident, or near miss report using the wizard below.
               </DialogDescription>
             </DialogHeader>
