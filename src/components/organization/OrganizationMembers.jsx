@@ -13,6 +13,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Users, Plus, Trash2, Shield, User } from 'lucide-react';
+import { accountNativeSelect } from '@/components/account/accountChrome';
 import { fetchOrganizationMembers, inviteMember, removeMember } from '@/services/organizationService';
 
 export const OrganizationMembers = ({ organization, onUpdate }) => {
@@ -74,37 +75,24 @@ export const OrganizationMembers = ({ organization, onUpdate }) => {
     setDeleteDialogOpen(true);
   };
 
-  const getRoleColor = (role) => {
-    switch (role) {
-      case 'org_admin':
-      case 'admin':
-      case 'super_admin':
-        return 'bg-red-900 text-red-100 hover:bg-red-800';
-      case 'manager':
-        return 'bg-blue-900 text-blue-100 hover:bg-blue-800';
-      default:
-        return 'bg-gray-700 text-gray-100 hover:bg-gray-600';
-    }
-  };
-
   return (
     <div className="space-y-6">
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent className="bg-gray-800 border-gray-700">
+        <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-white">Remove Member</AlertDialogTitle>
-            <AlertDialogDescription className="text-gray-400">
+            <AlertDialogTitle>Remove Member</AlertDialogTitle>
+            <AlertDialogDescription>
               Are you sure you want to remove this member from the organization? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="flex gap-3 justify-end">
-            <AlertDialogCancel className="bg-gray-700 hover:bg-gray-600 text-white border-gray-600">
+            <AlertDialogCancel>
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleRemoveMember}
-              className="bg-red-600 hover:bg-red-700 text-white"
+              className="bg-pl-danger text-pl-danger-fg hover:bg-pl-danger/90"
             >
               Remove
             </AlertDialogAction>
@@ -112,15 +100,15 @@ export const OrganizationMembers = ({ organization, onUpdate }) => {
         </AlertDialogContent>
       </AlertDialog>
 
-      <Card className="bg-gray-800 border-gray-700">
-        <CardHeader className="flex flex-row items-center justify-between">
+      <Card>
+        <CardHeader className="flex flex-col gap-3 space-y-0 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <CardTitle className="text-white">Team Members</CardTitle>
-            <CardDescription className="text-gray-400">Manage your organization members</CardDescription>
+            <CardTitle>Team Members</CardTitle>
+            <CardDescription className="mt-1.5">Manage your organization members</CardDescription>
           </div>
           <Button 
             onClick={() => setShowInvite(!showInvite)}
-            className="bg-yellow-600 hover:bg-yellow-700 flex items-center gap-2 text-white"
+            className="flex items-center gap-2 self-start sm:self-auto"
           >
             <Plus className="w-4 h-4" />
             Invite Member
@@ -128,7 +116,7 @@ export const OrganizationMembers = ({ organization, onUpdate }) => {
         </CardHeader>
         <CardContent>
           {showInvite && (
-            <form onSubmit={handleInvite} className="mb-6 p-4 bg-gray-700 rounded-lg space-y-4 text-white">
+            <form onSubmit={handleInvite} className="mb-6 p-4 rounded-lg border border-pl-border bg-pl-sunken space-y-4 text-pl-text">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium mb-2">Email Address</label>
@@ -137,7 +125,6 @@ export const OrganizationMembers = ({ organization, onUpdate }) => {
                     value={inviteEmail}
                     onChange={(e) => setInviteEmail(e.target.value)}
                     placeholder="member@example.com"
-                    className="bg-gray-600 border-gray-500 text-white"
                     required
                   />
                 </div>
@@ -146,7 +133,7 @@ export const OrganizationMembers = ({ organization, onUpdate }) => {
                   <select
                     value={inviteRole}
                     onChange={(e) => setInviteRole(e.target.value)}
-                    className="w-full bg-gray-600 border border-gray-500 rounded px-3 py-2 text-white"
+                    className={accountNativeSelect}
                   >
                     <option value="employee">Employee</option>
                     <option value="manager">Manager</option>
@@ -155,13 +142,13 @@ export const OrganizationMembers = ({ organization, onUpdate }) => {
                 </div>
               </div>
               <div className="flex gap-2">
-                <Button type="submit" className="bg-green-600 hover:bg-green-700 text-white">
+                <Button type="submit">
                   Send Invite
                 </Button>
                 <Button 
                   type="button"
+                  variant="outline"
                   onClick={() => setShowInvite(false)}
-                  className="bg-gray-600 hover:bg-gray-500 text-white"
                 >
                   Cancel
                 </Button>
@@ -171,28 +158,28 @@ export const OrganizationMembers = ({ organization, onUpdate }) => {
 
           {loading ? (
             <div className="text-center py-8">
-              <p className="text-gray-400">Loading members...</p>
+              <p className="text-pl-muted">Loading members...</p>
             </div>
           ) : members.length === 0 ? (
             <div className="text-center py-8">
-              <Users className="w-12 h-12 text-gray-600 mx-auto mb-4" />
-              <p className="text-gray-400">No members yet</p>
+              <Users className="w-12 h-12 text-pl-border-strong mx-auto mb-4" aria-hidden="true" />
+              <p className="text-pl-muted">No members yet</p>
             </div>
           ) : (
             <div className="space-y-3">
               {members.map((member) => (
-                <div key={member.id} className="flex items-center justify-between p-4 bg-gray-700 rounded-lg text-white">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-gray-600 rounded-full flex items-center justify-center">
-                      <User className="w-5 h-5 text-gray-400" />
+                <div key={member.id} className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between p-4 rounded-lg border border-pl-border bg-pl-sunken text-pl-text">
+                  <div className="flex items-center gap-4 min-w-0">
+                    <div className="w-10 h-10 shrink-0 rounded-full bg-pl-surface border border-pl-border flex items-center justify-center">
+                      <User className="w-5 h-5 text-pl-muted" aria-hidden="true" />
                     </div>
-                    <div>
-                      <p className="font-medium">{member.email}</p>
-                      <p className="text-sm text-gray-400">Joined {new Date(member.created_at).toLocaleDateString()}</p>
+                    <div className="min-w-0">
+                      <p className="font-medium break-all">{member.email}</p>
+                      <p className="text-sm text-pl-muted">Joined {new Date(member.created_at).toLocaleDateString()}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <Badge className={getRoleColor(member.role)}>
+                    <Badge variant="neutral">
                       {member.role === 'org_admin' || member.role === 'admin' ? <Shield className="w-3 h-3 mr-1" /> : null}
                       {member.role ? member.role.charAt(0).toUpperCase() + member.role.slice(1).replace('_', ' ') : 'Member'}
                     </Badge>
@@ -201,7 +188,9 @@ export const OrganizationMembers = ({ organization, onUpdate }) => {
                         onClick={() => openDeleteDialog(member.id)}
                         variant="ghost"
                         size="sm"
-                        className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                        aria-label={`Remove ${member.email}`}
+                        title="Remove"
+                        className="text-pl-danger-text hover:bg-pl-danger-bg hover:text-pl-danger-text"
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
