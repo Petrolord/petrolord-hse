@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, AreaChart, Area
+  BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, PieChart, Pie, Cell, AreaChart, Area
 } from 'recharts';
+import ChartFrame from '@/components/charts/ChartFrame';
 import { 
   TrendingUp, TrendingDown, Activity, AlertCircle, 
   MapPin, Download, RefreshCw
@@ -237,9 +238,8 @@ const AnalyticsDashboardModule = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Trend Chart */}
         <ChartPanel title="Reporting Activity" subtitle="Submission volume over time" className="lg:col-span-2 p-5">
-          <div className="h-[300px]">
-            {chartData.length === 0 ? <EmptyChart /> : (
-            <ResponsiveContainer width="100%" height="100%">
+          {chartData.length === 0 ? <div className="h-[300px]"><EmptyChart /></div> : (
+            <ChartFrame height={300}>
               <AreaChart data={chartData} margin={{ top: 5, right: 10, bottom: 5, left: -20 }}>
                 <defs>
                   <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
@@ -253,16 +253,14 @@ const AnalyticsDashboardModule = () => {
                 <RechartsTooltip {...TOOLTIP} />
                 <Area type="monotone" dataKey="count" name="Reports" stroke={CHART_SERIES[0]} fillOpacity={1} fill="url(#colorCount)" />
               </AreaChart>
-            </ResponsiveContainer>
-            )}
-          </div>
+            </ChartFrame>
+          )}
         </ChartPanel>
 
         {/* Severity Pie Chart */}
         <ChartPanel title="Severity Distribution" subtitle="By incident level" className="p-5">
-          <div className="h-[300px]">
-            {severityData.length === 0 ? <EmptyChart /> : (
-            <ResponsiveContainer width="100%" height="100%">
+          {severityData.length === 0 ? <div className="h-[300px]"><EmptyChart /></div> : (
+            <ChartFrame height={300}>
               <PieChart>
                 <Pie
                   data={severityData}
@@ -280,9 +278,8 @@ const AnalyticsDashboardModule = () => {
                 <RechartsTooltip {...TOOLTIP} />
                 <Legend {...LEGEND_PROPS} />
               </PieChart>
-            </ResponsiveContainer>
-            )}
-          </div>
+            </ChartFrame>
+          )}
         </ChartPanel>
       </div>
 

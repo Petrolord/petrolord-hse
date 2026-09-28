@@ -6,9 +6,9 @@
 // element with data-canvas="chart"), which pins the light roles around it,
 // and take the colours below. Do not restyle a chart per theme.
 //
-// Not ported yet: CHART_LOGO_PATH / ChartLogo / ChartFrame. They need the
-// watermark image in public/ (the Suite serves /petrolord-chart-watermark.png);
-// see docs/scope/DesignSystem-Rollout.md, section 6.
+// Every chart carries the family mark: wrap the Recharts chart in ChartFrame
+// (src/components/charts/ChartFrame.jsx), which reserves a band for ChartLogo
+// under the plot (batch 4B; the owner chose the Suite's mark for HSE).
 
 export const CHART_COLORS = {
   background: '#ffffff',
@@ -70,4 +70,21 @@ export const TOOLTIP_STYLE = {
   fontSize: `${CHART_TYPOGRAPHY.tooltipFontSize}px`,
   color: CHART_COLORS.tooltipText,
   boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)',
+};
+
+// === Petrolord chart branding (batch 4B, Suite values) ===
+// Path to the watermark logo. Vite serves /public assets at the root.
+export const CHART_LOGO_PATH = '/petrolord-chart-watermark.png';
+
+// Standard logo styling, used by ChartLogo. The logo is positioned
+// absolutely, so it must sit inside a relative-positioned container.
+export const CHART_LOGO_STYLE = {
+  position: 'absolute',
+  bottom: '8px',
+  right: '8px',
+  height: '40px',
+  width: 'auto',
+  opacity: 0.50,
+  pointerEvents: 'none',
+  userSelect: 'none',
 };

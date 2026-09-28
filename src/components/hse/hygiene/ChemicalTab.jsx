@@ -1,8 +1,9 @@
 import React, { useMemo } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 import {
-  ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine,
 } from 'recharts';
+import ChartFrame from '@/components/charts/ChartFrame';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -252,7 +253,7 @@ export default function ChemicalTab({ orgId, form, setForm, sites, canSave, save
 
             {chartData.length > 0 && (
               <ChartCard title="8-hour TWA as a percent of its limit" subtitle="Each agent against the limit you entered for it. The line is 100%.">
-                <ResponsiveContainer width="100%" height={Math.max(160, 48 * chartData.length + 40)}>
+                <ChartFrame height={Math.max(160, 48 * chartData.length + 40)}>
                   <BarChart data={chartData} layout="vertical" margin={{ top: 8, right: 24, bottom: 8, left: 8 }}>
                     <CartesianGrid stroke={CHART.grid} horizontal={false} />
                     <XAxis type="number" unit="%" tick={{ fill: CHART.textSecondary, fontSize: 11 }} axisLine={{ stroke: CHART.grid }} tickLine={false} />
@@ -265,7 +266,7 @@ export default function ChemicalTab({ orgId, form, setForm, sites, canSave, save
                     <ReferenceLine x={100} stroke={CHART.limit} strokeDasharray="4 3" label={{ value: 'limit', fill: CHART.textSecondary, fontSize: 11, position: 'top' }} />
                     <Bar dataKey="pct" fill={SERIES[0]} radius={[0, 4, 4, 0]} maxBarSize={24} />
                   </BarChart>
-                </ResponsiveContainer>
+                </ChartFrame>
               </ChartCard>
             )}
           </>

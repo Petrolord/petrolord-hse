@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react';
 import {
-  ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine,
 } from 'recharts';
+import ChartFrame from '@/components/charts/ChartFrame';
 import { heatInputs, heatRowFromForm, blankHeatForm } from '@/lib/hygiene/forms';
 import {
   evaluateHeat, isRefusal, WBGT_FORMS, HEAT_EQUATION_NOTE,
@@ -138,7 +139,7 @@ export default function HeatTab({ orgId, form, setForm, sites, canSave, saveBloc
 
             {chartData.length > 0 && !isRefusal(a) && (
               <ChartCard title="WBGT by period" subtitle="Each period's WBGT. The dashed line is the limit for the hour's time-weighted metabolic rate.">
-                <ResponsiveContainer width="100%" height={240}>
+                <ChartFrame height={240}>
                   <BarChart data={chartData} margin={{ top: 16, right: 16, bottom: 8, left: 0 }}>
                     <CartesianGrid stroke={CHART.grid} vertical={false} />
                     <XAxis dataKey="name" tick={{ fill: CHART.textSecondary, fontSize: 11 }} axisLine={{ stroke: CHART.grid }} tickLine={false} />
@@ -156,7 +157,7 @@ export default function HeatTab({ orgId, form, setForm, sites, canSave, saveBloc
                     />
                     <Bar dataKey="wbgt" fill={SERIES[0]} radius={[4, 4, 0, 0]} maxBarSize={40} />
                   </BarChart>
-                </ResponsiveContainer>
+                </ChartFrame>
               </ChartCard>
             )}
           </>

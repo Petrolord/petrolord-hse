@@ -1,8 +1,9 @@
 import React from 'react';
 import {
-  ResponsiveContainer, LineChart, Line, ComposedChart, XAxis, YAxis, CartesianGrid,
+  LineChart, Line, ComposedChart, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, ReferenceLine,
 } from 'recharts';
+import ChartFrame from '@/components/charts/ChartFrame';
 import { TOOLTIP_STYLE } from '@/utils/chartTheme';
 import { ChartCard, CHART, fmtMonth, fmtRate, fmtHours, Notice } from './common';
 
@@ -54,8 +55,7 @@ export function RollingChart({ rolling, metric, baseLabel, from }) {
       {empty ? (
         <div className="h-[280px] flex items-center justify-center text-sm text-pl-muted">No 12-month window in this range has exposure hours.</div>
       ) : (
-        <div className="h-[280px]">
-          <ResponsiveContainer width="100%" height="100%">
+        <ChartFrame height={280}>
             <LineChart data={data} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
               <CartesianGrid stroke={CHART.grid} vertical={false} />
               <XAxis dataKey="label" {...axisProps} minTickGap={16} />
@@ -72,8 +72,7 @@ export function RollingChart({ rolling, metric, baseLabel, from }) {
               <Line name="Rolling 12-month rate (pooled)" dataKey="rate" stroke={CHART.series1} strokeWidth={2} dot={{ r: 3 }} connectNulls={false} isAnimationActive={false} />
               <Line name="Mean of monthly rates (contrast only)" dataKey="mean" stroke={CHART.series2} strokeWidth={2} strokeDasharray="6 4" dot={false} connectNulls={false} isAnimationActive={false} />
             </LineChart>
-          </ResponsiveContainer>
-        </div>
+        </ChartFrame>
       )}
     </ChartCard>
   );
@@ -123,8 +122,7 @@ export function UChartView({ chart, metric, baseLabel }) {
         </div>
       )}
     >
-      <div className="h-[300px]">
-        <ResponsiveContainer width="100%" height="100%">
+      <ChartFrame height={300}>
           <ComposedChart data={data} margin={{ top: 24, right: 40, left: 0, bottom: 0 }}>
             <CartesianGrid stroke={CHART.grid} vertical={false} />
             <XAxis dataKey="label" {...axisProps} minTickGap={16} />
@@ -143,8 +141,7 @@ export function UChartView({ chart, metric, baseLabel }) {
             <Line name="Lower limit" dataKey="lcl" type="step" stroke={CHART.limit} strokeWidth={1.5} strokeDasharray="1 3" dot={false} isAnimationActive={false} />
             <Line name={`Monthly ${metric.short}`} dataKey="u" stroke={CHART.series1} strokeWidth={2} dot={<SignalDot />} activeDot={{ r: 6 }} isAnimationActive={false} />
           </ComposedChart>
-        </ResponsiveContainer>
-      </div>
+      </ChartFrame>
     </ChartCard>
   );
 }

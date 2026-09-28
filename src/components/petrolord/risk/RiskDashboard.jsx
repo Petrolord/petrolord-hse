@@ -5,8 +5,9 @@ import RiskHeatMap from './components/RiskHeatMap';
 import { riskService } from '@/services/riskService';
 import { useHSE } from '@/context/HSEContext';
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip
 } from 'recharts';
+import ChartFrame from '@/components/charts/ChartFrame';
 import { ChartPanel } from '@/components/ui/chart-panel';
 import { CHART_COLORS, CHART_SERIES, GRID_STYLE, AXIS_PROPS, TOOLTIP_STYLE } from '@/utils/chartTheme';
 import { tableHeadClass, tableBodyClass, tableRowClass, RiskScoreBadge } from '../common/ui';
@@ -61,8 +62,7 @@ export default function RiskDashboard() {
 
         {/* Charts */}
         <ChartPanel title="Risk Distribution by Category" className="lg:col-span-2">
-          <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
+          <ChartFrame height={300}>
               <BarChart data={categoryData} layout="vertical" margin={{ left: 20 }}>
                 <CartesianGrid {...GRID_STYLE} horizontal={false} />
                 <XAxis type="number" {...AXIS_PROPS} allowDecimals={false} />
@@ -73,8 +73,7 @@ export default function RiskDashboard() {
                 />
                 <Bar dataKey="value" name="Risks" fill={CHART_SERIES[0]} radius={[0, 4, 4, 0]} barSize={20} />
               </BarChart>
-            </ResponsiveContainer>
-          </div>
+          </ChartFrame>
         </ChartPanel>
       </div>
 

@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { BookOpen, Calendar, GraduationCap, Award } from 'lucide-react';
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
 } from 'recharts';
+import ChartFrame from '@/components/charts/ChartFrame';
 import { useHSE } from '@/context/HSEContext';
 import { trainingService } from '@/services/trainingService';
 import { ChartPanel } from '@/components/ui/chart-panel';
@@ -40,9 +40,8 @@ export default function TrainingCompetencyDashboard({ stats }) {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ChartPanel title="Training Compliance Trend" className="p-5">
-          <div className="h-64">
-            {hasCompletions ? (
-              <ResponsiveContainer width="100%" height="100%">
+          {hasCompletions ? (
+              <ChartFrame height={256}>
                 <LineChart data={charts.complianceTrend} margin={{ top: 8, right: 16, left: -16, bottom: 0 }}>
                   <CartesianGrid {...GRID_STYLE} />
                   <XAxis dataKey="month" {...AXIS_PROPS} />
@@ -50,17 +49,15 @@ export default function TrainingCompetencyDashboard({ stats }) {
                   <Tooltip {...TOOLTIP} />
                   <Line type="monotone" dataKey="completed" name="Completed trainings" stroke={CHART_SERIES[1]} strokeWidth={2} dot={{ r: 3 }} />
                 </LineChart>
-              </ResponsiveContainer>
+              </ChartFrame>
             ) : (
-              <div className="h-full flex items-center justify-center text-center text-pl-muted text-sm">No completed trainings in the last 6 months.</div>
+              <div className="h-64 flex items-center justify-center text-center text-pl-muted text-sm">No completed trainings in the last 6 months.</div>
             )}
-          </div>
         </ChartPanel>
 
         <ChartPanel title="Competency Gaps" className="p-5">
-          <div className="h-64">
-            {charts.competencyGaps.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%">
+          {charts.competencyGaps.length > 0 ? (
+              <ChartFrame height={256}>
                 <RadarChart data={charts.competencyGaps} outerRadius="75%">
                   <PolarGrid stroke={CHART_COLORS.grid} />
                   <PolarAngleAxis dataKey="category" tick={{ fill: CHART_COLORS.axisText, fontSize: CHART_TYPOGRAPHY.axisFontSize }} />
@@ -68,11 +65,10 @@ export default function TrainingCompetencyDashboard({ stats }) {
                   <Radar name="Avg. assessment score" dataKey="score" stroke={CHART_SERIES[4]} fill={CHART_SERIES[4]} fillOpacity={0.3} />
                   <Tooltip {...TOOLTIP} />
                 </RadarChart>
-              </ResponsiveContainer>
+              </ChartFrame>
             ) : (
-              <div className="h-full flex items-center justify-center text-center text-pl-muted text-sm">No competency assessments recorded yet.</div>
+              <div className="h-64 flex items-center justify-center text-center text-pl-muted text-sm">No competency assessments recorded yet.</div>
             )}
-          </div>
         </ChartPanel>
       </div>
     </div>

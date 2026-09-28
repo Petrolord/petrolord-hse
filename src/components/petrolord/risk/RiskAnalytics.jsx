@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Card } from "@/components/ui/card";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend, CartesianGrid } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, PieChart, Pie, Cell, Legend, CartesianGrid } from 'recharts';
+import ChartFrame from '@/components/charts/ChartFrame';
 import { riskService } from '@/services/riskService';
 import { useHSE } from '@/context/HSEContext';
 import RiskHeatMap from './components/RiskHeatMap';
@@ -81,8 +82,7 @@ export default function RiskAnalytics() {
         </Panel>
 
         <ChartPanel title="Severity Distribution" className="p-5">
-          <div className="h-[300px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
+          <ChartFrame height={300}>
               <PieChart>
                 <Pie data={byRating} cx="50%" cy="50%" innerRadius={60} outerRadius={90} paddingAngle={4} dataKey="value" nameKey="name">
                   {byRating.map((e) => <Cell key={e.name} fill={RATING_COLORS[e.name]} />)}
@@ -90,15 +90,13 @@ export default function RiskAnalytics() {
                 <Tooltip {...TOOLTIP} />
                 <Legend {...LEGEND_PROPS} />
               </PieChart>
-            </ResponsiveContainer>
-          </div>
+          </ChartFrame>
         </ChartPanel>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <ChartPanel title="Risks by Category" className="p-5">
-          <div className="h-[300px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
+          <ChartFrame height={300}>
               <BarChart data={byCategory} margin={{ top: 5, right: 10, bottom: 5, left: -20 }}>
                 <CartesianGrid {...GRID_STYLE} />
                 <XAxis dataKey="name" {...AXIS_PROPS} interval={0} angle={-20} textAnchor="end" height={60} />
@@ -106,13 +104,11 @@ export default function RiskAnalytics() {
                 <Tooltip {...TOOLTIP} cursor={CURSOR} />
                 <Bar dataKey="count" name="Risks" fill={CHART_SERIES[0]} radius={[4, 4, 0, 0]} />
               </BarChart>
-            </ResponsiveContainer>
-          </div>
+          </ChartFrame>
         </ChartPanel>
 
         <ChartPanel title="Risks by Status" className="p-5">
-          <div className="h-[300px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
+          <ChartFrame height={300}>
               <BarChart data={byStatus} margin={{ top: 5, right: 10, bottom: 5, left: -20 }}>
                 <CartesianGrid {...GRID_STYLE} />
                 <XAxis dataKey="name" {...AXIS_PROPS} />
@@ -120,8 +116,7 @@ export default function RiskAnalytics() {
                 <Tooltip {...TOOLTIP} cursor={CURSOR} />
                 <Bar dataKey="count" name="Risks" fill={CHART_SERIES[1]} radius={[4, 4, 0, 0]} />
               </BarChart>
-            </ResponsiveContainer>
-          </div>
+          </ChartFrame>
         </ChartPanel>
       </div>
     </div>
