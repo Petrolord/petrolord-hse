@@ -27,9 +27,9 @@ export default function LoginPageCustomizer({ settings, setSettings, onUpload })
 
   return (
     <div className="space-y-6">
-      <Card className="bg-[var(--bg-card)] border-[var(--border-color)]">
+      <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2"><LayoutTemplate className="h-5 w-5 text-[var(--accent)]"/> Layout & Background</CardTitle>
+          <CardTitle className="flex items-center gap-2"><LayoutTemplate className="h-5 w-5 text-pl-muted" aria-hidden="true"/> Layout & Background</CardTitle>
           <CardDescription>Customize the entrance experience for your users.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -50,23 +50,23 @@ export default function LoginPageCustomizer({ settings, setSettings, onUpload })
 
           <div className="space-y-3">
             <Label>Background Image</Label>
-            <div className="flex gap-4 items-start">
+            <div className="flex flex-wrap gap-4 items-start">
               <div 
-                className="w-32 h-20 bg-gray-800 rounded border border-dashed border-gray-600 flex items-center justify-center cursor-pointer overflow-hidden relative"
+                className="w-32 h-20 shrink-0 bg-pl-sunken rounded border border-dashed border-pl-border-strong flex items-center justify-center cursor-pointer overflow-hidden relative"
                 onClick={() => bgInputRef.current?.click()}
               >
                 {loginConfig.bgImage ? (
                   <img src={loginConfig.bgImage} alt="Login Bg" className="w-full h-full object-cover" />
                 ) : (
-                  <ImageIcon className="text-gray-500" />
+                  <ImageIcon className="text-pl-muted" aria-hidden="true" />
                 )}
               </div>
               <div className="flex-1 space-y-2">
                 <Button variant="outline" size="sm" onClick={() => bgInputRef.current?.click()}>Upload Image</Button>
                 {loginConfig.bgImage && (
-                  <Button variant="ghost" size="sm" className="text-red-400" onClick={() => updateLoginConfig('bgImage', null)}>Remove</Button>
+                  <Button variant="ghost" size="sm" className="text-pl-danger-text" onClick={() => updateLoginConfig('bgImage', null)}>Remove</Button>
                 )}
-                <p className="text-xs text-[var(--text-muted)]">Recommended 1920x1080px. Max 2MB.</p>
+                <p className="text-xs text-pl-muted">Recommended 1920x1080px. Max 2MB.</p>
               </div>
               <input 
                 type="file" 
@@ -90,7 +90,7 @@ export default function LoginPageCustomizer({ settings, setSettings, onUpload })
               <Input 
                 value={loginConfig.bgColor || '#111827'}
                 onChange={(e) => updateLoginConfig('bgColor', e.target.value)}
-                className="font-mono"
+                className="font-pl-mono"
               />
             </div>
           </div>
@@ -98,15 +98,15 @@ export default function LoginPageCustomizer({ settings, setSettings, onUpload })
         </CardContent>
       </Card>
 
-      <Card className="bg-[var(--bg-card)] border-[var(--border-color)]">
+      <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2"><Type className="h-5 w-5 text-[var(--accent)]"/> Content</CardTitle>
+          <CardTitle className="flex items-center gap-2"><Type className="h-5 w-5 text-pl-muted" aria-hidden="true"/> Content</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label>Show Company Logo</Label>
-              <p className="text-xs text-[var(--text-muted)]">Display logo above login form</p>
+              <p className="text-xs text-pl-muted">Display logo above login form</p>
             </div>
             <Switch 
               checked={loginConfig.showLogo !== false}

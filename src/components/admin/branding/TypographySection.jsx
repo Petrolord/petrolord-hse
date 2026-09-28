@@ -39,9 +39,9 @@ export default function TypographySection({ settings, setSettings }) {
   const typo = settings.branding_config?.typography || {};
 
   return (
-    <Card className="bg-[var(--bg-card)] border-[var(--border-color)]">
+    <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2"><Type className="h-5 w-5 text-[var(--accent)]"/> Typography</CardTitle>
+        <CardTitle className="flex items-center gap-2"><Type className="h-5 w-5 text-pl-muted" aria-hidden="true"/> Typography</CardTitle>
         <CardDescription>Choose fonts and sizing scaling.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -49,7 +49,7 @@ export default function TypographySection({ settings, setSettings }) {
           <div className="space-y-3">
             <Label>Heading Font</Label>
             <Select value={typo.headingFont} onValueChange={(val) => updateTypo('headingFont', val)}>
-              <SelectTrigger className="bg-[var(--bg-app)] border-[var(--border-color)]">
+              <SelectTrigger>
                 <SelectValue placeholder="Select font" />
               </SelectTrigger>
               <SelectContent>
@@ -58,13 +58,13 @@ export default function TypographySection({ settings, setSettings }) {
                 ))}
               </SelectContent>
             </Select>
-            <p className="text-[10px] text-[var(--text-muted)]">Applied to H1-H6 elements.</p>
+            <p className="text-[10px] text-pl-muted">Applied to H1-H6 elements.</p>
           </div>
 
           <div className="space-y-3">
             <Label>Body Font</Label>
             <Select value={typo.bodyFont} onValueChange={(val) => updateTypo('bodyFont', val)}>
-              <SelectTrigger className="bg-[var(--bg-app)] border-[var(--border-color)]">
+              <SelectTrigger>
                 <SelectValue placeholder="Select font" />
               </SelectTrigger>
               <SelectContent>
@@ -73,14 +73,14 @@ export default function TypographySection({ settings, setSettings }) {
                 ))}
               </SelectContent>
             </Select>
-            <p className="text-[10px] text-[var(--text-muted)]">Applied to paragraphs and UI text.</p>
+            <p className="text-[10px] text-pl-muted">Applied to paragraphs and UI text.</p>
           </div>
         </div>
 
-        <div className="space-y-4 pt-4 border-t border-[var(--border-color)]">
+        <div className="space-y-4 pt-4 border-t border-pl-border">
           <div className="flex justify-between items-center">
             <Label>Base Font Size</Label>
-            <span className="text-xs font-mono text-[var(--text-muted)]">{typo.baseFontSize || 16}px</span>
+            <span className="text-xs font-pl-mono tabular-nums text-pl-muted">{typo.baseFontSize || 16}px</span>
           </div>
           <Slider 
             value={[typo.baseFontSize || 16]} 
@@ -90,7 +90,7 @@ export default function TypographySection({ settings, setSettings }) {
             onValueChange={(v) => updateTypo('baseFontSize', v)} 
             className="py-2"
           />
-          <div className="flex justify-between text-[10px] text-[var(--text-muted)]">
+          <div className="flex justify-between text-[10px] text-pl-muted">
             <span>Compact (12px)</span>
             <span>Readable (20px)</span>
           </div>

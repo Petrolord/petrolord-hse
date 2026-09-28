@@ -2,9 +2,10 @@ import React from 'react';
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
-// Shared look for the Environment and Risk modules on the design family
-// roles (batch 2A, docs/scope/DesignSystem-Rollout.md). Only these two
-// modules import it.
+// Shared look for the modules on the design family roles (batch 2A:
+// Environment and Risk; batch 2D: Contractor Safety, Safety Audits, Training
+// and Settings; docs/scope/DesignSystem-Rollout.md). Only migrated modules
+// import it, so it renders the roles directly.
 
 /** The missing-value glyph (the Suite's EMPTY_VALUE). */
 export const EMPTY = 'n/a';

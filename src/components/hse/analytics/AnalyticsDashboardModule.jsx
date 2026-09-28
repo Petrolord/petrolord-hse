@@ -8,7 +8,9 @@ import {
   MapPin, Download, RefreshCw
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
+import { ChartPanel } from '@/components/ui/chart-panel';
+import { CHART_COLORS, CHART_SERIES, GRID_STYLE, AXIS_PROPS, TOOLTIP_STYLE, LEGEND_PROPS } from '@/utils/chartTheme';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useHSE } from '@/context/HSEContext';
 import { analyticsService } from '@/services/analyticsService';
@@ -17,7 +19,12 @@ import { useToast } from "@/components/ui/use-toast";
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
+// Charts stay white in both themes (ChartPanel) with the chart theme colours.
+const TOOLTIP = {
+  contentStyle: TOOLTIP_STYLE,
+  itemStyle: { color: CHART_COLORS.tooltipText },
+  labelStyle: { color: CHART_COLORS.axisText },
+};
 
 const AnalyticsDashboardModule = () => {
   const { currentOrganization } = useHSE();
@@ -165,23 +172,23 @@ const AnalyticsDashboardModule = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-[500px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FFC107]"></div>
+      <div className="flex items-center justify-center h-[500px]" role="status" aria-label="Loading analytics">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pl-primary"></div>
       </div>
     );
   }
 
   return (
-    <div className="p-6 space-y-6 max-w-[1600px] mx-auto bg-[#1a1a2e] min-h-screen">
+    <div className="p-4 sm:p-6 space-y-6 max-w-[1600px] mx-auto min-h-screen">
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white mb-1">Advanced Analytics</h1>
-          <p className="text-gray-400 text-sm">Reporting trends from your organization's submitted reports.</p>
+          <h1 className="font-pl-display text-2xl font-bold text-pl-text mb-1">Advanced Analytics</h1>
+          <p className="text-pl-muted text-sm">Reporting trends from your organization's submitted reports.</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <Select value={timeRange} onValueChange={setTimeRange}>
-            <SelectTrigger className="w-[140px] bg-[#252541] border-[#3a3a5a] text-white">
+            <SelectTrigger className="w-[140px]" aria-label="Time range">
               <SelectValue placeholder="Time Range" />
             </SelectTrigger>
             <SelectContent>
@@ -190,12 +197,12 @@ const AnalyticsDashboardModule = () => {
               <SelectItem value="90days">Last 90 Days</SelectItem>
             </SelectContent>
           </Select>
-          <Button onClick={handleExport} variant="outline" className="bg-[#252541] border-[#3a3a5a] text-white hover:bg-[#2d2d4a]">
-            <Download className="h-4 w-4 mr-2" />
+          <Button onClick={handleExport} variant="outline">
+            <Download className="h-4 w-4 mr-2" aria-hidden="true" />
             Export PDF
           </Button>
-          <Button onClick={fetchAnalyticsData} size="icon" className="bg-[#FFC107] text-black hover:bg-[#FFC107]/90">
-            <RefreshCw className="h-4 w-4" />
+          <Button onClick={fetchAnalyticsData} size="icon" aria-label="Refresh">
+            <RefreshCw className="h-4 w-4" aria-hidden="true" />
           </Button>
         </div>
       </div>
@@ -214,84 +221,66 @@ const AnalyticsDashboardModule = () => {
           value={metrics.criticalCount} 
           trend={metrics.totalReports ? `${Math.round((metrics.criticalCount / metrics.totalReports) * 100)}% of reports in range` : 'No data yet'}
           icon={AlertCircle}
-          color="text-red-500"
         />
         <KpiCard 
           title="Top Location" 
           value={metrics.topLocation || 'No data yet'} 
           trend={metrics.topLocation ? `${metrics.topLocationCount} reports in range` : 'No locations recorded'}
           icon={MapPin}
-          color="text-blue-500"
         />
       </div>
 
-      {/* Main Charts Row */}
+      {/* Main Charts Row: white chart panels in both themes */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Trend Chart */}
-        <Card className="lg:col-span-2 bg-[#1e1e2d] border-[#2d2d4a]">
-          <CardHeader>
-            <CardTitle className="text-white">Reporting Activity</CardTitle>
-            <CardDescription className="text-gray-400">Submission volume over time</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[300px]">
-              {chartData.length === 0 ? <EmptyChart /> : (
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={chartData}>
-                  <defs>
-                    <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#FFC107" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="#FFC107" stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#2d2d4a" />
-                  <XAxis dataKey="date" stroke="#6b7280" tick={{fill: '#6b7280'}} />
-                  <YAxis stroke="#6b7280" tick={{fill: '#6b7280'}} />
-                  <RechartsTooltip 
-                    contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', color: '#fff' }}
-                  />
-                  <Area type="monotone" dataKey="count" stroke="#FFC107" fillOpacity={1} fill="url(#colorCount)" />
-                </AreaChart>
-              </ResponsiveContainer>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+        <ChartPanel title="Reporting Activity" subtitle="Submission volume over time" className="lg:col-span-2 p-5">
+          <div className="h-[300px]">
+            {chartData.length === 0 ? <EmptyChart /> : (
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={chartData} margin={{ top: 5, right: 10, bottom: 5, left: -20 }}>
+                <defs>
+                  <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor={CHART_SERIES[0]} stopOpacity={0.25}/>
+                    <stop offset="95%" stopColor={CHART_SERIES[0]} stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid {...GRID_STYLE} />
+                <XAxis dataKey="date" {...AXIS_PROPS} />
+                <YAxis allowDecimals={false} {...AXIS_PROPS} />
+                <RechartsTooltip {...TOOLTIP} />
+                <Area type="monotone" dataKey="count" name="Reports" stroke={CHART_SERIES[0]} fillOpacity={1} fill="url(#colorCount)" />
+              </AreaChart>
+            </ResponsiveContainer>
+            )}
+          </div>
+        </ChartPanel>
 
         {/* Severity Pie Chart */}
-        <Card className="bg-[#1e1e2d] border-[#2d2d4a]">
-          <CardHeader>
-            <CardTitle className="text-white">Severity Distribution</CardTitle>
-            <CardDescription className="text-gray-400">By incident level</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[300px]">
-              {severityData.length === 0 ? <EmptyChart /> : (
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={severityData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={80}
-                    paddingAngle={5}
-                    dataKey="value"
-                  >
-                    {severityData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <RechartsTooltip 
-                    contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', color: '#fff' }}
-                  />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+        <ChartPanel title="Severity Distribution" subtitle="By incident level" className="p-5">
+          <div className="h-[300px]">
+            {severityData.length === 0 ? <EmptyChart /> : (
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={severityData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={80}
+                  paddingAngle={5}
+                  dataKey="value"
+                >
+                  {severityData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={CHART_SERIES[index % CHART_SERIES.length]} />
+                  ))}
+                </Pie>
+                <RechartsTooltip {...TOOLTIP} />
+                <Legend {...LEGEND_PROPS} />
+              </PieChart>
+            </ResponsiveContainer>
+            )}
+          </div>
+        </ChartPanel>
       </div>
 
     </div>
@@ -299,30 +288,33 @@ const AnalyticsDashboardModule = () => {
 };
 
 const EmptyChart = () => (
-  <div className="h-full w-full flex items-center justify-center text-sm text-gray-500">
+  <div className="h-full w-full flex items-center justify-center text-sm text-pl-muted">
     No data yet
   </div>
 );
 
-const KpiCard = ({ title, value, trend, trendUp, icon: Icon, color = "text-[#FFC107]" }) => (
-  <Card className="bg-[#1e1e2d] border-[#2d2d4a]">
+// Neutral icon, mono count; a word ("No data yet", a location) reads in the body face.
+const KpiCard = ({ title, value, trend, trendUp, icon: Icon }) => (
+  <Card>
     <CardContent className="p-6">
-      <div className="flex justify-between items-start mb-4">
-        <div>
-          <p className="text-sm font-medium text-gray-400">{title}</p>
-          <h3 className="text-2xl font-bold text-white mt-1">{value}</h3>
+      <div className="flex justify-between items-start gap-2 mb-4">
+        <div className="min-w-0">
+          <p className="text-sm font-medium text-pl-muted">{title}</p>
+          {typeof value === 'number'
+            ? <h3 className="font-pl-mono tabular-nums text-2xl font-semibold text-pl-text mt-1">{value}</h3>
+            : <h3 className="text-xl font-semibold text-pl-text mt-1 break-words">{value}</h3>}
         </div>
-        <div className={`p-2 rounded-lg bg-opacity-10 bg-white`}>
-          <Icon className={`h-5 w-5 ${color}`} />
+        <div className="shrink-0 p-2 rounded-lg bg-pl-sunken border border-pl-border text-pl-muted">
+          <Icon className="h-5 w-5" aria-hidden="true" />
         </div>
       </div>
-      <div className="flex items-center text-xs">
+      <div className="flex items-center text-xs text-pl-muted">
         {trendUp !== undefined && (
           trendUp ? 
-            <TrendingUp className="h-3 w-3 text-gray-400 mr-1" /> : 
-            <TrendingDown className="h-3 w-3 text-gray-400 mr-1" />
+            <TrendingUp className="h-3 w-3 mr-1" aria-hidden="true" /> : 
+            <TrendingDown className="h-3 w-3 mr-1" aria-hidden="true" />
         )}
-        <span className="text-gray-500">
+        <span>
           {trend}
         </span>
       </div>

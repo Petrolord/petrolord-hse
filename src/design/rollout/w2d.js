@@ -1,2 +1,3 @@
-// Batch 2D: filled in by that batch's PR (docs/scope/DesignSystem-Rollout.md section 3).
-export default [];
+// Batch 2D (registers and settings): the modules this batch themed.
+// See docs/scope/DesignSystem-Rollout.md section 3.
+export default ['analytics', 'contractor', 'audit', 'training', 'settings'];
