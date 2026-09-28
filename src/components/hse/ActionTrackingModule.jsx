@@ -88,7 +88,7 @@ export default function ActionTrackingModule() {
   const isEmpty = !loading && actions.length === 0 && !filters.search;
 
   return (
-    <div className="flex h-full overflow-hidden bg-pl-bg text-pl-text">
+    <div className="flex h-[calc(100vh-64px)] overflow-hidden bg-pl-bg text-pl-text">
       {/* Sidebar Filters */}
       <div className="hidden lg:block w-64 flex-shrink-0">
         <ActionFilters filters={filters} setFilters={setFilters} users={users} />
