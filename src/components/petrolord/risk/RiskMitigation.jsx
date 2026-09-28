@@ -124,7 +124,7 @@ export default function RiskMitigation() {
                     </td>
                     <td className="px-6 py-4 max-w-md text-pl-text">{a.description}</td>
                     <td className="px-6 py-4">
-                      <Badge variant="neutral">{a.strategy || EMPTY}</Badge>
+                      {a.strategy ? <Badge variant="neutral">{a.strategy}</Badge> : <span className="text-xs text-pl-muted">{EMPTY}</span>}
                     </td>
                     <td className={`px-6 py-4 text-xs whitespace-nowrap ${isOverdue(a) ? 'text-pl-danger-text font-medium' : 'text-pl-muted'}`}>
                       <span className="font-pl-mono tabular-nums">{a.due_date ? new Date(a.due_date).toLocaleDateString() : EMPTY}</span>

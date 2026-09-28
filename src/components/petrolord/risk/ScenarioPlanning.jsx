@@ -110,9 +110,9 @@ export default function ScenarioPlanning() {
                       {s.description && <div className="text-pl-muted text-xs truncate">{s.description}</div>}
                     </td>
                     <td className="px-6 py-4">
-                      <Badge variant="neutral">{s.type || EMPTY}</Badge>
+                      {s.type ? <Badge variant="neutral">{s.type}</Badge> : <span className="text-xs text-pl-muted">{EMPTY}</span>}
                     </td>
-                    <td className="px-6 py-4"><Badge variant={s.probability ? probVariant(s.probability) : 'neutral'}>{s.probability || EMPTY}</Badge></td>
+                    <td className="px-6 py-4">{s.probability ? <Badge variant={probVariant(s.probability)}>{s.probability}</Badge> : <span className="text-xs text-pl-muted">{EMPTY}</span>}</td>
                     <td className="px-6 py-4 text-right text-pl-text font-pl-mono tabular-nums whitespace-nowrap">{fmtMoney(s.impact_financial)}</td>
                     <td className="px-6 py-4 text-right text-pl-text font-pl-mono tabular-nums font-semibold whitespace-nowrap">{fmtMoney(Math.round((s.impact_financial || 0) * (PROB_WEIGHT[s.probability] ?? 0)))}</td>
                     <td className="px-6 py-4 text-right">

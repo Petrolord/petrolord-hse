@@ -71,7 +71,7 @@ export default function ObligationsPermits() {
                 <TableRow key={p.id}>
                   <TableCell className="font-medium font-pl-mono">{p.permit_number}</TableCell>
                   <TableCell className="text-pl-muted">{p.type}</TableCell>
-                  <TableCell className="text-pl-muted">{p.issuing_authority}</TableCell>
+                  <TableCell className="text-pl-muted">{p.issuing_authority || EMPTY}</TableCell>
                   <TableCell className="text-pl-muted font-pl-mono tabular-nums">{p.expiry_date ? new Date(p.expiry_date).toLocaleDateString() : EMPTY}</TableCell>
                   <TableCell>
                     <Badge variant={permitStatusVariant(p.status)}>{p.status}</Badge>

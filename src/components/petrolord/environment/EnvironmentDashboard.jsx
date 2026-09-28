@@ -76,7 +76,7 @@ export default function EnvironmentDashboard({ onLogSpill, onSubmitMonitoring })
         </Card>
 
         {/* KPIs */}
-        <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="lg:col-span-8 grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
           <StatCard title="Permits Due (90 Days)" value={stats.expiringPermits} icon={FileCheck} />
           <StatCard title="Overdue Actions" value={stats.overdueActions} icon={Calendar} />
           <StatCard title="Spills (All Time)" value={stats.spillCount} icon={Droplets} />
