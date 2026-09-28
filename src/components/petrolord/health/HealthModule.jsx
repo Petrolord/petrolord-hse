@@ -20,7 +20,7 @@ import HealthDashboard from '@/components/hse/health/HealthDashboard';
 import FireSafetyTab from './FireSafetyTab';
 
 // Design family (batch 2B): Health renders inside the signed-in scope
-// (src/design/rollout/w2b.js), so it uses the theme roles directly.
+// (src/design/SignedInScope.jsx), so it uses the theme roles directly.
 export default function HealthModule() {
   const [activeTab, setActiveTab] = useState('dashboard');
 

@@ -382,6 +382,46 @@ that reuse the button look).
 4B: delete the unreachable files and unused ui files, port the chart
 watermark, final walk of every screen in both themes.
 
+**As built (4A, `feat/hse-ds-4a`).** The rollout gate is off:
+`SignedInScope` opens one `ThemedApp` on every module, and
+`src/design/rollout/` and `src/design/themeClass.js` (`useThemeClass`,
+`themeClassPicker`) are deleted. Every `tc(legacy, themed)` call became its
+themed string; the ui kit keeps one variant set each (`buttonVariants`,
+`badgeVariants`, `alertVariants`, `labelVariants`, `toastVariants`;
+`useButtonVariants` and the `themed*` exports are gone). The legacy branches
+in the shell, the Quick Report flow, the Report Wizard, `UpgradeModal`,
+`ProtectedRoute` and `PetrolordHSE` loaders, the offline pill, the install
+prompt, the toaster and the back-online toast are gone; the root pieces
+take the theme of the scope on screen and the light paper style where
+none is mounted (the homepage). `ThemedLoadingScreen` is a scope of its
+own, so it publishes its theme and the offline pill matches on a cold load.
+Route map: `/dashboard/*` is `SignedInScope`; the six pages outside the
+layout and the denied panels are `AccountScope`; the auth and public pages
+are `PublicPage`; the root error panel and loaders open their own scope;
+`/` is `.hse-home`. One uncovered piece was found and scoped:
+`UpgradeToSuiteModal`, which `FeatureAccessProvider` mounts at the root
+(no routed screen opens it today), now follows the scope on screen like the
+toaster and sits on the roles. The pins `uiLegacyDom`, `shellLegacyDom`,
+`reportingLegacyDom` and `rootLegacyDom` (and their .json) are retired;
+`shellScope.test.jsx` mounts the shell on every MainContent module and on
+the old `legacy-probe` id and finds the scope, the toggle, the ink rail and
+no legacy colour. `index.css`: `:root` holds the light scope's shadcn
+values, and `.dark`, the legacy palette variables (`--bg-app`, `--bg-card`,
+`--text-*`, `--border-color`, `--accent*`) and `petrolord-card` /
+`petrolord-button` are retired. `GlobalThemeContext` no longer sets `.dark`
+or `data-theme` on `<html>`, CSS variables, fonts or custom CSS from
+`organization_branding` (lead decision 6); it still reads the row and
+exposes `orgSettings` and `orgLogo`, and no column changed. The Settings
+branding editor hides the Quick Theme Presets, the Colors and Typography
+tabs, the Custom CSS editor and the colour preview (its saved values are
+kept); logo, layout, login page, footer and the change history stay.
+The ink rail's section labels (gold, 11.6:1) and Sign Out (now the text
+role, above 15:1) are pinned at 4.5:1 or more, and Sign Out sits clear of
+the Online pill. Phone: the layout starts with the nav drawer closed below
+the lg breakpoint (where the drawer covers the page and the menu button
+shows) and open on a desktop.
+
+
 ## 8. Test strategy
 
 The repo's runner stays vitest. Wave 0 adds `jsdom`, `@testing-library/react`

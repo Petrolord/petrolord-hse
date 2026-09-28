@@ -33,7 +33,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import ReportClassificationPanel from './safety-stats/ReportClassificationPanel';
 
 // Design family (batch 1B): Supervisor View renders inside the signed-in
-// scope (src/design/rollout/w1b.js), so it uses the theme roles directly.
+// scope (src/design/SignedInScope.jsx), so it uses the theme roles directly.
 // Severity and status are Badge status variants with the word inside.
 const SupervisorDashboardModule = () => {
   const { userData } = useHSE();

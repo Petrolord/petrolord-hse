@@ -17,7 +17,7 @@ const fromReport = (r) => ({
   occurred_on: r.occurred_on || '',
 });
 
-// Supervisor View is on the design family (src/design/rollout/w1b.js), so the
+// Supervisor View is on the design family (src/design/SignedInScope.jsx), so the
 // native fields take the Suite field styling on the theme roles.
 const selectClass = 'w-full rounded-md border border-pl-border-strong bg-pl-surface p-2 text-xs text-pl-text focus:outline-none focus-visible:ring-2 focus-visible:ring-pl-focus';
 

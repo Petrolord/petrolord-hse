@@ -4,9 +4,9 @@
 //
 // It mounts the real PetrolordHSE layout on the module, runs the standard
 // four checks on the premium upsell a non-premium admin sees, then walks the
-// branding editor (all six sections and the live preview, which keeps the
-// organisation's own colours on a document canvas), Departments, Compliance
-// and My Profile, in light and in dark. Only the data layer is stubbed; no
+// branding editor (since batch 4A without its theme, colour, typography and
+// custom CSS controls: the family look wins), Departments, Compliance and My
+// Profile, in light and in dark. Only the data layer is stubbed; no
 // request leaves the test.
 import React from 'react';
 import { render, screen, fireEvent, act, within, configure } from '@testing-library/react';
@@ -91,7 +91,7 @@ const clickTab = async (name) => {
 // A non-premium org admin sees the upsell; a super admin gets the editor.
 const onSettings = (role = 'org_admin') => resetShell({ activeModule: { id: 'settings', label: 'Settings' }, role });
 const ready = async () => { await screen.findByText('Organization Settings'); await screen.findByText(/Premium Feature/); await flush(); };
-const readyEditor = async () => { await screen.findByText('Organization Settings'); await screen.findByText('Quick Theme Presets'); await flush(); };
+const readyEditor = async () => { await screen.findByText('Organization Settings'); await screen.findByText('Colors and theme'); await flush(); };
 
 describe('Settings (batch 2D)', () => {
   beforeEach(() => onSettings());
@@ -109,27 +109,29 @@ describe('Settings (batch 2D)', () => {
       expectNoLegacyChrome();
     });
 
-    it('walks the branding editor sections; the live preview keeps the organisation colours on a document canvas', async () => {
+    it('walks the branding editor sections; the theme, colour, typography and custom CSS controls are hidden (4A)', async () => {
       onSettings('super_admin');
       renderLayout();
       await readyEditor();
-      const preview = screen.getByText('Dashboard Overview').closest('[data-canvas]');
-      expect(preview).toHaveAttribute('data-canvas', 'document');
       expect(screen.getByRole('button', { name: 'Save Changes' }).className).not.toContain('petrolord-button');
+      expect(screen.getByText('Colors and theme').closest('[role="alert"]').className).toContain('bg-pl-info-bg');
       expectNoLegacyChrome();
 
-      fireEvent.click(screen.getByRole('button', { name: 'Light preview' }));
-      expect(screen.getByRole('button', { name: 'Light preview' })).toHaveAttribute('aria-pressed', 'true');
+      // hidden: presets, the Colors and Typography tabs, the colour preview
+      expect(screen.queryByText('Quick Theme Presets')).toBeNull();
+      expect(screen.queryByRole('tab', { name: /^Colors$/ })).toBeNull();
+      expect(screen.queryByRole('tab', { name: /^Typography$/ })).toBeNull();
+      expect(screen.queryByText('Dashboard Overview')).toBeNull();
 
       for (const [tab, text] of [
-        [/^Colors$/, 'Color Palette'], [/^Typography$/, 'Base Font Size'], [/^Login Page$/, 'Login Form Position'],
-        [/^Footer$/, 'Footer Settings'], [/^Advanced$/, 'Change History'],
+        [/^Login Page$/, 'Login Form Position'], [/^Footer$/, 'Footer Settings'], [/^Advanced$/, 'Change History'],
       ]) {
         await clickTab(tab);
         await screen.findByText(text);
         expectNoLegacyChrome();
       }
-      expect(screen.getByText('Warning').closest('[role="alert"]').className).toContain('bg-pl-warning-bg');
+      // hidden: the custom CSS editor
+      expect(screen.queryByText('Custom CSS')).toBeNull();
     });
 
     it('walks Departments, Compliance and My Profile on roles', async () => {

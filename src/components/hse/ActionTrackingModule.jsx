@@ -14,7 +14,7 @@ import { useToast } from "@/components/ui/use-toast";
 import ActionsEmpty from '@/components/EmptyStates/ActionsEmpty';
 
 // Design family (batch 1B): Action Tracker renders inside the signed-in scope
-// (src/design/rollout/w1b.js), so it uses the theme roles directly. The view
+// (src/design/SignedInScope.jsx), so it uses the theme roles directly. The view
 // and quick filter chips use the Suite chip look; colour is kept for status.
 const chipClass = (active) => `h-9 px-4 border font-medium transition-colors ${
   active

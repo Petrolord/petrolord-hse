@@ -6,7 +6,7 @@ import { CHART_COLORS, CHART_SERIES } from '@/utils/chartTheme';
 import { cn } from '@/lib/utils';
 
 // Design family (batch 2B): Safety Statistics and Occupational Hygiene both
-// render inside the signed-in scope (src/design/rollout/w2b.js) and are the
+// render inside the signed-in scope (src/design/SignedInScope.jsx) and are the
 // only users of this file, so it is on the theme roles directly.
 
 export const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];

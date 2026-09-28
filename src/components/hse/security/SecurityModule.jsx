@@ -18,7 +18,7 @@ import LogSecurityIncidentModal from './LogSecurityIncidentModal';
 import { supabase } from '@/lib/customSupabaseClient';
 
 // Design family (batch 2B): Security renders inside the signed-in scope
-// (src/design/rollout/w2b.js), so it uses the theme roles directly.
+// (src/design/SignedInScope.jsx), so it uses the theme roles directly.
 export default function SecurityModule() {
   const { currentOrganization, role } = useHSE();
   const [activeTab, setActiveTab] = useState('dashboard');

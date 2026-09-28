@@ -13,7 +13,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { safetyMomentsData } from '@/data/safetyMomentsData';
 
 // Design family (batch 2C): Safety Moments renders inside the signed-in scope
-// (src/design/rollout/w2c.js), so it uses the theme roles directly. The tabs
+// (src/design/SignedInScope.jsx), so it uses the theme roles directly. The tabs
 // keep their underline look on the roles.
 const tabTriggerClass = 'gap-2 rounded-none border-b-2 border-transparent bg-transparent px-0 py-3 text-pl-muted shadow-none hover:text-pl-text data-[state=active]:border-pl-primary data-[state=active]:bg-transparent data-[state=active]:text-pl-primary-text data-[state=active]:shadow-none';
 
