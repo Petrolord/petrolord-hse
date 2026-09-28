@@ -3,12 +3,20 @@ import * as CheckboxPrimitive from "@radix-ui/react-checkbox"
 import { Check } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import { useThemeClass } from "@/design/themeClass"
 
-const Checkbox = React.forwardRef(({ className, ...props }, ref) => (
+// Inside a design-system scope: the Suite's checkbox (strong border, primary
+// when checked, a 4px corner that stays square where --radius grows).
+const Checkbox = React.forwardRef(({ className, ...props }, ref) => {
+  const tc = useThemeClass()
+  return (
   <CheckboxPrimitive.Root
     ref={ref}
     className={cn(
-      "peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground",
+      tc(
+        "peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground",
+        "peer h-4 w-4 shrink-0 border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 rounded-[4px] border-pl-border-strong bg-pl-surface ring-offset-pl-bg focus-visible:ring-pl-focus data-[state=checked]:border-pl-primary data-[state=checked]:bg-pl-primary data-[state=checked]:text-pl-primary-fg"
+      ),
       className
     )}
     {...props}
@@ -19,7 +27,8 @@ const Checkbox = React.forwardRef(({ className, ...props }, ref) => (
       <Check className="h-4 w-4" />
     </CheckboxPrimitive.Indicator>
   </CheckboxPrimitive.Root>
-))
+  )
+})
 Checkbox.displayName = CheckboxPrimitive.Root.displayName
 
 export { Checkbox }

@@ -2,6 +2,7 @@ import * as React from "react"
 import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area"
 
 import { cn } from "@/lib/utils"
+import { useThemeClass } from "@/design/themeClass"
 
 const ScrollArea = React.forwardRef(({ className, children, ...props }, ref) => (
   <ScrollAreaPrimitive.Root
@@ -17,7 +18,9 @@ const ScrollArea = React.forwardRef(({ className, children, ...props }, ref) => 
 ))
 ScrollArea.displayName = ScrollAreaPrimitive.Root.displayName
 
-const ScrollBar = React.forwardRef(({ className, orientation = "vertical", ...props }, ref) => (
+const ScrollBar = React.forwardRef(({ className, orientation = "vertical", ...props }, ref) => {
+  const tc = useThemeClass()
+  return (
   <ScrollAreaPrimitive.Scrollbar
     ref={ref}
     orientation={orientation}
@@ -30,9 +33,10 @@ const ScrollBar = React.forwardRef(({ className, orientation = "vertical", ...pr
       className
     )}
     {...props}>
-    <ScrollAreaPrimitive.Thumb className="relative flex-1 rounded-full bg-border" />
+    <ScrollAreaPrimitive.Thumb className={tc("relative flex-1 rounded-full bg-border", "relative flex-1 rounded-full bg-pl-border-strong/70 hover:bg-pl-border-strong")} />
   </ScrollAreaPrimitive.Scrollbar>
-))
+  )
+})
 ScrollBar.displayName = ScrollAreaPrimitive.Scrollbar.displayName
 
 export { ScrollArea, ScrollBar }
