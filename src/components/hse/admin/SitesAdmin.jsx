@@ -202,128 +202,131 @@ export default function SitesAdmin() {
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="p-6 max-w-6xl mx-auto"
+      className="p-4 sm:p-6 max-w-6xl mx-auto"
     >
-      <div className="flex items-center gap-2 text-xs text-slate-400 mb-2">
+      <div className="flex items-center gap-2 text-xs text-pl-muted mb-2">
         <button
           onClick={() => setActiveModule({ id: 'admin-setup-hub', label: 'Setup Hub' })}
-          className="flex items-center hover:text-white"
+          className="flex items-center rounded-sm hover:text-pl-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pl-focus"
         >
-          <ChevronLeft className="w-3 h-3" /> Setup Hub
+          <ChevronLeft className="w-3 h-3" aria-hidden="true" /> Setup Hub
         </button>
       </div>
 
-      <div className="flex items-start justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-            <MapPin className="w-6 h-6 text-blue-400" />
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-6">
+        <div className="min-w-0">
+          <h1 className="font-pl-display text-2xl sm:text-3xl font-semibold text-pl-text flex items-center gap-2">
+            <MapPin className="w-6 h-6 text-pl-primary-text" aria-hidden="true" />
             Sites
           </h1>
-          <p className="text-slate-400 text-sm mt-1">
+          <p className="text-pl-muted text-sm mt-1">
             Physical locations where work happens. Add rigs, plants, offices, depots.
           </p>
         </div>
-        <Button onClick={openCreate} className="bg-blue-600 hover:bg-blue-700">
+        <Button onClick={openCreate} className="self-start shrink-0">
           <Plus className="w-4 h-4 mr-2" /> Add Site
         </Button>
       </div>
 
-      <div className="bg-[#1f1f35] border border-[#2d2d4a] rounded-lg overflow-hidden">
+      <div className="rounded-lg border border-pl-border bg-pl-surface shadow-pl-sm overflow-hidden">
         {loading ? (
-          <div className="p-8 text-center text-slate-400 text-sm">Loading sites...</div>
+          <div className="p-8 text-center text-pl-muted text-sm">Loading sites...</div>
         ) : sites.length === 0 ? (
           <div className="p-12 text-center">
-            <MapPin className="w-10 h-10 text-slate-600 mx-auto mb-3" />
-            <div className="text-white font-medium mb-1">No sites yet</div>
-            <div className="text-slate-400 text-sm mb-4">
+            <MapPin className="w-10 h-10 text-pl-border-strong mx-auto mb-3" aria-hidden="true" />
+            <div className="text-pl-text font-medium mb-1">No sites yet</div>
+            <div className="text-pl-muted text-sm mb-4">
               Add your first site so quick reports can be tagged with a location.
             </div>
-            <Button onClick={openCreate} className="bg-blue-600 hover:bg-blue-700">
+            <Button onClick={openCreate}>
               <Plus className="w-4 h-4 mr-2" /> Add your first site
             </Button>
           </div>
         ) : (
-          <table className="w-full text-sm">
-            <thead className="bg-[#1a1a2e] text-[#7a7a9a] uppercase text-xs">
-              <tr>
-                <th className="px-6 py-3 text-left">Name</th>
-                <th className="px-6 py-3 text-left">Type</th>
-                <th className="px-6 py-3 text-left">Address</th>
-                <th className="px-6 py-3 text-left">Contact</th>
-                <th className="px-6 py-3 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#2d2d4a] text-slate-300">
-              {sites.map((s) => (
-                <tr key={s.id} className="hover:bg-[#252541]">
-                  <td className="px-6 py-3">
-                    <div className="flex items-center gap-2">
-                      <span className="text-white font-medium">{s.name}</span>
-                      {s.is_primary && (
-                        <Star className="w-3.5 h-3.5 text-yellow-400" fill="currentColor" />
-                      )}
-                    </div>
-                    {s.description && (
-                      <div className="text-xs text-slate-500 mt-0.5">{s.description}</div>
-                    )}
-                  </td>
-                  <td className="px-6 py-3 capitalize text-xs">
-                    {SITE_TYPES.find(t => t.value === s.site_type)?.label || s.site_type || '—'}
-                  </td>
-                  <td className="px-6 py-3 text-xs">{s.address || '—'}</td>
-                  <td className="px-6 py-3 text-xs">
-                    {s.contact_person ? (
-                      <>
-                        <div>{s.contact_person}</div>
-                        {s.contact_email && <div className="text-slate-500">{s.contact_email}</div>}
-                      </>
-                    ) : '—'}
-                  </td>
-                  <td className="px-6 py-3 text-right">
-                    <Button variant="ghost" size="sm" onClick={() => setShowQrFor(s)} className="text-slate-300" title="Show QR code">
-                      <QrCode className="w-3.5 h-3.5" />
-                    </Button>
-                    <Button variant="ghost" size="sm" onClick={() => openEdit(s)} className="text-slate-300">
-                      <Edit2 className="w-3.5 h-3.5" />
-                    </Button>
-                    <Button variant="ghost" size="sm" onClick={() => setConfirmDeleteId(s.id)} className="text-red-400 hover:text-red-300">
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </Button>
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[720px] text-sm">
+              <thead className="bg-pl-sunken text-pl-muted uppercase text-xs">
+                <tr>
+                  <th className="px-4 sm:px-6 py-3 text-left">Name</th>
+                  <th className="px-4 sm:px-6 py-3 text-left">Type</th>
+                  <th className="px-4 sm:px-6 py-3 text-left">Address</th>
+                  <th className="px-4 sm:px-6 py-3 text-left">Contact</th>
+                  <th className="px-4 sm:px-6 py-3 text-right">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-pl-border text-pl-text">
+                {sites.map((s) => (
+                  <tr key={s.id} className="hover:bg-pl-sunken/60">
+                    <td className="px-4 sm:px-6 py-3">
+                      <div className="flex items-center gap-2">
+                        <span className="text-pl-text font-medium">{s.name}</span>
+                        {s.is_primary && (
+                          <span className="inline-flex items-center gap-1 text-xs font-medium text-pl-accent-text">
+                            <Star className="w-3.5 h-3.5" fill="currentColor" aria-hidden="true" /> Primary
+                          </span>
+                        )}
+                      </div>
+                      {s.description && (
+                        <div className="text-xs text-pl-muted mt-0.5">{s.description}</div>
+                      )}
+                    </td>
+                    <td className="px-4 sm:px-6 py-3 capitalize text-xs">
+                      {SITE_TYPES.find(t => t.value === s.site_type)?.label || s.site_type || 'n/a'}
+                    </td>
+                    <td className="px-4 sm:px-6 py-3 text-xs">{s.address || 'n/a'}</td>
+                    <td className="px-4 sm:px-6 py-3 text-xs">
+                      {s.contact_person ? (
+                        <>
+                          <div>{s.contact_person}</div>
+                          {s.contact_email && <div className="text-pl-muted">{s.contact_email}</div>}
+                        </>
+                      ) : 'n/a'}
+                    </td>
+                    <td className="px-4 sm:px-6 py-3 text-right whitespace-nowrap">
+                      <Button variant="ghost" size="sm" onClick={() => setShowQrFor(s)} title="Show QR code" aria-label={`Show QR code for ${s.name}`}>
+                        <QrCode className="w-3.5 h-3.5" />
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={() => openEdit(s)} title="Edit" aria-label={`Edit ${s.name}`}>
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={() => setConfirmDeleteId(s.id)} title="Delete" aria-label={`Delete ${s.name}`} className="text-pl-danger-text hover:bg-pl-danger-bg hover:text-pl-danger-text">
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
 
       {/* Create / Edit dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="bg-[#1a1a2e] border-[#2d2d4a] text-white max-w-lg">
+        <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>{editingSite ? 'Edit Site' : 'Add Site'}</DialogTitle>
-            <DialogDescription className="text-slate-400">
+            <DialogDescription>
               {editingSite ? 'Update site details.' : 'Create a new site for incident reporting.'}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-3 py-2">
             <div>
-              <Label className="text-xs text-slate-400">Name *</Label>
+              <Label className="text-xs text-pl-muted">Name *</Label>
               <Input
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                 placeholder="e.g. Refinery Block A"
-                className="bg-[#252541] border-[#3a3a5a] text-white mt-1"
               />
             </div>
             <div>
-              <Label className="text-xs text-slate-400">Site Type</Label>
+              <Label className="text-xs text-pl-muted">Site Type</Label>
               <Select value={form.site_type} onValueChange={(v) => setForm({ ...form, site_type: v })}>
-                <SelectTrigger className="bg-[#252541] border-[#3a3a5a] text-white mt-1">
+                <SelectTrigger>
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
-                <SelectContent className="bg-[#1a1a2e] border-[#2d2d4a] text-white">
+                <SelectContent>
                   {SITE_TYPES.map(t => (
                     <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
                   ))}
@@ -331,48 +334,44 @@ export default function SitesAdmin() {
               </Select>
             </div>
             <div>
-              <Label className="text-xs text-slate-400">Address / Location</Label>
+              <Label className="text-xs text-pl-muted">Address / Location</Label>
               <Input
                 value={form.address}
                 onChange={(e) => setForm({ ...form, address: e.target.value })}
                 placeholder="Street, city, country"
-                className="bg-[#252541] border-[#3a3a5a] text-white mt-1"
               />
             </div>
             <div>
-              <Label className="text-xs text-slate-400">Description</Label>
+              <Label className="text-xs text-pl-muted">Description</Label>
               <Textarea
                 value={form.description}
                 onChange={(e) => setForm({ ...form, description: e.target.value })}
                 rows={2}
-                className="bg-[#252541] border-[#3a3a5a] text-white mt-1"
               />
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <Label className="text-xs text-slate-400">Contact Person</Label>
+                <Label className="text-xs text-pl-muted">Contact Person</Label>
                 <Input
                   value={form.contact_person}
                   onChange={(e) => setForm({ ...form, contact_person: e.target.value })}
-                  className="bg-[#252541] border-[#3a3a5a] text-white mt-1"
                 />
               </div>
               <div>
-                <Label className="text-xs text-slate-400">Contact Email</Label>
+                <Label className="text-xs text-pl-muted">Contact Email</Label>
                 <Input
                   type="email"
                   value={form.contact_email}
                   onChange={(e) => setForm({ ...form, contact_email: e.target.value })}
-                  className="bg-[#252541] border-[#3a3a5a] text-white mt-1"
                 />
               </div>
             </div>
-            <label className="flex items-center gap-2 text-sm text-slate-300 pt-2">
+            <label className="flex items-center gap-2 text-sm text-pl-text pt-2">
               <input
                 type="checkbox"
                 checked={form.is_primary}
                 onChange={(e) => setForm({ ...form, is_primary: e.target.checked })}
-                className="accent-blue-500"
+                className="accent-pl-primary"
               />
               Mark as primary site
             </label>
@@ -380,42 +379,47 @@ export default function SitesAdmin() {
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
-            <Button onClick={handleSave} disabled={saving} className="bg-blue-600 hover:bg-blue-700">
+            <Button onClick={handleSave} disabled={saving}>
               {saving ? 'Saving...' : (editingSite ? 'Save changes' : 'Add site')}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* QR display dialog */}
+      {/* QR display dialog. The code itself sits on a white light canvas in
+          both themes so any phone camera reads it. */}
       <Dialog open={!!showQrFor} onOpenChange={() => { setShowQrFor(null); setConfirmRegenerate(false); }}>
-        <DialogContent className="bg-white border-slate-300 text-slate-900 max-w-lg">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-slate-900">QR code for {showQrFor?.name}</DialogTitle>
-            <DialogDescription className="text-slate-600">
+            <DialogTitle>QR code for {showQrFor?.name}</DialogTitle>
+            <DialogDescription>
               Print or display this code at the site. Anyone who scans it can submit a safety observation without logging in.
             </DialogDescription>
           </DialogHeader>
           {showQrFor && (
             <div className="py-4 flex flex-col items-center gap-4">
               {showQrFor.qr_enabled === false && (
-                <div className="w-full text-xs text-red-700 bg-red-50 border border-red-200 rounded p-2 text-center">
+                <div className="w-full rounded-md border border-pl-danger/40 bg-pl-danger-bg p-2 text-center text-xs text-pl-danger-text">
                   QR submissions are currently disabled for this site. Anyone scanning the code sees a "disabled" message.
                 </div>
               )}
-              <div className={`border border-slate-200 rounded-lg p-3 bg-white ${showQrFor.qr_enabled === false ? 'opacity-40' : ''}`}>
+              <div
+                data-canvas="light"
+                className={`max-w-full rounded-lg border border-pl-border bg-white p-3 ${showQrFor.qr_enabled === false ? 'opacity-40' : ''}`}
+              >
                 <QRCodeCanvas
                   id="site-qr-canvas"
                   value={buildQrUrl(showQrFor.qr_token)}
                   size={300}
                   marginSize={2}
                   level="M"
+                  style={{ maxWidth: '100%', height: 'auto' }}
                 />
               </div>
               <div className="w-full">
-                <div className="text-xs text-slate-500 mb-1">Public URL</div>
+                <div className="text-xs text-pl-muted mb-1">Public URL</div>
                 <div className="flex items-center gap-2">
-                  <code className="flex-1 bg-slate-100 px-2 py-1.5 rounded text-xs text-slate-700 break-all">
+                  <code className="flex-1 rounded bg-pl-sunken px-2 py-1.5 font-pl-mono text-xs text-pl-text break-all">
                     {buildQrUrl(showQrFor.qr_token)}
                   </code>
                   <Button
@@ -431,19 +435,19 @@ export default function SitesAdmin() {
               </div>
 
               {confirmRegenerate ? (
-                <div className="w-full text-xs bg-amber-50 border border-amber-300 rounded p-3">
-                  <div className="text-amber-800 mb-2">
+                <div className="w-full rounded-md border border-pl-warning/40 bg-pl-warning-bg p-3 text-xs">
+                  <div className="text-pl-warning-text mb-2">
                     Issue a new code? Every previously printed poster for this site will stop working.
                   </div>
-                  <div className="flex gap-2 justify-end">
+                  <div className="flex flex-wrap gap-2 justify-end">
                     <Button variant="outline" size="sm" onClick={() => setConfirmRegenerate(false)}>Cancel</Button>
-                    <Button size="sm" disabled={qrBusy} onClick={() => handleRegenerate(showQrFor)} className="bg-amber-600 hover:bg-amber-700 text-white">
+                    <Button size="sm" variant="destructive" disabled={qrBusy} onClick={() => handleRegenerate(showQrFor)}>
                       {qrBusy ? 'Working...' : 'Yes, issue new code'}
                     </Button>
                   </div>
                 </div>
               ) : (
-                <div className="w-full flex items-center justify-between gap-2">
+                <div className="w-full flex flex-wrap items-center justify-between gap-2">
                   <Button variant="outline" size="sm" disabled={qrBusy} onClick={() => setConfirmRegenerate(true)}>
                     <RefreshCw className="w-3.5 h-3.5 mr-1" /> Regenerate code
                   </Button>
@@ -452,14 +456,14 @@ export default function SitesAdmin() {
                     size="sm"
                     disabled={qrBusy}
                     onClick={() => handleToggleQr(showQrFor)}
-                    className={showQrFor.qr_enabled === false ? 'text-green-700' : 'text-red-600'}
+                    className={showQrFor.qr_enabled === false ? 'text-pl-success-text' : 'text-pl-danger-text'}
                   >
                     {showQrFor.qr_enabled === false ? 'Enable submissions' : 'Disable submissions'}
                   </Button>
                 </div>
               )}
 
-              <div className="w-full text-xs text-slate-500 bg-slate-50 border border-slate-200 rounded p-2">
+              <div className="w-full rounded-md border border-pl-border bg-pl-sunken p-2 text-xs text-pl-muted">
                 Tip: print the QR on a laminated card and post it at the site entrance, near the safety briefing board.
               </div>
             </div>
@@ -469,7 +473,6 @@ export default function SitesAdmin() {
             <Button
               onClick={() => printPoster(showQrFor)}
               disabled={showQrFor?.qr_enabled === false}
-              className="bg-blue-600 hover:bg-blue-700"
             >
               Print poster
             </Button>
@@ -479,16 +482,16 @@ export default function SitesAdmin() {
 
       {/* Delete confirmation */}
       <Dialog open={!!confirmDeleteId} onOpenChange={() => setConfirmDeleteId(null)}>
-        <DialogContent className="bg-[#1a1a2e] border-[#2d2d4a] text-white">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>Delete this site?</DialogTitle>
-            <DialogDescription className="text-slate-400">
+            <DialogDescription>
               This action cannot be undone. Existing reports referencing this site will keep their data.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setConfirmDeleteId(null)}>Cancel</Button>
-            <Button onClick={() => handleDelete(confirmDeleteId)} className="bg-red-600 hover:bg-red-700">
+            <Button variant="destructive" onClick={() => handleDelete(confirmDeleteId)}>
               Delete
             </Button>
           </DialogFooter>

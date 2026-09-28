@@ -48,52 +48,52 @@ export const OrganizationInfo = ({ organization, onUpdate }) => {
   return (
     <div className="space-y-6">
       {/* Organization Overview */}
-      <Card className="bg-gray-800 border-gray-700">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-white">Organization Overview</CardTitle>
-          <CardDescription className="text-gray-400">Basic information about your organization</CardDescription>
+          <CardTitle>Organization Overview</CardTitle>
+          <CardDescription className="mt-1.5">Basic information about your organization</CardDescription>
         </CardHeader>
         <CardContent>
           {!isEditing ? (
             <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-white">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-pl-text">
                 <div>
-                  <p className="text-sm text-gray-400">Organization Name</p>
-                  <p className="text-lg font-semibold">{organization?.name || 'N/A'}</p>
+                  <p className="text-sm text-pl-muted">Organization Name</p>
+                  <p className="text-lg font-semibold">{organization?.name || 'n/a'}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-400">Industry</p>
-                  <p className="text-lg font-semibold">{organization?.industry || 'N/A'}</p>
+                  <p className="text-sm text-pl-muted">Industry</p>
+                  <p className="text-lg font-semibold">{organization?.industry || 'n/a'}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-400">Location</p>
-                  <p className="text-lg font-semibold">{organization?.location || 'N/A'}</p>
+                  <p className="text-sm text-pl-muted">Location</p>
+                  <p className="text-lg font-semibold">{organization?.location || 'n/a'}</p>
                 </div>
-                <div>
-                  <p className="text-sm text-gray-400">Website</p>
-                  <p className="text-lg font-semibold">{organization?.website || 'N/A'}</p>
+                <div className="min-w-0">
+                  <p className="text-sm text-pl-muted">Website</p>
+                  <p className="text-lg font-semibold break-all">{organization?.website || 'n/a'}</p>
                 </div>
               </div>
-              <div className="text-white">
-                <p className="text-sm text-gray-400">Description</p>
-                <p className="text-gray-300">{organization?.description || 'No description'}</p>
+              <div className="text-pl-text">
+                <p className="text-sm text-pl-muted">Description</p>
+                <p>{organization?.description || 'No description'}</p>
               </div>
-              <Button onClick={() => setIsEditing(true)} className="bg-yellow-600 hover:bg-yellow-700 text-white">
+              <Button onClick={() => setIsEditing(true)}>
                 Edit Organization
               </Button>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-4 text-white">
+            <form onSubmit={handleSubmit} className="space-y-4 text-pl-text">
               {message && (
-                <div className={`p-4 rounded-lg flex items-center gap-2 ${
+                <div role="status" className={`p-4 rounded-lg border flex items-center gap-2 ${
                   message.type === 'success' 
-                    ? 'bg-green-900 text-green-100' 
-                    : 'bg-red-900 text-red-100'
+                    ? 'border-pl-success/40 bg-pl-success-bg text-pl-success-text' 
+                    : 'border-pl-danger/40 bg-pl-danger-bg text-pl-danger-text'
                 }`}>
                   {message.type === 'success' ? (
-                    <CheckCircle className="w-5 h-5" />
+                    <CheckCircle className="w-5 h-5 shrink-0" aria-hidden="true" />
                   ) : (
-                    <AlertCircle className="w-5 h-5" />
+                    <AlertCircle className="w-5 h-5 shrink-0" aria-hidden="true" />
                   )}
                   {message.text}
                 </div>
@@ -106,7 +106,6 @@ export const OrganizationInfo = ({ organization, onUpdate }) => {
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-                    className="bg-gray-700 border-gray-600 text-white"
                     required
                   />
                 </div>
@@ -116,7 +115,6 @@ export const OrganizationInfo = ({ organization, onUpdate }) => {
                     name="industry"
                     value={formData.industry}
                     onChange={handleChange}
-                    className="bg-gray-700 border-gray-600 text-white"
                   />
                 </div>
                 <div>
@@ -125,7 +123,6 @@ export const OrganizationInfo = ({ organization, onUpdate }) => {
                     name="location"
                     value={formData.location}
                     onChange={handleChange}
-                    className="bg-gray-700 border-gray-600 text-white"
                   />
                 </div>
                 <div>
@@ -134,7 +131,6 @@ export const OrganizationInfo = ({ organization, onUpdate }) => {
                     name="website"
                     value={formData.website}
                     onChange={handleChange}
-                    className="bg-gray-700 border-gray-600 text-white"
                     type="url"
                   />
                 </div>
@@ -146,19 +142,18 @@ export const OrganizationInfo = ({ organization, onUpdate }) => {
                   name="description"
                   value={formData.description}
                   onChange={handleChange}
-                  className="bg-gray-700 border-gray-600 text-white"
                   rows={4}
                 />
               </div>
 
               <div className="flex gap-2">
-                <Button type="submit" disabled={loading} className="bg-green-600 hover:bg-green-700 text-white">
+                <Button type="submit" disabled={loading}>
                   {loading ? 'Saving...' : 'Save Changes'}
                 </Button>
                 <Button 
                   type="button" 
+                  variant="outline"
                   onClick={() => setIsEditing(false)}
-                  className="bg-gray-700 hover:bg-gray-600 text-white"
                 >
                   Cancel
                 </Button>
@@ -170,37 +165,37 @@ export const OrganizationInfo = ({ organization, onUpdate }) => {
 
       {/* Safety Statistics */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="bg-gray-800 border-gray-700">
+        <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-white">Total Assets</CardTitle>
+            <CardTitle className="text-sm font-medium">Total Assets</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold text-yellow-500">{organization?.asset_count || 0}</p>
-            <p className="text-xs text-gray-400 mt-2">Equipment and resources</p>
+            <p className="font-pl-mono tabular-nums text-3xl font-semibold text-pl-text">{organization?.asset_count || 0}</p>
+            <p className="text-xs text-pl-muted mt-2">Equipment and resources</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-gray-800 border-gray-700">
+        <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-white">Team Members</CardTitle>
+            <CardTitle className="text-sm font-medium">Team Members</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold text-blue-500">{organization?.member_count || 0}</p>
-            <p className="text-xs text-gray-400 mt-2">Active users</p>
+            <p className="font-pl-mono tabular-nums text-3xl font-semibold text-pl-text">{organization?.member_count || 0}</p>
+            <p className="text-xs text-pl-muted mt-2">Active users</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-gray-800 border-gray-700">
+        <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-white">Safety Score</CardTitle>
+            <CardTitle className="text-sm font-medium">Safety Score</CardTitle>
           </CardHeader>
           <CardContent>
             {organization?.safety_score != null ? (
-              <p className="text-3xl font-bold text-green-500">{organization.safety_score}%</p>
+              <p className="font-pl-mono tabular-nums text-3xl font-semibold text-pl-text">{organization.safety_score}%</p>
             ) : (
-              <p className="text-xl font-semibold text-gray-400">No data yet</p>
+              <p className="text-xl font-semibold text-pl-muted">No data yet</p>
             )}
-            <p className="text-xs text-gray-400 mt-2">Overall safety rating</p>
+            <p className="text-xs text-pl-muted mt-2">Overall safety rating</p>
           </CardContent>
         </Card>
       </div>

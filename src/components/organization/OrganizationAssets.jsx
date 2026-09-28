@@ -15,6 +15,7 @@ import {
 import { Package, Plus, Trash2, Edit2, AlertCircle } from 'lucide-react';
 import { AssetForm } from './AssetForm';
 import { ASSET_CATEGORIES, ASSET_TEMPLATES } from '@/constants/assetConstants';
+import { accountNativeSelect } from '@/components/account/accountChrome';
 import { fetchOrganizationAssets, addAsset, updateAsset, deleteAsset } from '@/services/organizationService';
 
 export const OrganizationAssets = ({ organization, onUpdate }) => {
@@ -93,16 +94,18 @@ export const OrganizationAssets = ({ organization, onUpdate }) => {
     return matchesCategory && matchesSearch;
   });
 
-  const getSafetyColor = (status) => {
+  // Safety status is the one place colour carries meaning here, and the
+  // badge always shows the word.
+  const safetyVariant = (status) => {
     switch (status) {
       case 'safe':
-        return 'bg-green-900 text-green-100 hover:bg-green-800';
+        return 'success';
       case 'warning':
-        return 'bg-yellow-900 text-yellow-100 hover:bg-yellow-800';
+        return 'warning';
       case 'critical':
-        return 'bg-red-900 text-red-100 hover:bg-red-800';
+        return 'danger';
       default:
-        return 'bg-gray-700 text-gray-100 hover:bg-gray-600';
+        return 'neutral';
     }
   };
 
@@ -110,20 +113,20 @@ export const OrganizationAssets = ({ organization, onUpdate }) => {
     <div className="space-y-6">
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent className="bg-gray-800 border-gray-700">
+        <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-white">Delete Asset</AlertDialogTitle>
-            <AlertDialogDescription className="text-gray-400">
+            <AlertDialogTitle>Delete Asset</AlertDialogTitle>
+            <AlertDialogDescription>
               Are you sure you want to delete this asset? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="flex gap-3 justify-end">
-            <AlertDialogCancel className="bg-gray-700 hover:bg-gray-600 text-white border-gray-600">
+            <AlertDialogCancel>
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleDeleteAsset}
-              className="bg-red-600 hover:bg-red-700 text-white"
+              className="bg-pl-danger text-pl-danger-fg hover:bg-pl-danger/90"
             >
               Delete
             </AlertDialogAction>
@@ -133,13 +136,13 @@ export const OrganizationAssets = ({ organization, onUpdate }) => {
 
       {/* Asset Templates */}
       {!showForm && !editingAsset && (
-        <Card className="bg-gray-800 border-gray-700">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-white">Quick Add Assets</CardTitle>
-            <CardDescription className="text-gray-400">Use templates to quickly add common assets</CardDescription>
+            <CardTitle>Quick Add Assets</CardTitle>
+            <CardDescription>Use templates to quickly add common assets</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">
               {ASSET_TEMPLATES.map((template) => (
                 <Button
                   key={template.id}
@@ -148,10 +151,10 @@ export const OrganizationAssets = ({ organization, onUpdate }) => {
                     setShowForm(template);
                   }}
                   variant="outline"
-                  className="border-gray-600 hover:bg-gray-700 text-left justify-start text-white"
+                  className="text-left justify-start min-w-0"
                 >
-                  <span className="text-lg mr-2">{template.icon}</span>
-                  <span className="text-sm">{template.name}</span>
+                  <span className="text-lg mr-2" aria-hidden="true">{template.icon}</span>
+                  <span className="text-sm truncate">{template.name}</span>
                 </Button>
               ))}
             </div>
@@ -173,18 +176,18 @@ export const OrganizationAssets = ({ organization, onUpdate }) => {
       )}
 
       {/* Assets List */}
-      <Card className="bg-gray-800 border-gray-700">
-        <CardHeader className="flex flex-row items-center justify-between">
+      <Card>
+        <CardHeader className="flex flex-col gap-3 space-y-0 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <CardTitle className="text-white">Organization Assets</CardTitle>
-            <CardDescription className="text-gray-400">Manage equipment and resources</CardDescription>
+            <CardTitle>Organization Assets</CardTitle>
+            <CardDescription className="mt-1.5">Manage equipment and resources</CardDescription>
           </div>
           <Button 
             onClick={() => {
               setEditingAsset(null);
               setShowForm(true);
             }}
-            className="bg-yellow-600 hover:bg-yellow-700 flex items-center gap-2 text-white"
+            className="flex items-center gap-2 self-start sm:self-auto"
           >
             <Plus className="w-4 h-4" />
             Add Asset
@@ -198,12 +201,13 @@ export const OrganizationAssets = ({ organization, onUpdate }) => {
                 placeholder="Search assets..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="bg-gray-700 border-gray-600 text-white"
+                aria-label="Search assets"
               />
               <select
                 value={filterCategory}
                 onChange={(e) => setFilterCategory(e.target.value)}
-                className="bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white"
+                aria-label="Category"
+                className={`${accountNativeSelect} md:w-56`}
               >
                 <option value="all">All Categories</option>
                 {ASSET_CATEGORIES.map((cat) => (
@@ -218,39 +222,39 @@ export const OrganizationAssets = ({ organization, onUpdate }) => {
           {/* Assets Grid */}
           {loading ? (
             <div className="text-center py-8">
-              <p className="text-gray-400">Loading assets...</p>
+              <p className="text-pl-muted">Loading assets...</p>
             </div>
           ) : filteredAssets.length === 0 ? (
             <div className="text-center py-8">
-              <Package className="w-12 h-12 text-gray-600 mx-auto mb-4" />
-              <p className="text-gray-400">No assets found</p>
+              <Package className="w-12 h-12 text-pl-border-strong mx-auto mb-4" aria-hidden="true" />
+              <p className="text-pl-muted">No assets found</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredAssets.map((asset) => (
-                <div key={asset.id} className="p-4 bg-gray-700 rounded-lg border border-gray-600 hover:border-yellow-500 transition text-white">
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
+                <div key={asset.id} className="p-4 rounded-lg border border-pl-border bg-pl-sunken hover:border-pl-primary/50 transition-colors text-pl-text">
+                  <div className="flex items-start justify-between gap-2 mb-3">
+                    <div className="min-w-0">
                       <h3 className="font-semibold text-lg">{asset.name}</h3>
-                      <p className="text-sm text-gray-400">ID: {asset.asset_id}</p>
+                      <p className="text-sm text-pl-muted">ID: <span className="font-pl-mono">{asset.asset_id}</span></p>
                     </div>
-                    <Badge className={getSafetyColor(asset.safety_status)}>
+                    <Badge variant={safetyVariant(asset.safety_status)} className="shrink-0">
                       {asset.safety_status?.toUpperCase()}
                     </Badge>
                   </div>
 
                   <div className="space-y-2 mb-4 text-sm">
-                    <p><span className="text-gray-400">Category:</span> {asset.category}</p>
-                    <p><span className="text-gray-400">Location:</span> {asset.location || 'N/A'}</p>
-                    <p><span className="text-gray-400">Assigned to:</span> {asset.assigned_to || 'Unassigned'}</p>
+                    <p><span className="text-pl-muted">Category:</span> {asset.category}</p>
+                    <p><span className="text-pl-muted">Location:</span> {asset.location || 'n/a'}</p>
+                    <p><span className="text-pl-muted">Assigned to:</span> {asset.assigned_to || 'Unassigned'}</p>
                     {asset.last_inspection && (
-                      <p><span className="text-gray-400">Last Inspection:</span> {new Date(asset.last_inspection).toLocaleDateString()}</p>
+                      <p><span className="text-pl-muted">Last Inspection:</span> {new Date(asset.last_inspection).toLocaleDateString()}</p>
                     )}
                   </div>
 
                   {asset.safety_notes && (
-                    <div className="mb-4 p-2 bg-yellow-900/20 border border-yellow-700 rounded text-sm text-yellow-100 flex gap-2">
-                      <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                    <div className="mb-4 p-2 rounded border border-pl-warning/40 bg-pl-warning-bg text-sm text-pl-warning-text flex gap-2">
+                      <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" aria-hidden="true" />
                       <p>{asset.safety_notes}</p>
                     </div>
                   )}
@@ -262,7 +266,7 @@ export const OrganizationAssets = ({ organization, onUpdate }) => {
                         setShowForm(false);
                       }}
                       size="sm"
-                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                      className="flex-1"
                     >
                       <Edit2 className="w-4 h-4 mr-1" />
                       Edit
@@ -271,7 +275,9 @@ export const OrganizationAssets = ({ organization, onUpdate }) => {
                       onClick={() => openDeleteDialog(asset.id)}
                       size="sm"
                       variant="ghost"
-                      className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                      aria-label={`Delete ${asset.name}`}
+                      title="Delete"
+                      className="text-pl-danger-text hover:bg-pl-danger-bg hover:text-pl-danger-text"
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
@@ -284,44 +290,46 @@ export const OrganizationAssets = ({ organization, onUpdate }) => {
       </Card>
 
       {/* Asset Statistics */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="bg-gray-800 border-gray-700">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-white">Total Assets</CardTitle>
+            <CardTitle className="text-sm font-medium">Total Assets</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold text-blue-500">{assets.length}</p>
+            <p className="font-pl-mono tabular-nums text-3xl font-semibold text-pl-text">
+              {assets.length}
+            </p>
           </CardContent>
         </Card>
 
-        <Card className="bg-gray-800 border-gray-700">
+        <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-white">Safe</CardTitle>
+            <CardTitle className="text-sm font-medium">Safe</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold text-green-500">
+            <p className="font-pl-mono tabular-nums text-3xl font-semibold text-pl-success-text">
               {assets.filter(a => a.safety_status === 'safe').length}
             </p>
           </CardContent>
         </Card>
 
-        <Card className="bg-gray-800 border-gray-700">
+        <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-white">Warnings</CardTitle>
+            <CardTitle className="text-sm font-medium">Warnings</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold text-yellow-500">
+            <p className="font-pl-mono tabular-nums text-3xl font-semibold text-pl-warning-text">
               {assets.filter(a => a.safety_status === 'warning').length}
             </p>
           </CardContent>
         </Card>
 
-        <Card className="bg-gray-800 border-gray-700">
+        <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-white">Critical</CardTitle>
+            <CardTitle className="text-sm font-medium">Critical</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold text-red-500">
+            <p className="font-pl-mono tabular-nums text-3xl font-semibold text-pl-danger-text">
               {assets.filter(a => a.safety_status === 'critical').length}
             </p>
           </CardContent>

@@ -8,6 +8,7 @@ import { AssetSafety } from '@/components/organization/AssetSafety';
 import { useHSE } from '@/context/HSEContext';
 import { fetchOrganization } from '@/services/organizationService';
 import { Button } from '@/components/ui/button';
+import { AccountScope, AccountPage, AccountHeader } from '@/components/account/accountChrome';
 
 const OrganizationSettings = () => {
   const { currentOrganization, isLoading: contextLoading } = useHSE();
@@ -41,66 +42,70 @@ const OrganizationSettings = () => {
     }
   };
 
+  // /organization sits outside the signed-in layout, so it opens its own
+  // design-system scope (AccountScope) with the light/dark toggle in its
+  // header (docs/scope/DesignSystem-Rollout.md section 4.2).
   if (contextLoading || loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-gray-400">
-        <Loader2 className="h-12 w-12 animate-spin text-yellow-500 mb-4" />
+      <AccountScope testId="organization-settings-theme-scope" className="flex flex-col items-center justify-center text-pl-muted">
+        <Loader2 className="h-12 w-12 animate-spin text-pl-primary-text mb-4" aria-hidden="true" />
         <p>Loading organization settings...</p>
-      </div>
+      </AccountScope>
     );
   }
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-4">
-        <div className="bg-gray-800 border border-red-700 rounded-lg p-6 max-w-md w-full text-center">
-            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-            <h2 className="text-xl font-bold mb-2">Error Loading Settings</h2>
-            <p className="text-gray-400 mb-6">{error}</p>
-            <Button onClick={loadOrganizationData} className="bg-blue-600 hover:bg-blue-700">Retry</Button>
+      <AccountScope testId="organization-settings-theme-scope" className="flex flex-col items-center justify-center p-4 text-pl-text">
+        <div className="rounded-lg border border-pl-danger/40 bg-pl-surface shadow-pl-sm p-6 max-w-md w-full text-center">
+            <AlertCircle className="h-12 w-12 text-pl-danger-text mx-auto mb-4" aria-hidden="true" />
+            <h2 className="text-xl font-semibold mb-2">Error Loading Settings</h2>
+            <p className="text-pl-muted mb-6">{error}</p>
+            <Button onClick={loadOrganizationData}>Retry</Button>
         </div>
-      </div>
+      </AccountScope>
     );
   }
 
   if (!organization && !contextLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-4">
+      <AccountScope testId="organization-settings-theme-scope" className="flex flex-col items-center justify-center p-4 text-pl-text">
         <div className="text-center max-w-md">
-            <Settings className="h-16 w-16 text-gray-600 mx-auto mb-4" />
-            <h2 className="text-xl font-bold mb-2">No Organization Found</h2>
-            <p className="text-gray-400">Please ensure you are logged in and associated with an organization.</p>
+            <Settings className="h-16 w-16 text-pl-border-strong mx-auto mb-4" aria-hidden="true" />
+            <h2 className="text-xl font-semibold mb-2">No Organization Found</h2>
+            <p className="text-pl-muted">Please ensure you are logged in and associated with an organization.</p>
         </div>
-      </div>
+      </AccountScope>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-6">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2 text-white">⚙️ Organization Settings</h1>
-          <p className="text-gray-400">Manage your organization, team, and assets</p>
-        </div>
+    <AccountScope testId="organization-settings-theme-scope" className="text-pl-text">
+      <AccountPage>
+        <AccountHeader
+          eyebrow="Organization"
+          icon={Settings}
+          title="Organization Settings"
+          description="Manage your organization, team, and assets"
+        />
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 bg-gray-800 border border-gray-700">
-            <TabsTrigger value="info" className="flex items-center gap-2 data-[state=active]:bg-yellow-600 data-[state=active]:text-white">
-              <Settings className="w-4 h-4" />
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="info" className="flex items-center gap-2" aria-label="Organization">
+              <Settings className="w-4 h-4" aria-hidden="true" />
               <span className="hidden sm:inline">Organization</span>
             </TabsTrigger>
-            <TabsTrigger value="members" className="flex items-center gap-2 data-[state=active]:bg-yellow-600 data-[state=active]:text-white">
-              <Users className="w-4 h-4" />
+            <TabsTrigger value="members" className="flex items-center gap-2" aria-label="Members">
+              <Users className="w-4 h-4" aria-hidden="true" />
               <span className="hidden sm:inline">Members</span>
             </TabsTrigger>
-            <TabsTrigger value="assets" className="flex items-center gap-2 data-[state=active]:bg-yellow-600 data-[state=active]:text-white">
-              <Package className="w-4 h-4" />
+            <TabsTrigger value="assets" className="flex items-center gap-2" aria-label="Assets">
+              <Package className="w-4 h-4" aria-hidden="true" />
               <span className="hidden sm:inline">Assets</span>
             </TabsTrigger>
-            <TabsTrigger value="safety" className="flex items-center gap-2 data-[state=active]:bg-yellow-600 data-[state=active]:text-white">
-              <AlertCircle className="w-4 h-4" />
+            <TabsTrigger value="safety" className="flex items-center gap-2" aria-label="Safety">
+              <AlertCircle className="w-4 h-4" aria-hidden="true" />
               <span className="hidden sm:inline">Safety</span>
             </TabsTrigger>
           </TabsList>
@@ -125,8 +130,8 @@ const OrganizationSettings = () => {
             <AssetSafety organization={organization} />
           </TabsContent>
         </Tabs>
-      </div>
-    </div>
+      </AccountPage>
+    </AccountScope>
   );
 };
 
