@@ -1,35 +1,47 @@
 import * as React from "react"
 import * as AccordionPrimitive from "@radix-ui/react-accordion"
 import { ChevronDown } from "lucide-react"
-
 import { cn } from "@/lib/utils"
+import { useThemeClass } from "@/design/themeClass"
+
+// Legacy strings outside a design-system scope (byte for byte); the Suite's
+// roles inside one.
 
 const Accordion = AccordionPrimitive.Root
 
-const AccordionItem = React.forwardRef(({ className, ...props }, ref) => (
-  <AccordionPrimitive.Item
-    ref={ref}
-    className={cn("border-b", className)}
-    {...props}
-  />
-))
+const AccordionItem = React.forwardRef(({ className, ...props }, ref) => {
+  const tc = useThemeClass()
+  return (
+    <AccordionPrimitive.Item
+      ref={ref}
+      className={cn(tc("border-b", "border-b border-pl-border"), className)}
+      {...props}
+    />
+  )
+})
 AccordionItem.displayName = "AccordionItem"
 
-const AccordionTrigger = React.forwardRef(({ className, children, ...props }, ref) => (
-  <AccordionPrimitive.Header className="flex">
-    <AccordionPrimitive.Trigger
-      ref={ref}
-      className={cn(
-        "flex flex-1 items-center justify-between py-4 font-medium transition-all hover:underline [&[data-state=open]>svg]:rotate-180",
-        className
-      )}
-      {...props}
-    >
-      {children}
-      <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200" />
-    </AccordionPrimitive.Trigger>
-  </AccordionPrimitive.Header>
-))
+const AccordionTrigger = React.forwardRef(({ className, children, ...props }, ref) => {
+  const tc = useThemeClass()
+  return (
+    <AccordionPrimitive.Header className="flex">
+      <AccordionPrimitive.Trigger
+        ref={ref}
+        className={cn(
+          tc(
+            "flex flex-1 items-center justify-between py-4 font-medium transition-all hover:underline [&[data-state=open]>svg]:rotate-180",
+            "flex flex-1 items-center justify-between py-4 font-medium transition-all hover:underline [&[data-state=open]>svg]:rotate-180 text-pl-text rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pl-focus"
+          ),
+          className
+        )}
+        {...props}
+      >
+        {children}
+        <ChevronDown className={tc("h-4 w-4 shrink-0 transition-transform duration-200", "h-4 w-4 shrink-0 text-pl-muted transition-transform duration-200")} />
+      </AccordionPrimitive.Trigger>
+    </AccordionPrimitive.Header>
+  )
+})
 AccordionTrigger.displayName = AccordionPrimitive.Trigger.displayName
 
 const AccordionContent = React.forwardRef(({ className, children, ...props }, ref) => (

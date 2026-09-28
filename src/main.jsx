@@ -2,6 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from '@/App';
 import '@/index.css';
+// Design-system scope styles, after index.css (inert outside [data-pl-theme]).
+import './design/theme.css';
 
 // Service Worker Registration
 if ('serviceWorker' in navigator) {

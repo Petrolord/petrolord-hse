@@ -39,11 +39,17 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useThemeClass } from '@/design/themeClass';
 
+// Inside the design-system scope the rail is the fixed dark ink frame
+// (InkRail in the layout gives it data-pl-theme="dark"), as the Suite's
+// dashboard rail: gold section labels, a raised active item with a gold
+// edge. Outside a scope it renders exactly as before.
 export default function LeftNav({ onClose }) {
   const { role, activeModule, setActiveModule } = useHSE();
   const { sidebarCollapsed, toggleSidebar, setPersistedModule } = useAppState();
   const location = useLocation();
+  const tc = useThemeClass();
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -120,23 +126,23 @@ export default function LeftNav({ onClose }) {
 
   return (
     <div className={cn(
-      "h-full bg-[#1e1e2d] border-r border-[#2d2d4a] flex flex-col transition-all duration-300 ease-in-out",
+      tc("h-full bg-[#1e1e2d] border-r border-[#2d2d4a] flex flex-col transition-all duration-300 ease-in-out", "h-full bg-pl-surface border-r border-pl-border flex flex-col transition-all duration-300 ease-in-out"),
       sidebarCollapsed ? "w-[70px]" : "w-[280px]"
     )}>
       {/* Header / Collapse Toggle */}
       <div className={cn(
-        "p-4 flex items-center justify-between border-b border-[#2d2d4a] h-[64px]",
+        tc("p-4 flex items-center justify-between border-b border-[#2d2d4a] h-[64px]", "p-4 flex items-center justify-between border-b border-pl-border h-[64px]"),
         sidebarCollapsed && "justify-center"
       )}>
         {!sidebarCollapsed && (
-          <div className="flex items-center gap-2 font-bold text-white tracking-wider">
-            <span className="text-[#FFC107]">PETROLORD</span> HSE
+          <div className={tc("flex items-center gap-2 font-bold text-white tracking-wider", "flex items-center gap-2 font-bold text-pl-text tracking-wider")}>
+            <span className={tc("text-[#FFC107]", "text-pl-accent-text")}>PETROLORD</span> HSE
           </div>
         )}
         
         {/* Mobile close button */}
         <div className="lg:hidden">
-          <Button variant="ghost" size="icon" onClick={onClose} className="text-gray-400">
+          <Button variant="ghost" size="icon" onClick={onClose} className={tc("text-gray-400", undefined)} aria-label={tc(undefined, 'Close navigation')}>
             <X className="h-5 w-5" />
           </Button>
         </div>
@@ -147,7 +153,8 @@ export default function LeftNav({ onClose }) {
             variant="ghost" 
             size="icon" 
             onClick={toggleSidebar} 
-            className="text-gray-400 hover:text-white hover:bg-[#2d2d4a]"
+            className={tc("text-gray-400 hover:text-white hover:bg-[#2d2d4a]", undefined)}
+            aria-label={tc(undefined, sidebarCollapsed ? 'Expand navigation' : 'Collapse navigation')}
           >
             {sidebarCollapsed ? <PanelLeftOpen className="h-5 w-5" /> : <PanelLeftClose className="h-5 w-5" />}
           </Button>
@@ -167,12 +174,12 @@ export default function LeftNav({ onClose }) {
               <div key={groupIndex}>
                 {/* Category Label */}
                 {!sidebarCollapsed && (
-                  <h3 className="px-4 mb-2 text-[10px] font-bold uppercase tracking-wider text-gray-500 animate-in fade-in duration-300">
+                  <h3 className={tc("px-4 mb-2 text-[10px] font-bold uppercase tracking-wider text-gray-500 animate-in fade-in duration-300", "px-4 mb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-pl-accent-text animate-in fade-in duration-300")}>
                     {group.category}
                   </h3>
                 )}
                 {sidebarCollapsed && (
-                   <div className="h-[1px] bg-[#2d2d4a] mx-2 mb-2" />
+                   <div className={tc("h-[1px] bg-[#2d2d4a] mx-2 mb-2", "h-[1px] bg-pl-border mx-2 mb-2")} />
                 )}
 
                 <div className="space-y-1">
@@ -181,18 +188,19 @@ export default function LeftNav({ onClose }) {
                     const buttonContent = (
                       <button
                         onClick={() => handleNavClick(item)}
+                        aria-current={tc(undefined, isActive ? 'page' : undefined)}
                         className={cn(
-                          "w-full flex items-center rounded-lg transition-all duration-200 group relative overflow-hidden",
+                          tc("w-full flex items-center rounded-lg transition-all duration-200 group relative overflow-hidden", "w-full flex items-center rounded-lg transition-all duration-200 group relative overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pl-focus"),
                           sidebarCollapsed ? "justify-center p-2.5" : "justify-between px-4 py-2.5",
                           isActive 
-                            ? "bg-[#FFC107] text-black shadow-lg shadow-[#FFC107]/20" 
-                            : "text-gray-400 hover:bg-[#2d2d4a] hover:text-white"
+                            ? tc("bg-[#FFC107] text-black shadow-lg shadow-[#FFC107]/20", "bg-pl-raised text-pl-text shadow-[inset_3px_0_0_rgb(var(--pl-accent))]")
+                            : tc("text-gray-400 hover:bg-[#2d2d4a] hover:text-white", "text-pl-muted hover:bg-pl-raised/60 hover:text-pl-text")
                         )}
                       >
                         <div className={cn("flex items-center relative z-10", !sidebarCollapsed && "gap-3")}>
                           <item.icon className={cn(
                             "h-5 w-5 transition-colors flex-shrink-0",
-                            isActive ? "text-black" : "text-gray-500 group-hover:text-white"
+                            isActive ? tc("text-black", "text-pl-accent-text") : tc("text-gray-500 group-hover:text-white", "text-pl-muted group-hover:text-pl-text")
                           )} />
                           {!sidebarCollapsed && (
                             <span className="text-sm font-medium whitespace-nowrap opacity-100 transition-opacity duration-300">
@@ -209,7 +217,7 @@ export default function LeftNav({ onClose }) {
                           <TooltipTrigger asChild>
                             {buttonContent}
                           </TooltipTrigger>
-                          <TooltipContent side="right" className="bg-[#2d2d4a] text-white border-[#3d3d5c]">
+                          <TooltipContent side="right" className={tc("bg-[#2d2d4a] text-white border-[#3d3d5c]", undefined)}>
                             {item.label}
                           </TooltipContent>
                         </Tooltip>
@@ -225,27 +233,28 @@ export default function LeftNav({ onClose }) {
         </div>
       </ScrollArea>
 
-      <div className="p-4 border-t border-[#2d2d4a]">
+      <div className={tc("p-4 border-t border-[#2d2d4a]", "p-4 border-t border-pl-border")}>
         {sidebarCollapsed ? (
           <Tooltip delayDuration={0}>
             <TooltipTrigger asChild>
               <Button 
                 variant="ghost" 
                 size="icon"
-                className="w-full justify-center text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                className={tc("w-full justify-center text-red-400 hover:text-red-300 hover:bg-red-900/20", "w-full justify-center text-pl-muted hover:text-pl-danger-text hover:bg-pl-danger-bg")}
                 onClick={handleLogout}
+                aria-label={tc(undefined, 'Sign Out')}
               >
                 <LogOut className="h-5 w-5" />
               </Button>
             </TooltipTrigger>
-            <TooltipContent side="right" className="bg-red-900 text-white border-red-800">
+            <TooltipContent side="right" className={tc("bg-red-900 text-white border-red-800", undefined)}>
               Sign Out
             </TooltipContent>
           </Tooltip>
         ) : (
           <Button 
             variant="ghost" 
-            className="w-full justify-start text-red-400 hover:text-red-300 hover:bg-red-900/20 animate-in fade-in duration-300"
+            className={tc("w-full justify-start text-red-400 hover:text-red-300 hover:bg-red-900/20 animate-in fade-in duration-300", "w-full justify-start text-pl-muted hover:text-pl-danger-text hover:bg-pl-danger-bg animate-in fade-in duration-300")}
             onClick={handleLogout}
           >
             <LogOut className="h-5 w-5 mr-3" />

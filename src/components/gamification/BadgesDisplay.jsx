@@ -4,6 +4,9 @@ import { gamificationService } from '@/services/gamificationService';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
+// Design system (wave 0 pilot): dashboard only, so theme roles directly.
+// An unlocked badge carries the gold accent edge; a locked one is dimmed
+// and says so in its tooltip.
 export default function BadgesDisplay() {
   const { currentUser, currentOrganization } = useHSE();
   const [allBadges, setAllBadges] = useState([]);
@@ -24,11 +27,14 @@ export default function BadgesDisplay() {
   }, [currentUser, currentOrganization]);
 
   return (
-    <div className="bg-[#252541] border border-[#3a3a5a] rounded-xl p-5 shadow-lg">
+    <div className="h-full rounded-xl border border-pl-border bg-pl-surface p-5 shadow-pl-sm">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-sm font-bold text-white uppercase tracking-wider">Your Badges</h3>
-        <span className="text-xs text-[#7a7a9a]">{userBadges.length} / {allBadges.length} Unlocked</span>
+        <h3 className="text-sm font-semibold text-pl-text uppercase tracking-wider">Your Badges</h3>
+        <span className="text-xs text-pl-muted font-pl-mono tabular-nums">{userBadges.length} / {allBadges.length} Unlocked</span>
       </div>
+      {allBadges.length === 0 && (
+        <p className="text-sm text-pl-muted">No badges are set up yet.</p>
+      )}
       
       <div className="grid grid-cols-4 gap-3">
         {allBadges.map(badge => {
@@ -39,16 +45,16 @@ export default function BadgesDisplay() {
                 <TooltipTrigger>
                   <div className={`aspect-square rounded-lg flex items-center justify-center text-2xl border transition-all
                     ${isUnlocked 
-                      ? 'bg-[#1a1a2e] border-[#FFC107]/30 text-white shadow-[0_0_10px_rgba(255,193,7,0.1)]' 
-                      : 'bg-[#1a1a2e]/50 border-[#3a3a5a] opacity-30 grayscale'}`}
+                      ? 'bg-pl-sunken border-pl-accent/60 text-pl-text' 
+                      : 'bg-pl-sunken/50 border-pl-border opacity-40 grayscale'}`}
                   >
                     {badge.icon}
                   </div>
                 </TooltipTrigger>
-                <TooltipContent className="bg-[#1a1a2e] border-[#3a3a5a] text-white">
-                  <p className="font-bold">{badge.name}</p>
-                  <p className="text-xs text-[#b0b0c0]">{badge.description}</p>
-                  {!isUnlocked && <p className="text-xs text-[#FFC107] mt-1">Locked</p>}
+                <TooltipContent>
+                  <p className="font-semibold">{badge.name}</p>
+                  <p className="text-xs opacity-80">{badge.description}</p>
+                  {!isUnlocked && <p className="text-xs mt-1 font-semibold">Locked</p>}
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>

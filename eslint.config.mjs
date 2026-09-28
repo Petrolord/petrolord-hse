@@ -52,7 +52,8 @@ export default [
 	{ files: ['tools/**/*.js', 'tools/**/*.mjs', 'tailwind.config.js', 'vitest.config.js'], languageOptions: { globals: globals.node } },
 	// vitest runs with globals: true (vitest.config.js)
 	{
-		files: ['**/*.test.js', '**/*.test.jsx'],
+		// src/design/testing holds the test-only theme helpers (never imported by app code)
+		files: ['**/*.test.js', '**/*.test.jsx', 'src/design/testing/**/*.js', 'src/design/testing/**/*.jsx'],
 		languageOptions: {
 			globals: {
 				...globals.node,

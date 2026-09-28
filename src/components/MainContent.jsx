@@ -26,9 +26,11 @@ import HealthModule from './petrolord/health/HealthModule';
 import OccupationalHygieneModule from './hse/hygiene/OccupationalHygieneModule';
 import HelpCenter from './help/HelpCenter';
 import PredictiveInsightsDashboard from './analytics/PredictiveInsightsDashboard';
+import { useThemeClass } from '@/design/themeClass';
 
 export default function MainContent() {
   const { activeModule } = useHSE();
+  const tc = useThemeClass();
 
   // If no active module, default to Dashboard
   const currentModuleId = activeModule?.id || 'dashboard';
@@ -77,7 +79,7 @@ export default function MainContent() {
   };
 
   return (
-    <div className="flex-1 relative overflow-hidden bg-[var(--bg-app)]">
+    <div className={tc('flex-1 relative overflow-hidden bg-[var(--bg-app)]', 'flex-1 relative overflow-hidden bg-pl-bg')}>
       {renderModule()}
     </div>
   );
