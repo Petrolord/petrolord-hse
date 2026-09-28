@@ -320,7 +320,9 @@ export async function walkReportWizard(snap) {
   await flush();
   type(screen.getByPlaceholderText('Brief headline...'), 'Loose handrail on stair B');
   type(screen.getByPlaceholderText('Detailed description...'), 'Bolts missing at the landing.');
-  await flush();
+  // past the wizard's 2 s draft autosave, so "Draft saved" shows from here on
+  // whatever the machine's speed
+  await flush(2200);
   snap('step3');
 
   next();
