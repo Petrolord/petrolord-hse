@@ -4,9 +4,15 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
+import { useThemeClass } from '@/design/themeClass';
+
+// Scope-aware: outside a design-system scope every class below is the legacy
+// string (pinned by src/components/hse/__tests__/reportingLegacyDom.test.jsx);
+// inside one the themed string. Status colour always sits beside a word.
 
 // --- Diagnostic Sub-Component ---
 const MicDiagnostic = ({ onBack }) => {
+  const tc = useThemeClass();
   const [stage, setStep] = useState('idle'); // idle, running, finished
   const [results, setResults] = useState({
     permission: 'pending', // pending, success, failed
@@ -143,29 +149,29 @@ const MicDiagnostic = ({ onBack }) => {
   }, []);
 
   const StatusIcon = ({ status }) => {
-    if (status === 'pending') return <div className="w-4 h-4 rounded-full border-2 border-gray-600" />;
-    if (status === 'success') return <CheckCircle2 className="w-4 h-4 text-emerald-500" />;
-    if (status === 'failed') return <X className="w-4 h-4 text-red-500" />;
-    return <div className="w-4 h-4 animate-spin rounded-full border-2 border-gray-600 border-t-transparent" />;
+    if (status === 'pending') return <div className={tc('w-4 h-4 rounded-full border-2 border-gray-600', 'w-4 h-4 rounded-full border-2 border-pl-border-strong')} />;
+    if (status === 'success') return <CheckCircle2 className={tc('w-4 h-4 text-emerald-500', 'w-4 h-4 text-pl-success-text')} aria-label={tc(undefined, 'Passed')} />;
+    if (status === 'failed') return <X className={tc('w-4 h-4 text-red-500', 'w-4 h-4 text-pl-danger-text')} aria-label={tc(undefined, 'Failed')} />;
+    return <div className={tc('w-4 h-4 animate-spin rounded-full border-2 border-gray-600 border-t-transparent', 'w-4 h-4 animate-spin rounded-full border-2 border-pl-border-strong border-t-transparent')} />;
   };
 
   return (
-    <div className="bg-slate-900 border border-slate-700 rounded-xl p-4 text-left animate-in slide-in-from-right-4 duration-300">
+    <div className={tc('bg-slate-900 border border-slate-700 rounded-xl p-4 text-left animate-in slide-in-from-right-4 duration-300', 'bg-pl-surface border border-pl-border rounded-xl p-4 text-left animate-in slide-in-from-right-4 duration-300')}>
       <div className="flex items-center justify-between mb-4">
-        <h3 className="font-semibold text-white flex items-center gap-2">
-          <Activity className="w-4 h-4 text-[#FFC107]" />
+        <h3 className={tc('font-semibold text-white flex items-center gap-2', 'font-semibold text-pl-text flex items-center gap-2')}>
+          <Activity className={tc('w-4 h-4 text-[#FFC107]', 'w-4 h-4 text-pl-muted')} />
           Microphone Diagnostics
         </h3>
-        <Button size="sm" variant="ghost" onClick={onBack} className="text-gray-400 hover:text-white h-8">
+        <Button size="sm" variant="ghost" onClick={onBack} aria-label={tc(undefined, 'Close microphone diagnostics')} className={tc('text-gray-400 hover:text-white h-8', 'h-8')}>
           <X className="w-4 h-4" />
         </Button>
       </div>
 
       {stage === 'idle' && (
         <div className="text-center py-6">
-          <Volume2 className="w-12 h-12 text-gray-500 mx-auto mb-3" />
-          <p className="text-sm text-gray-300 mb-4">Run this test if you're having trouble recording audio.</p>
-          <Button onClick={runTest} className="bg-blue-600 hover:bg-blue-700 text-white">
+          <Volume2 className={tc('w-12 h-12 text-gray-500 mx-auto mb-3', 'w-12 h-12 text-pl-muted mx-auto mb-3')} />
+          <p className={tc('text-sm text-gray-300 mb-4', 'text-sm text-pl-muted mb-4')}>Run this test if you're having trouble recording audio.</p>
+          <Button onClick={runTest} className={tc('bg-blue-600 hover:bg-blue-700 text-white', undefined)}>
             Start Test
           </Button>
         </div>
@@ -173,40 +179,40 @@ const MicDiagnostic = ({ onBack }) => {
 
       {(stage === 'running' || stage === 'finished') && (
         <div className="space-y-4">
-          <div className="space-y-2 text-sm text-gray-300">
-            <div className="flex items-center justify-between p-2 bg-black/20 rounded">
+          <div className={tc('space-y-2 text-sm text-gray-300', 'space-y-2 text-sm text-pl-text')}>
+            <div className={tc('flex items-center justify-between p-2 bg-black/20 rounded', 'flex items-center justify-between p-2 bg-pl-sunken rounded')}>
               <span>Browser Permission</span>
               <StatusIcon status={results.permission} />
             </div>
-            <div className="flex items-center justify-between p-2 bg-black/20 rounded">
+            <div className={tc('flex items-center justify-between p-2 bg-black/20 rounded', 'flex items-center justify-between p-2 bg-pl-sunken rounded')}>
               <span>Input Devices Found</span>
               <StatusIcon status={results.devices} />
             </div>
-            <div className="flex items-center justify-between p-2 bg-black/20 rounded">
+            <div className={tc('flex items-center justify-between p-2 bg-black/20 rounded', 'flex items-center justify-between p-2 bg-pl-sunken rounded')}>
               <span>Audio Stream Access</span>
               <StatusIcon status={results.stream} />
             </div>
-            <div className="flex items-center justify-between p-2 bg-black/20 rounded">
+            <div className={tc('flex items-center justify-between p-2 bg-black/20 rounded', 'flex items-center justify-between p-2 bg-pl-sunken rounded')}>
               <span>Sound Detected</span>
               <StatusIcon status={results.signal} />
             </div>
           </div>
 
-          <div className="bg-black/40 p-3 rounded-lg">
-            <div className="flex justify-between text-xs text-gray-400 mb-1">
+          <div className={tc('bg-black/40 p-3 rounded-lg', 'bg-pl-sunken border border-pl-border p-3 rounded-lg')}>
+            <div className={tc('flex justify-between text-xs text-gray-400 mb-1', 'flex justify-between text-xs text-pl-muted mb-1')}>
               <span>Input Level</span>
-              <span>{audioLevel}%</span>
+              <span className={tc(undefined, 'font-pl-mono tabular-nums')}>{audioLevel}%</span>
             </div>
-            <Progress value={audioLevel} className="h-2" indicatorClassName={audioLevel > 50 ? 'bg-emerald-500' : 'bg-blue-500'} />
+            <Progress value={audioLevel} className="h-2" indicatorClassName={audioLevel > 50 ? tc('bg-emerald-500', 'bg-pl-success') : tc('bg-blue-500', 'bg-pl-primary')} />
           </div>
 
           {errorMessage && (
-            <Alert variant="destructive" className="bg-red-950/30 border-red-900/50 py-2">
+            <Alert variant="destructive" className={tc('bg-red-950/30 border-red-900/50 py-2', 'py-2')}>
               <AlertTriangle className="h-4 w-4" />
               <AlertTitle className="text-sm font-semibold">Diagnosis Failed</AlertTitle>
-              <AlertDescription className="text-xs text-red-200 mt-1">
+              <AlertDescription className={tc('text-xs text-red-200 mt-1', 'text-xs mt-1')}>
                 {errorMessage}
-                <div className="mt-2 pl-2 border-l-2 border-red-800 text-red-300">
+                <div className={tc('mt-2 pl-2 border-l-2 border-red-800 text-red-300', 'mt-2 pl-2 border-l-2 border-pl-danger/40')}>
                   <p className="font-semibold mb-1">Troubleshooting:</p>
                   <ul className="list-disc pl-4 space-y-1">
                     <li>Check browser address bar for 🔒 or mic icon to allow access.</li>
@@ -220,18 +226,18 @@ const MicDiagnostic = ({ onBack }) => {
 
           {stage === 'finished' && !errorMessage && (
             <div className="text-center">
-              <p className="text-emerald-400 text-sm font-medium mb-3 flex items-center justify-center gap-2">
+              <p className={tc('text-emerald-400 text-sm font-medium mb-3 flex items-center justify-center gap-2', 'text-pl-success-text text-sm font-medium mb-3 flex items-center justify-center gap-2')}>
                 <CheckCircle2 className="w-4 h-4" /> Microphone is working correctly!
               </p>
-              <Button onClick={onBack} size="sm" variant="outline" className="w-full border-emerald-500/30 bg-emerald-500/10 text-emerald-200 hover:bg-emerald-500/20 hover:text-emerald-100">
+              <Button onClick={onBack} size="sm" variant="outline" className={tc('w-full border-emerald-500/30 bg-emerald-500/10 text-emerald-200 hover:bg-emerald-500/20 hover:text-emerald-100', 'w-full')}>
                 Back to Recorder
               </Button>
             </div>
           )}
           
           <div className="mt-4">
-             <p className="text-[10px] text-gray-500 font-mono mb-1">Logs:</p>
-             <div className="h-24 overflow-y-auto bg-black rounded p-2 text-[10px] font-mono text-gray-400 border border-gray-800">
+             <p className={tc('text-[10px] text-gray-500 font-mono mb-1', 'text-[10px] text-pl-muted font-pl-mono mb-1')}>Logs:</p>
+             <div className={tc('h-24 overflow-y-auto bg-black rounded p-2 text-[10px] font-mono text-gray-400 border border-gray-800', 'h-24 overflow-y-auto bg-pl-sunken rounded p-2 text-[10px] font-pl-mono text-pl-muted border border-pl-border')}>
                {logs.map((log, i) => <div key={i}>{log}</div>)}
              </div>
           </div>
@@ -244,6 +250,7 @@ const MicDiagnostic = ({ onBack }) => {
 // --- Main Component ---
 export const CaptureStep = ({ onNext, error }) => {
   const { toast } = useToast();
+  const tc = useThemeClass();
   const [photo, setPhoto] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
   const [audioBlob, setAudioBlob] = useState(null);
@@ -460,10 +467,10 @@ export const CaptureStep = ({ onNext, error }) => {
       {/* Photo Capture Area */}
       <div 
         onClick={triggerFileInput}
-        className={`
+        className={tc(`
           relative h-56 border-2 border-dashed rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all overflow-hidden group
           ${photo ? 'border-emerald-500 bg-black' : 'border-gray-600 bg-gray-800/50 hover:bg-gray-800 hover:border-yellow-500'}
-        `}
+        `, `relative h-56 border-2 border-dashed rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all overflow-hidden group ${photo ? 'border-pl-success/60 bg-pl-sunken' : 'border-pl-border-strong bg-pl-sunken hover:border-pl-primary'}`)}
       >
         {photo ? (
           <>
@@ -472,7 +479,8 @@ export const CaptureStep = ({ onNext, error }) => {
               alt="Preview" 
               className="absolute inset-0 w-full h-full object-contain p-2" 
             />
-            <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+            {/* over the photo: a dark scrim with light text in both themes */}
+            <div data-canvas={tc(undefined, 'dark')} className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
               <RefreshCw className="h-8 w-8 text-white mb-2" />
               <p className="text-white font-medium">Tap to retake</p>
             </div>
@@ -486,17 +494,17 @@ export const CaptureStep = ({ onNext, error }) => {
                 <X className="h-4 w-4" />
               </Button>
             </div>
-            <div className="absolute bottom-2 left-2 bg-emerald-500/90 text-white text-xs px-2 py-1 rounded-md flex items-center gap-1">
+            <div className={tc('absolute bottom-2 left-2 bg-emerald-500/90 text-white text-xs px-2 py-1 rounded-md flex items-center gap-1', 'absolute bottom-2 left-2 bg-pl-success-bg text-pl-success-text border border-pl-success/40 text-xs px-2 py-1 rounded-md flex items-center gap-1')}>
               <CheckCircle2 className="h-3 w-3" /> Photo Ready
             </div>
           </>
         ) : (
           <div className="text-center p-6">
-            <div className="w-16 h-16 bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-yellow-500/20 transition-colors">
-              <Camera className="h-8 w-8 text-gray-400 group-hover:text-yellow-500" />
+            <div className={tc('w-16 h-16 bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-yellow-500/20 transition-colors', 'w-16 h-16 bg-pl-surface border border-pl-border rounded-full flex items-center justify-center mx-auto mb-4 transition-colors')}>
+              <Camera className={tc('h-8 w-8 text-gray-400 group-hover:text-yellow-500', 'h-8 w-8 text-pl-muted group-hover:text-pl-primary-text')} />
             </div>
-            <h3 className="text-lg font-semibold text-gray-200">Take a Photo</h3>
-            <p className="text-sm text-gray-500 mt-1">or click to upload from gallery</p>
+            <h3 className={tc('text-lg font-semibold text-gray-200', 'text-lg font-semibold text-pl-text')}>Take a Photo</h3>
+            <p className={tc('text-sm text-gray-500 mt-1', 'text-sm text-pl-muted mt-1')}>or click to upload from gallery</p>
           </div>
         )}
       </div>
@@ -506,36 +514,36 @@ export const CaptureStep = ({ onNext, error }) => {
         <MicDiagnostic onBack={() => setShowDiagnostics(false)} />
       ) : (
         /* Audio Capture Area */
-        <div className={`
+        <div className={tc(`
           rounded-xl border transition-all overflow-hidden
           ${isRecording ? 'bg-red-900/20 border-red-500/50' : audioBlob ? 'bg-emerald-500/5 border-emerald-500/30' : 'bg-gray-800 border-gray-700'}
-        `}>
+        `, `rounded-xl border transition-all overflow-hidden ${isRecording ? 'bg-pl-danger-bg border-pl-danger/40' : audioBlob ? 'bg-pl-success-bg border-pl-success/40' : 'bg-pl-surface border-pl-border'}`)}>
           <div className="p-4">
             {!audioBlob ? (
               <div className="flex flex-col gap-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <div className={`
+                    <div className={tc(`
                       h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0 transition-all
                       ${isRecording ? 'bg-red-500 animate-pulse text-white shadow-[0_0_15px_rgba(239,68,68,0.5)]' : 'bg-gray-700 text-gray-400'}
-                    `}>
+                    `, `h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0 transition-all ${isRecording ? 'bg-pl-danger text-pl-danger-fg' : 'bg-pl-sunken border border-pl-border text-pl-muted'}`)}>
                       <Mic className="h-6 w-6" />
                     </div>
                     
                     <div>
-                      <p className={`font-medium ${isRecording ? 'text-red-400' : 'text-gray-200'}`}>
+                      <p className={tc(`font-medium ${isRecording ? 'text-red-400' : 'text-gray-200'}`, `font-medium ${isRecording ? 'text-pl-danger-text' : 'text-pl-text'}`)}>
                         {isRecording ? 'Recording...' : 'Add Voice Note'}
                       </p>
-                      <div className="text-xs text-gray-500 flex items-center gap-2">
+                      <div className={tc('text-xs text-gray-500 flex items-center gap-2', 'text-xs text-pl-muted flex items-center gap-2')}>
                         {isRecording ? (
-                          <span className="text-red-300 font-mono">{MAX_RECORDING_TIME - recordingTime}s remaining</span>
+                          <span className={tc('text-red-300 font-mono', 'text-pl-danger-text font-pl-mono tabular-nums')}>{MAX_RECORDING_TIME - recordingTime}s remaining</span>
                         ) : (
                           <div className="flex items-center gap-2">
                             <span>Max 30 seconds</span>
-                            <span className="text-gray-600">|</span>
+                            <span className={tc('text-gray-600', 'text-pl-border-strong')}>|</span>
                             <button 
                               onClick={() => setShowDiagnostics(true)}
-                              className="text-blue-400 hover:text-blue-300 hover:underline flex items-center gap-1"
+                              className={tc('text-blue-400 hover:text-blue-300 hover:underline flex items-center gap-1', 'text-pl-primary-text hover:text-pl-primary-text-hover hover:underline flex items-center gap-1')}
                             >
                               Test Mic <Settings className="w-3 h-3" />
                             </button>
@@ -560,7 +568,7 @@ export const CaptureStep = ({ onNext, error }) => {
                         variant="outline" 
                         size="sm" 
                         onClick={startRecording}
-                        className="bg-transparent border-gray-600 text-gray-300 hover:text-white hover:border-gray-400"
+                        className={tc('bg-transparent border-gray-600 text-gray-300 hover:text-white hover:border-gray-400', undefined)}
                       >
                         Start Recording
                       </Button>
@@ -570,9 +578,9 @@ export const CaptureStep = ({ onNext, error }) => {
 
                 {/* Audio Visualization Bar */}
                 {isRecording && (
-                  <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden mt-2">
+                  <div className={tc('w-full h-2 bg-gray-700 rounded-full overflow-hidden mt-2', 'w-full h-2 bg-pl-border rounded-full overflow-hidden mt-2')}>
                     <div 
-                      className="h-full bg-red-500 transition-all duration-75 ease-out"
+                      className={tc('h-full bg-red-500 transition-all duration-75 ease-out', 'h-full bg-pl-danger transition-all duration-75 ease-out')}
                       style={{ width: `${Math.min(100, Math.max(5, audioLevel))}%` }}
                     />
                   </div>
@@ -583,19 +591,19 @@ export const CaptureStep = ({ onNext, error }) => {
               <div className="flex flex-col gap-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 bg-emerald-500/20 rounded-full flex items-center justify-center">
-                      <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                    <div className={tc('h-8 w-8 bg-emerald-500/20 rounded-full flex items-center justify-center', 'h-8 w-8 bg-pl-surface rounded-full flex items-center justify-center')}>
+                      <CheckCircle2 className={tc('h-4 w-4 text-emerald-500', 'h-4 w-4 text-pl-success-text')} />
                     </div>
                     <div>
-                      <p className="text-emerald-400 font-medium text-sm">Voice Note Ready</p>
-                      <p className="text-xs text-gray-500">{audioBlob ? `${(audioBlob.size / 1024).toFixed(1)} KB` : ''}</p>
+                      <p className={tc('text-emerald-400 font-medium text-sm', 'text-pl-success-text font-medium text-sm')}>Voice Note Ready</p>
+                      <p className={tc('text-xs text-gray-500', 'text-xs text-pl-muted font-pl-mono tabular-nums')}>{audioBlob ? `${(audioBlob.size / 1024).toFixed(1)} KB` : ''}</p>
                     </div>
                   </div>
                   <Button 
                     variant="ghost" 
                     size="sm" 
                     onClick={handleDeleteAudio}
-                    className="text-gray-400 hover:text-red-400 hover:bg-red-400/10 h-8 px-2"
+                    className={tc('text-gray-400 hover:text-red-400 hover:bg-red-400/10 h-8 px-2', 'h-8 px-2')}
                   >
                     <Trash2 className="h-4 w-4 mr-2" />
                     Re-record
@@ -603,7 +611,7 @@ export const CaptureStep = ({ onNext, error }) => {
                 </div>
                 
                 {audioUrl && (
-                  <div className="w-full bg-black/20 rounded-lg p-2">
+                  <div className={tc('w-full bg-black/20 rounded-lg p-2', 'w-full bg-pl-surface rounded-lg p-2')}>
                     <audio 
                       controls 
                       src={audioUrl} 
@@ -623,12 +631,13 @@ export const CaptureStep = ({ onNext, error }) => {
         <Button 
           onClick={handleAnalyze} 
           disabled={(!photo && !audioBlob) || isRecording} 
-          className={`
+          variant={tc(undefined, 'accent')}
+          className={tc(`
             w-full sm:w-auto font-bold text-base px-8 py-6 rounded-xl transition-all shadow-lg
             ${(!photo && !audioBlob) || isRecording
               ? 'bg-gray-700 text-gray-500 cursor-not-allowed' 
               : 'bg-[#FFC107] text-black hover:bg-[#FFD54F] hover:shadow-[#FFC107]/20 hover:scale-[1.02]'}
-          `}
+          `, 'w-full sm:w-auto font-semibold text-base px-8 py-6 rounded-xl')}
         >
           <Zap className={`mr-2 h-5 w-5 ${(!photo && !audioBlob) ? '' : 'fill-current'}`} />
           Analyze Report
