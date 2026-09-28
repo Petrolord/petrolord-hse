@@ -13,31 +13,35 @@ import { Building2, Users, MapPin, ChevronRight, CheckCircle, Circle } from 'luc
 import { useHSE } from '@/context/HSEContext';
 import { orgAdminService } from '@/services/orgAdminService';
 
-const SetupCard = ({ icon: Icon, title, description, count, label, complete, onClick, color }) => (
+const SetupCard = ({ icon: Icon, title, description, count, label, complete, onClick }) => (
   <button
     onClick={onClick}
-    className="group flex flex-col items-start gap-3 bg-[#1f1f35] border border-[#2d2d4a] rounded-lg p-5 text-left hover:border-blue-500/40 hover:bg-[#252541] transition-all"
+    className="group flex flex-col items-start gap-3 rounded-lg border border-pl-border bg-pl-surface p-5 text-left shadow-pl-sm transition-colors hover:border-pl-primary/50 hover:bg-pl-raised focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pl-focus"
   >
     <div className="flex items-center justify-between w-full">
-      <div className={`p-2 rounded-lg ${color}`}>
-        <Icon className="w-5 h-5 text-white" />
+      <div className="p-2 rounded-lg bg-pl-primary/10 text-pl-primary-text">
+        <Icon className="w-5 h-5" aria-hidden="true" />
       </div>
       {complete ? (
-        <CheckCircle className="w-5 h-5 text-green-400" />
+        <span className="flex items-center gap-1 text-xs font-medium text-pl-success-text">
+          <CheckCircle className="w-5 h-5" aria-hidden="true" /> Done
+        </span>
       ) : (
-        <Circle className="w-5 h-5 text-slate-600" />
+        <span className="flex items-center gap-1 text-xs font-medium text-pl-muted">
+          <Circle className="w-5 h-5 text-pl-border-strong" aria-hidden="true" /> To do
+        </span>
       )}
     </div>
     <div>
-      <h3 className="font-semibold text-white">{title}</h3>
-      <p className="text-xs text-slate-400 mt-1">{description}</p>
+      <h3 className="font-semibold text-pl-text">{title}</h3>
+      <p className="text-xs text-pl-muted mt-1">{description}</p>
     </div>
-    <div className="flex items-center justify-between w-full mt-2 pt-3 border-t border-[#2d2d4a]">
+    <div className="flex items-center justify-between w-full mt-2 pt-3 border-t border-pl-border">
       <div className="text-sm">
-        <span className="text-2xl font-bold text-white">{count}</span>
-        <span className="text-slate-400 ml-1">{label}</span>
+        <span className="font-pl-mono tabular-nums text-2xl font-semibold text-pl-text">{count}</span>
+        <span className="text-pl-muted ml-1">{label}</span>
       </div>
-      <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-white group-hover:translate-x-1 transition-all" />
+      <ChevronRight className="w-4 h-4 text-pl-muted group-hover:text-pl-text group-hover:translate-x-1 transition-all" aria-hidden="true" />
     </div>
   </button>
 );
@@ -81,21 +85,21 @@ export default function OrgSetupHub() {
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="p-6 max-w-5xl mx-auto"
+      className="p-4 sm:p-6 max-w-5xl mx-auto"
     >
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white">Organization Setup</h1>
-        <p className="text-slate-400 mt-1 text-sm">
+        <h1 className="font-pl-display text-2xl sm:text-3xl font-semibold text-pl-text">Organization Setup</h1>
+        <p className="text-pl-muted mt-1 text-sm">
           Configure your organization's structure to enable better safety reporting and team coordination.
         </p>
       </div>
 
       {!loading && status.setupComplete && (
-        <div className="bg-green-900/20 border border-green-500/30 rounded-lg p-4 mb-6 flex items-center gap-3">
-          <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
+        <div className="rounded-lg border border-pl-success/40 bg-pl-success-bg p-4 mb-6 flex items-center gap-3">
+          <CheckCircle className="w-5 h-5 text-pl-success-text flex-shrink-0" aria-hidden="true" />
           <div>
-            <div className="text-sm font-medium text-white">Setup is complete</div>
-            <div className="text-xs text-slate-400 mt-0.5">
+            <div className="text-sm font-medium text-pl-success-text">Setup is complete</div>
+            <div className="text-xs text-pl-text mt-0.5">
               You can revisit this page anytime to manage sites, departments, and members.
             </div>
           </div>
@@ -103,9 +107,9 @@ export default function OrgSetupHub() {
       )}
 
       {!loading && !status.setupComplete && (
-        <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4 mb-6">
-          <div className="text-sm font-medium text-white">Get started in 3 quick steps</div>
-          <div className="text-xs text-slate-400 mt-1">
+        <div className="rounded-lg border border-pl-info/40 bg-pl-info-bg p-4 mb-6">
+          <div className="text-sm font-medium text-pl-info-text">Get started in 3 quick steps</div>
+          <div className="text-xs text-pl-text mt-1">
             Add at least one site and one department, then invite your team. Quick Reports will use this structure to organize incident data.
           </div>
         </div>
@@ -115,36 +119,33 @@ export default function OrgSetupHub() {
         <SetupCard
           icon={MapPin}
           title="Sites"
-          description="Physical locations where work happens — rigs, plants, offices, depots."
-          count={loading ? '—' : status.siteCount}
+          description="Physical locations where work happens: rigs, plants, offices, depots."
+          count={loading ? '...' : status.siteCount}
           label={status.siteCount === 1 ? 'site' : 'sites'}
           complete={status.siteCount > 0}
-          color="bg-blue-600"
           onClick={() => goTo('admin-sites', 'Sites')}
         />
         <SetupCard
           icon={Building2}
           title="Departments"
-          description="Functional units within your organization — HSE, Operations, Maintenance."
-          count={loading ? '—' : status.departmentCount}
+          description="Functional units within your organization: HSE, Operations, Maintenance."
+          count={loading ? '...' : status.departmentCount}
           label={status.departmentCount === 1 ? 'department' : 'departments'}
           complete={status.departmentCount > 0}
-          color="bg-purple-600"
           onClick={() => goTo('admin-departments', 'Departments')}
         />
         <SetupCard
           icon={Users}
           title="Members"
           description="Invite team members and assign roles to control access."
-          count={loading ? '—' : status.memberCount}
+          count={loading ? '...' : status.memberCount}
           label={status.memberCount === 1 ? 'member' : 'members'}
           complete={status.memberCount > 1}
-          color="bg-emerald-600"
           onClick={() => goTo('team', 'Team Management')}
         />
       </div>
 
-      <div className="mt-10 text-xs text-slate-500">
+      <div className="mt-10 text-xs text-pl-muted">
         Need help? Reach out to support@petrolord.com or visit the Help Center.
       </div>
     </motion.div>

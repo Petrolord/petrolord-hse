@@ -29,7 +29,7 @@ export const AssetSafety = ({ organization }) => {
   if (loading) {
     return (
       <div className="text-center py-8">
-        <p className="text-gray-400">Loading safety data...</p>
+        <p className="text-pl-muted">Loading safety data...</p>
       </div>
     );
   }
@@ -37,95 +37,95 @@ export const AssetSafety = ({ organization }) => {
   return (
     <div className="space-y-6">
       {/* Safety Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="bg-gray-800 border-gray-700">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium flex items-center gap-2 text-white">
-              <TrendingUp className="w-4 h-4 text-green-500" />
+            <CardTitle className="text-sm font-medium flex items-center gap-2">
+              <TrendingUp className="w-4 h-4 text-pl-primary-text" aria-hidden="true" />
               Safety Score
             </CardTitle>
           </CardHeader>
           <CardContent>
             {safetyData?.score != null ? (
-              <p className="text-3xl font-bold text-green-500">{safetyData.score}%</p>
+              <p className="font-pl-mono tabular-nums text-3xl font-semibold text-pl-text">{safetyData.score}%</p>
             ) : (
-              <p className="text-xl font-semibold text-gray-400">No data yet</p>
+              <p className="text-xl font-semibold text-pl-muted">No data yet</p>
             )}
-            <p className="text-xs text-gray-400 mt-2">Share of assets marked safe</p>
+            <p className="text-xs text-pl-muted mt-2">Share of assets marked safe</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-gray-800 border-gray-700">
+        <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium flex items-center gap-2 text-white">
-              <CheckCircle className="w-4 h-4 text-green-500" />
+            <CardTitle className="text-sm font-medium flex items-center gap-2">
+              <CheckCircle className="w-4 h-4 text-pl-success-text" aria-hidden="true" />
               Safe Assets
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold text-green-500">{safetyData?.safe || 0}</p>
-            <p className="text-xs text-gray-400 mt-2">No issues detected</p>
+            <p className="font-pl-mono tabular-nums text-3xl font-semibold text-pl-success-text">{safetyData?.safe || 0}</p>
+            <p className="text-xs text-pl-muted mt-2">No issues detected</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-gray-800 border-gray-700">
+        <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium flex items-center gap-2 text-white">
-              <AlertCircle className="w-4 h-4 text-yellow-500" />
+            <CardTitle className="text-sm font-medium flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 text-pl-warning-text" aria-hidden="true" />
               Warnings
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold text-yellow-500">{safetyData?.warning || 0}</p>
-            <p className="text-xs text-gray-400 mt-2">Require attention</p>
+            <p className="font-pl-mono tabular-nums text-3xl font-semibold text-pl-warning-text">{safetyData?.warning || 0}</p>
+            <p className="text-xs text-pl-muted mt-2">Require attention</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-gray-800 border-gray-700">
+        <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium flex items-center gap-2 text-white">
-              <Clock className="w-4 h-4 text-red-500" />
+            <CardTitle className="text-sm font-medium flex items-center gap-2">
+              <Clock className="w-4 h-4 text-pl-danger-text" aria-hidden="true" />
               Critical
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold text-red-500">{safetyData?.critical || 0}</p>
-            <p className="text-xs text-gray-400 mt-2">Immediate action needed</p>
+            <p className="font-pl-mono tabular-nums text-3xl font-semibold text-pl-danger-text">{safetyData?.critical || 0}</p>
+            <p className="text-xs text-pl-muted mt-2">Immediate action needed</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Maintenance Schedule */}
-      <Card className="bg-gray-800 border-gray-700">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-white">Upcoming Maintenance</CardTitle>
-          <CardDescription className="text-gray-400">Assets due for inspection or maintenance</CardDescription>
+          <CardTitle>Upcoming Maintenance</CardTitle>
+          <CardDescription>Assets due for inspection or maintenance</CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-gray-400">No data yet. Asset records do not carry maintenance due dates.</p>
+          <p className="text-sm text-pl-muted">No data yet. Asset records do not carry maintenance due dates.</p>
         </CardContent>
       </Card>
 
       {/* Flagged Assets */}
-      <Card className="bg-gray-800 border-gray-700">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-white">Assets Needing Attention</CardTitle>
-          <CardDescription className="text-gray-400">Assets currently marked warning or critical</CardDescription>
+          <CardTitle>Assets Needing Attention</CardTitle>
+          <CardDescription>Assets currently marked warning or critical</CardDescription>
         </CardHeader>
         <CardContent>
           {(safetyData?.flagged || []).length === 0 ? (
-            <p className="text-sm text-gray-400">No assets are flagged.</p>
+            <p className="text-sm text-pl-muted">No assets are flagged.</p>
           ) : (
-            <div className="space-y-3 text-white">
+            <div className="space-y-3 text-pl-text">
               {safetyData.flagged.map((item) => (
-                <div key={item.id} className={`flex items-center justify-between p-3 bg-gray-700 rounded-lg border-l-4 ${item.safety_status === 'critical' ? 'border-red-500' : 'border-yellow-500'}`}>
-                  <div>
+                <div key={item.id} className={`flex items-center justify-between gap-3 p-3 rounded-lg border border-pl-border bg-pl-sunken border-l-4 ${item.safety_status === 'critical' ? 'border-l-pl-danger' : 'border-l-pl-warning'}`}>
+                  <div className="min-w-0">
                     <p className="font-medium">{item.name}</p>
-                    {item.safety_notes && <p className="text-sm text-gray-400">{item.safety_notes}</p>}
+                    {item.safety_notes && <p className="text-sm text-pl-muted">{item.safety_notes}</p>}
                   </div>
-                  <div className="text-right">
-                    {item.updated_at && <p className="text-sm text-gray-400">{new Date(item.updated_at).toLocaleDateString()}</p>}
-                    <Badge className={item.safety_status === 'critical' ? 'bg-red-900 text-red-100 hover:bg-red-800' : 'bg-yellow-900 text-yellow-100 hover:bg-yellow-800'}>
+                  <div className="text-right shrink-0">
+                    {item.updated_at && <p className="text-sm text-pl-muted">{new Date(item.updated_at).toLocaleDateString()}</p>}
+                    <Badge variant={item.safety_status === 'critical' ? 'danger' : 'warning'}>
                       {item.safety_status.toUpperCase()}
                     </Badge>
                   </div>

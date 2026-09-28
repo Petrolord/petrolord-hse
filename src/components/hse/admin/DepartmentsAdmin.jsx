@@ -96,124 +96,123 @@ export default function DepartmentsAdmin() {
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="p-6 max-w-6xl mx-auto"
+      className="p-4 sm:p-6 max-w-6xl mx-auto"
     >
-      <div className="flex items-center gap-2 text-xs text-slate-400 mb-2">
+      <div className="flex items-center gap-2 text-xs text-pl-muted mb-2">
         <button
           onClick={() => setActiveModule({ id: 'admin-setup-hub', label: 'Setup Hub' })}
-          className="flex items-center hover:text-white"
+          className="flex items-center rounded-sm hover:text-pl-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pl-focus"
         >
-          <ChevronLeft className="w-3 h-3" /> Setup Hub
+          <ChevronLeft className="w-3 h-3" aria-hidden="true" /> Setup Hub
         </button>
       </div>
 
-      <div className="flex items-start justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-            <Building2 className="w-6 h-6 text-purple-400" />
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-6">
+        <div className="min-w-0">
+          <h1 className="font-pl-display text-2xl sm:text-3xl font-semibold text-pl-text flex items-center gap-2">
+            <Building2 className="w-6 h-6 text-pl-primary-text" aria-hidden="true" />
             Departments
           </h1>
-          <p className="text-slate-400 text-sm mt-1">
+          <p className="text-pl-muted text-sm mt-1">
             Functional units within your organization (HSE, Operations, Maintenance, etc.).
           </p>
         </div>
-        <Button onClick={openCreate} className="bg-purple-600 hover:bg-purple-700">
+        <Button onClick={openCreate} className="self-start shrink-0">
           <Plus className="w-4 h-4 mr-2" /> Add Department
         </Button>
       </div>
 
-      <div className="bg-[#1f1f35] border border-[#2d2d4a] rounded-lg overflow-hidden">
+      <div className="rounded-lg border border-pl-border bg-pl-surface shadow-pl-sm overflow-hidden">
         {loading ? (
-          <div className="p-8 text-center text-slate-400 text-sm">Loading departments...</div>
+          <div className="p-8 text-center text-pl-muted text-sm">Loading departments...</div>
         ) : departments.length === 0 ? (
           <div className="p-12 text-center">
-            <Building2 className="w-10 h-10 text-slate-600 mx-auto mb-3" />
-            <div className="text-white font-medium mb-1">No departments yet</div>
-            <div className="text-slate-400 text-sm mb-4">
+            <Building2 className="w-10 h-10 text-pl-border-strong mx-auto mb-3" aria-hidden="true" />
+            <div className="text-pl-text font-medium mb-1">No departments yet</div>
+            <div className="text-pl-muted text-sm mb-4">
               Define your departmental structure so reports can be assigned to the right team.
             </div>
-            <Button onClick={openCreate} className="bg-purple-600 hover:bg-purple-700">
+            <Button onClick={openCreate}>
               <Plus className="w-4 h-4 mr-2" /> Add your first department
             </Button>
           </div>
         ) : (
-          <table className="w-full text-sm">
-            <thead className="bg-[#1a1a2e] text-[#7a7a9a] uppercase text-xs">
-              <tr>
-                <th className="px-6 py-3 text-left">Name</th>
-                <th className="px-6 py-3 text-left">Cost Center</th>
-                <th className="px-6 py-3 text-left">Manager</th>
-                <th className="px-6 py-3 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#2d2d4a] text-slate-300">
-              {departments.map((d) => (
-                <tr key={d.id} className="hover:bg-[#252541]">
-                  <td className="px-6 py-3">
-                    <div className="text-white font-medium">{d.name}</div>
-                    {d.description && (
-                      <div className="text-xs text-slate-500 mt-0.5">{d.description}</div>
-                    )}
-                  </td>
-                  <td className="px-6 py-3 text-xs">{d.cost_center || '—'}</td>
-                  <td className="px-6 py-3 text-xs">{d.manager_name || '—'}</td>
-                  <td className="px-6 py-3 text-right">
-                    <Button variant="ghost" size="sm" onClick={() => openEdit(d)} className="text-slate-300">
-                      <Edit2 className="w-3.5 h-3.5" />
-                    </Button>
-                    <Button variant="ghost" size="sm" onClick={() => setConfirmDeleteId(d.id)} className="text-red-400 hover:text-red-300">
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </Button>
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[560px] text-sm">
+              <thead className="bg-pl-sunken text-pl-muted uppercase text-xs">
+                <tr>
+                  <th className="px-4 sm:px-6 py-3 text-left">Name</th>
+                  <th className="px-4 sm:px-6 py-3 text-left">Cost Center</th>
+                  <th className="px-4 sm:px-6 py-3 text-left">Manager</th>
+                  <th className="px-4 sm:px-6 py-3 text-right">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-pl-border text-pl-text">
+                {departments.map((d) => (
+                  <tr key={d.id} className="hover:bg-pl-sunken/60">
+                    <td className="px-4 sm:px-6 py-3">
+                      <div className="text-pl-text font-medium">{d.name}</div>
+                      {d.description && (
+                        <div className="text-xs text-pl-muted mt-0.5">{d.description}</div>
+                      )}
+                    </td>
+                    <td className="px-4 sm:px-6 py-3 text-xs">{d.cost_center || 'n/a'}</td>
+                    <td className="px-4 sm:px-6 py-3 text-xs">{d.manager_name || 'n/a'}</td>
+                    <td className="px-4 sm:px-6 py-3 text-right whitespace-nowrap">
+                      <Button variant="ghost" size="sm" onClick={() => openEdit(d)} aria-label={`Edit ${d.name}`} title="Edit">
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={() => setConfirmDeleteId(d.id)} aria-label={`Remove ${d.name}`} title="Remove" className="text-pl-danger-text hover:bg-pl-danger-bg hover:text-pl-danger-text">
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="bg-[#1a1a2e] border-[#2d2d4a] text-white max-w-lg">
+        <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>{editing ? 'Edit Department' : 'Add Department'}</DialogTitle>
-            <DialogDescription className="text-slate-400">
+            <DialogDescription>
               {editing ? 'Update department details.' : 'Create a new department.'}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-3 py-2">
             <div>
-              <Label className="text-xs text-slate-400">Name *</Label>
+              <Label className="text-xs text-pl-muted">Name *</Label>
               <Input
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                 placeholder="e.g. HSE"
-                className="bg-[#252541] border-[#3a3a5a] text-white mt-1"
               />
             </div>
             <div>
-              <Label className="text-xs text-slate-400">Description</Label>
+              <Label className="text-xs text-pl-muted">Description</Label>
               <Textarea
                 value={form.description}
                 onChange={(e) => setForm({ ...form, description: e.target.value })}
                 rows={2}
-                className="bg-[#252541] border-[#3a3a5a] text-white mt-1"
               />
             </div>
             <div>
-              <Label className="text-xs text-slate-400">Cost Center</Label>
+              <Label className="text-xs text-pl-muted">Cost Center</Label>
               <Input
                 value={form.cost_center}
                 onChange={(e) => setForm({ ...form, cost_center: e.target.value })}
                 placeholder="optional"
-                className="bg-[#252541] border-[#3a3a5a] text-white mt-1"
               />
             </div>
           </div>
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
-            <Button onClick={handleSave} disabled={saving} className="bg-purple-600 hover:bg-purple-700">
+            <Button onClick={handleSave} disabled={saving}>
               {saving ? 'Saving...' : (editing ? 'Save changes' : 'Add department')}
             </Button>
           </DialogFooter>
@@ -221,16 +220,16 @@ export default function DepartmentsAdmin() {
       </Dialog>
 
       <Dialog open={!!confirmDeleteId} onOpenChange={() => setConfirmDeleteId(null)}>
-        <DialogContent className="bg-[#1a1a2e] border-[#2d2d4a] text-white">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>Remove this department?</DialogTitle>
-            <DialogDescription className="text-slate-400">
+            <DialogDescription>
               The department will be deactivated. Existing reports referencing it remain intact.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setConfirmDeleteId(null)}>Cancel</Button>
-            <Button onClick={() => handleDelete(confirmDeleteId)} className="bg-red-600 hover:bg-red-700">
+            <Button variant="destructive" onClick={() => handleDelete(confirmDeleteId)}>
               Remove
             </Button>
           </DialogFooter>
