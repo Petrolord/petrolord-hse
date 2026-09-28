@@ -1,0 +1,374 @@
+{
+  "source": "Petrolord/petrolord-suite src/design/tokens.js",
+  "suiteCommit": "e7807a1da",
+  "capturedOn": "2026-09-28",
+  "BRAND": {
+    "ink": "#0C1F16",
+    "ink2": "#12301F",
+    "ink3": "#07140E",
+    "gold": "#C8A24E",
+    "goldSoft": "#E6D3A0",
+    "lime": "#A6D83A",
+    "paper": "#F2F4EF",
+    "paper2": "#E7EBE3",
+    "petrol": "#2F6B48"
+  },
+  "THEMES": {
+    "light": {
+      "bg": "#E1E4E8",
+      "surface": "#EDEFF2",
+      "raised": "#F8F9FA",
+      "sunken": "#D8DCE1",
+      "border": "#C3C9D0",
+      "border-strong": "#6E7883",
+      "text": "#14231B",
+      "muted": "#4D5761",
+      "primary": "#2F6B48",
+      "primary-hover": "#245A3B",
+      "primary-fg": "#FFFFFF",
+      "primary-text": "#2F6B48",
+      "primary-text-hover": "#1F4E33",
+      "accent": "#C8A24E",
+      "accent-fg": "#0C1F16",
+      "accent-text": "#7A5A12",
+      "success": "#1E7A46",
+      "success-fg": "#FFFFFF",
+      "success-bg": "#E3F2E8",
+      "success-text": "#18663A",
+      "warning": "#8F5300",
+      "warning-fg": "#FFFFFF",
+      "warning-bg": "#FBF0DC",
+      "warning-text": "#7F4A00",
+      "danger": "#B42318",
+      "danger-fg": "#FFFFFF",
+      "danger-bg": "#FCE8E6",
+      "danger-text": "#A11F15",
+      "info": "#1D5FA8",
+      "info-fg": "#FFFFFF",
+      "info-bg": "#E4EEF9",
+      "info-text": "#1A5596",
+      "focus": "#8A6A1F"
+    },
+    "dark": {
+      "bg": "#07140E",
+      "surface": "#0C1F16",
+      "raised": "#12301F",
+      "sunken": "#0A1A12",
+      "border": "#24402F",
+      "border-strong": "#5F7D6B",
+      "text": "#EEF2EC",
+      "muted": "#A9B8AE",
+      "primary": "#7CC49A",
+      "primary-hover": "#94D2AD",
+      "primary-fg": "#07140E",
+      "primary-text": "#8FD0AA",
+      "primary-text-hover": "#B3E2C6",
+      "accent": "#C8A24E",
+      "accent-fg": "#0C1F16",
+      "accent-text": "#E6D3A0",
+      "success": "#6FD19A",
+      "success-fg": "#07140E",
+      "success-bg": "#10301F",
+      "success-text": "#7FD9A6",
+      "warning": "#F0B955",
+      "warning-fg": "#07140E",
+      "warning-bg": "#33270C",
+      "warning-text": "#F3C470",
+      "danger": "#F28B82",
+      "danger-fg": "#07140E",
+      "danger-bg": "#3A1614",
+      "danger-text": "#F59C94",
+      "info": "#8AB8F2",
+      "info-fg": "#07140E",
+      "info-bg": "#0F2440",
+      "info-text": "#9CC4F5",
+      "focus": "#E6D3A0"
+    }
+  },
+  "CHART_SURFACE": "#FFFFFF",
+  "FONTS": {
+    "display": "\"Cormorant Garamond\", \"Iowan Old Style\", Georgia, serif",
+    "sans": "\"Public Sans\", system-ui, -apple-system, \"Segoe UI\", sans-serif",
+    "mono": "\"IBM Plex Mono\", ui-monospace, Menlo, Consolas, monospace"
+  },
+  "TYPE_SCALE": {
+    "xs": {
+      "size": 12,
+      "line": 16
+    },
+    "sm": {
+      "size": 14,
+      "line": 20
+    },
+    "base": {
+      "size": 16,
+      "line": 24
+    },
+    "lg": {
+      "size": 18,
+      "line": 28
+    },
+    "xl": {
+      "size": 20,
+      "line": 28
+    },
+    "2xl": {
+      "size": 24,
+      "line": 32
+    },
+    "3xl": {
+      "size": 30,
+      "line": 36
+    },
+    "4xl": {
+      "size": 36,
+      "line": 40
+    }
+  },
+  "SPACING": {
+    "1": 4,
+    "2": 8,
+    "3": 12,
+    "4": 16,
+    "5": 20,
+    "6": 24,
+    "8": 32,
+    "10": 40,
+    "12": 48,
+    "16": 64
+  },
+  "RADII": {
+    "sm": 6,
+    "md": 8,
+    "lg": 12,
+    "xl": 16,
+    "pill": 999
+  },
+  "CANVAS_RADIUS": "0.5rem",
+  "SHADOWS": {
+    "light": {
+      "sm": "0 1px 2px rgba(12, 31, 22, 0.06)",
+      "md": "0 4px 12px -2px rgba(12, 31, 22, 0.10)",
+      "lg": "0 16px 40px -12px rgba(12, 31, 22, 0.22)"
+    },
+    "dark": {
+      "sm": "0 1px 2px rgba(0, 0, 0, 0.40)",
+      "md": "0 4px 12px -2px rgba(0, 0, 0, 0.50)",
+      "lg": "0 16px 40px -12px rgba(0, 0, 0, 0.65)"
+    }
+  },
+  "CONTRAST_PAIRS": [
+    [
+      "text",
+      "bg",
+      4.5
+    ],
+    [
+      "text",
+      "surface",
+      4.5
+    ],
+    [
+      "text",
+      "raised",
+      4.5
+    ],
+    [
+      "text",
+      "sunken",
+      4.5
+    ],
+    [
+      "muted",
+      "bg",
+      4.5
+    ],
+    [
+      "muted",
+      "surface",
+      4.5
+    ],
+    [
+      "muted",
+      "sunken",
+      4.5
+    ],
+    [
+      "primary-fg",
+      "primary",
+      4.5
+    ],
+    [
+      "primary-fg",
+      "primary-hover",
+      4.5
+    ],
+    [
+      "primary-text",
+      "surface",
+      4.5
+    ],
+    [
+      "primary-text",
+      "bg",
+      4.5
+    ],
+    [
+      "primary-text-hover",
+      "surface",
+      4.5
+    ],
+    [
+      "primary-text-hover",
+      "bg",
+      4.5
+    ],
+    [
+      "primary-text-hover",
+      "sunken",
+      4.5
+    ],
+    [
+      "accent-fg",
+      "accent",
+      4.5
+    ],
+    [
+      "accent-text",
+      "surface",
+      4.5
+    ],
+    [
+      "accent-text",
+      "bg",
+      4.5
+    ],
+    [
+      "success-fg",
+      "success",
+      4.5
+    ],
+    [
+      "success-text",
+      "surface",
+      4.5
+    ],
+    [
+      "success-text",
+      "success-bg",
+      4.5
+    ],
+    [
+      "warning-fg",
+      "warning",
+      4.5
+    ],
+    [
+      "warning-text",
+      "surface",
+      4.5
+    ],
+    [
+      "warning-text",
+      "warning-bg",
+      4.5
+    ],
+    [
+      "danger-fg",
+      "danger",
+      4.5
+    ],
+    [
+      "danger-text",
+      "surface",
+      4.5
+    ],
+    [
+      "danger-text",
+      "danger-bg",
+      4.5
+    ],
+    [
+      "info-fg",
+      "info",
+      4.5
+    ],
+    [
+      "info-text",
+      "surface",
+      4.5
+    ],
+    [
+      "info-text",
+      "info-bg",
+      4.5
+    ],
+    [
+      "border-strong",
+      "surface",
+      3
+    ],
+    [
+      "primary",
+      "surface",
+      3
+    ],
+    [
+      "surface",
+      "border-strong",
+      3
+    ],
+    [
+      "focus",
+      "bg",
+      3
+    ],
+    [
+      "focus",
+      "surface",
+      3
+    ]
+  ],
+  "SHADCN_ALIASES": {
+    "background": "bg",
+    "foreground": "text",
+    "secondary-background": "sunken",
+    "card": "surface",
+    "card-foreground": "text",
+    "popover": "raised",
+    "popover-foreground": "text",
+    "border": "border",
+    "input": "border-strong",
+    "input-foreground": "text",
+    "ring": "focus",
+    "primary": "primary",
+    "primary-foreground": "primary-fg",
+    "primary-hover": "primary-hover",
+    "secondary": "sunken",
+    "secondary-foreground": "text",
+    "muted": "sunken",
+    "muted-foreground": "muted",
+    "accent": "sunken",
+    "accent-foreground": "text",
+    "destructive": "danger",
+    "destructive-foreground": "danger-fg",
+    "success": "success",
+    "success-foreground": "success-fg",
+    "warning": "warning",
+    "warning-foreground": "warning-fg",
+    "info": "info",
+    "info-foreground": "info-fg"
+  },
+  "CHART_SERIES": [
+    "#2563EB",
+    "#059669",
+    "#D97706",
+    "#DC2626",
+    "#7C3AED"
+  ],
+  "THEME_NAMES": [
+    "light",
+    "dark"
+  ],
+  "DEFAULT_THEME": "light"
+}
