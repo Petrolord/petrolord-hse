@@ -31,19 +31,21 @@ export default function ActionsAging({ actions, onBucketClick }) {
     return { buckets, total };
   }, [actions]);
 
+  // Age is a status (older open actions need attention), so the bars take the
+  // status roles; the bucket label beside each bar names it.
   const bucketConfig = [
-    { label: '0 - 30 Days', key: '0-30', color: 'bg-green-500' },
-    { label: '31 - 60 Days', key: '31-60', color: 'bg-yellow-500' },
-    { label: '61 - 90 Days', key: '61-90', color: 'bg-orange-500' },
-    { label: '90+ Days', key: '91+', color: 'bg-red-500' },
+    { label: '0 to 30 Days', key: '0-30', color: 'bg-pl-success' },
+    { label: '31 to 60 Days', key: '31-60', color: 'bg-pl-warning' },
+    { label: '61 to 90 Days', key: '61-90', color: 'bg-pl-warning' },
+    { label: '90+ Days', key: '91+', color: 'bg-pl-danger' },
   ];
 
   return (
-    <div className="p-4 md:p-6 space-y-6">
-      <Card className="bg-[#252541] border-[#3a3a5a]">
+    <div className="space-y-6">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-white text-lg">Open Actions Aging Analysis</CardTitle>
-          <p className="text-sm text-[#b0b0c0]">Distribution of open actions based on their age.</p>
+          <CardTitle className="text-pl-text text-lg">Open Actions Aging Analysis</CardTitle>
+          <p className="text-sm text-pl-muted">Distribution of open actions based on their age.</p>
         </CardHeader>
         <CardContent className="space-y-4">
           {bucketConfig.map(({ label, key, color }) => {
@@ -52,11 +54,11 @@ export default function ActionsAging({ actions, onBucketClick }) {
             return (
               <div key={key} className="cursor-pointer group" onClick={() => onBucketClick(agingData.buckets[key])}>
                 <div className="flex justify-between items-center mb-1.5 text-sm">
-                  <span className="text-white font-medium">{label}</span>
-                  <span className="text-[#b0b0c0] font-mono">{count} Actions</span>
+                  <span className="text-pl-text font-medium">{label}</span>
+                  <span className="text-pl-muted"><span className="font-pl-mono tabular-nums">{count}</span> Actions</span>
                 </div>
-                <Progress value={percentage} className="h-2 bg-[#1a1a2e]" indicatorClassName={color} />
-                <div className={`text-right text-xs mt-1 text-[#7a7a9a] group-hover:${color.replace('bg-', 'text-')}`}>
+                <Progress value={percentage} className="h-2 bg-pl-sunken" indicatorClassName={color} />
+                <div className="text-right text-xs mt-1 text-pl-muted group-hover:text-pl-text font-pl-mono tabular-nums">
                   {percentage.toFixed(1)}%
                 </div>
               </div>

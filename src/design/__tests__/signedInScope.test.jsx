@@ -36,7 +36,8 @@ describe('rollout lists', () => {
   });
 
   it('leaves every other module legacy', () => {
-    for (const id of ['permits', 'risk', 'environment', 'help', 'settings']) expect(isThemedModule(id)).toBe(false);
+    // 'legacy-probe' is an id no batch lists (batch 1B migrated 'permits').
+    for (const id of ['legacy-probe', 'risk', 'environment', 'help', 'settings']) expect(isThemedModule(id)).toBe(false);
   });
 
   it('lists each module once, only real MainContent module ids, one file per batch', () => {
@@ -53,7 +54,7 @@ describe('rollout lists', () => {
 describe('SignedInScope', () => {
   it('renders an unmigrated module with no wrapper and no toggle', () => {
     const { container } = render(
-      <SignedInScope moduleId="permits"><p className="legacy">legacy</p><ThemeToggle /></SignedInScope>,
+      <SignedInScope moduleId="legacy-probe"><p className="legacy">legacy</p><ThemeToggle /></SignedInScope>,
     );
     expect(container.innerHTML).toBe('<p class="legacy">legacy</p>');
   });
@@ -105,7 +106,7 @@ describe('ThemedLoadingScreen', () => {
     window.localStorage.setItem(LAST_THEME_KEY, 'dark');
     const { container, rerender } = render(<ThemedLoadingScreen moduleId="dashboard" label="Loading" />);
     expect(screen.getByTestId('hse-themed-loader')).toHaveAttribute('data-pl-theme', 'dark');
-    rerender(<ThemedLoadingScreen moduleId="permits" label="Loading" />);
+    rerender(<ThemedLoadingScreen moduleId="legacy-probe" label="Loading" />);
     expect(container.innerHTML).toBe('');
   });
 });

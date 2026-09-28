@@ -9,11 +9,11 @@ export default function PermitList({ permits, onViewDetails }) {
   if (!permits.length) {
     return (
       <div className="flex flex-col items-center justify-center h-64 text-center">
-        <div className="bg-gray-800 p-4 rounded-full mb-4">
-          <FileText className="h-8 w-8 text-gray-500" />
+        <div className="bg-pl-sunken p-4 rounded-full mb-4">
+          <FileText className="h-8 w-8 text-pl-muted" aria-hidden="true" />
         </div>
-        <h3 className="text-lg font-medium text-white">No Permits Found</h3>
-        <p className="text-gray-400">Get started by creating a new work permit.</p>
+        <h3 className="text-lg font-medium text-pl-text">No Permits Found</h3>
+        <p className="text-pl-muted">Get started by creating a new work permit.</p>
       </div>
     );
   }
@@ -21,39 +21,39 @@ export default function PermitList({ permits, onViewDetails }) {
   return (
     <div className="space-y-4">
       {permits.map((permit) => (
-        <Card key={permit.id} className="petrolord-card p-4 hover:bg-[var(--bg-hover)] transition-colors border-[var(--border-color)]">
+        <Card key={permit.id} className="p-4 hover:bg-pl-sunken/60 transition-colors">
           <div className="flex flex-col md:flex-row justify-between gap-4">
             <div className="flex-1 space-y-2">
-              <div className="flex items-center gap-3">
-                <span className="font-mono text-xs text-blue-400 bg-blue-400/10 px-2 py-1 rounded">{permit.permit_number || 'DRAFT'}</span>
-                <h3 className="font-semibold text-white text-lg">{permit.title}</h3>
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                <span className="font-pl-mono text-xs text-pl-muted bg-pl-sunken border border-pl-border px-2 py-1 rounded">{permit.permit_number || 'DRAFT'}</span>
+                <h3 className="font-semibold text-pl-text text-lg min-w-0 break-words">{permit.title}</h3>
                 <PermitStatusBadge status={permit.status} />
               </div>
               
-              <p className="text-sm text-gray-400 line-clamp-2">{permit.description}</p>
+              <p className="text-sm text-pl-muted line-clamp-2">{permit.description}</p>
               
-              <div className="flex flex-wrap gap-4 text-xs text-gray-500 mt-3">
+              <div className="flex flex-wrap gap-4 text-xs text-pl-muted mt-3">
                 <div className="flex items-center gap-1">
-                  <MapPin className="h-3 w-3" /> {permit.location || 'Unknown Location'}
+                  <MapPin className="h-3 w-3" aria-hidden="true" /> {permit.location || 'Unknown Location'}
                 </div>
                 <div className="flex items-center gap-1">
-                  <Clock className="h-3 w-3" /> 
-                  {permit.start_date ? new Date(permit.start_date).toLocaleDateString() : 'TBD'}
+                  <Clock className="h-3 w-3" aria-hidden="true" /> 
+                  <span className="font-pl-mono tabular-nums">{permit.start_date ? new Date(permit.start_date).toLocaleDateString() : 'TBD'}</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <User className="h-3 w-3" /> 
+                  <User className="h-3 w-3" aria-hidden="true" /> 
                   {permit.requester?.raw_user_meta_data?.full_name || permit.requester?.email || 'Unknown'}
                 </div>
               </div>
             </div>
 
-            <div className="flex flex-col items-end justify-between gap-2 min-w-[120px]">
-              <div className="text-right">
-                <span className="text-xs text-gray-500 block">Priority</span>
+            <div className="flex flex-row md:flex-col items-center md:items-end justify-between gap-2 md:min-w-[120px]">
+              <div className="md:text-right">
+                <span className="text-xs text-pl-muted block">Priority</span>
                 <PriorityBadge priority={permit.priority} />
               </div>
-              <Button variant="outline" size="sm" className="w-full" onClick={() => onViewDetails(permit)}>
-                <Eye className="mr-2 h-3 w-3" /> View
+              <Button variant="outline" size="sm" className="md:w-full" onClick={() => onViewDetails(permit)}>
+                <Eye className="mr-2 h-3 w-3" aria-hidden="true" /> View
               </Button>
             </div>
           </div>
