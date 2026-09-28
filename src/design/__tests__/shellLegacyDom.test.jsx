@@ -4,7 +4,8 @@
 // has NOT migrated renders exactly what it rendered before wave 0.
 //
 // shellLegacyDom.json was captured from main 9614e76 before the shell was
-// made scope-aware (UPDATE_SHELL_LEGACY_DOM=1 writes it). The module itself
+// made scope-aware (UPDATE_SHELL_LEGACY_DOM=1 writes it), and re-captured
+// from main 5040cbe with the probe id in batch 1B. The module itself
 // is stubbed; the module screens are pinned by their own tests.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -33,7 +34,10 @@ const FIXTURE = path.join(__dirname, 'shellLegacyDom.json');
 const UPDATE = process.env.UPDATE_SHELL_LEGACY_DOM === '1';
 
 // A module outside every rollout list: the shell must stay legacy around it.
-const UNMIGRATED = { id: 'permits', label: 'Work Permits' };
+// A probe id no batch will ever list (batch 1B migrated 'permits', the id
+// this pin first used), so no later batch has to re-capture the pin. The
+// module itself is stubbed, so only the rail's active item depends on it.
+const UNMIGRATED = { id: 'legacy-probe', label: 'Legacy probe' };
 
 const mountShell = () => render(
   <MemoryRouter initialEntries={['/dashboard']}>
@@ -111,6 +115,6 @@ describe('signed-in shell on an unmigrated module (legacy DOM pin)', () => {
     for (const html of Object.values(current)) {
       expect(html).not.toMatch(/data-pl-theme|data-pl-root|theme-toggle/);
     }
-    expect(shell.activeModule.id).toBe('permits');
+    expect(shell.activeModule.id).toBe(UNMIGRATED.id);
   });
 });
