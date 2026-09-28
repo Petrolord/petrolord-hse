@@ -10,29 +10,14 @@ import { useHSE } from '@/context/HSEContext';
 import { useToast } from "@/components/ui/use-toast";
 import AddMitigationModal from './components/AddMitigationModal';
 import RowActions from '../common/RowActions';
+import { EMPTY, KpiTile, Track, tableHeadClass, tableBodyClass, tableRowClass } from '../common/ui';
 
 const STATUSES = ['Not Started', 'In Progress', 'On Hold', 'Completed'];
 
-const statusColor = (s) => {
-  if (s === 'Completed') return 'bg-green-500/10 text-green-400 border-green-500/20';
-  if (s === 'In Progress') return 'bg-blue-500/10 text-blue-400 border-blue-500/20';
-  if (s === 'On Hold') return 'bg-orange-500/10 text-orange-400 border-orange-500/20';
-  return 'bg-gray-500/10 text-gray-400 border-gray-500/20';
-};
 
 const isOverdue = (m) => m.due_date && m.status !== 'Completed' && new Date(m.due_date) < new Date();
 
-function Kpi({ icon: Icon, label, value, color }) {
-  return (
-    <Card className="bg-[#1e1e30] border-[#2a2a40] p-4 flex items-center gap-3">
-      <div className={`p-2 rounded-lg bg-[#252541] ${color}`}><Icon className="h-5 w-5" /></div>
-      <div>
-        <div className="text-2xl font-bold text-white leading-none">{value}</div>
-        <div className="text-xs text-gray-400 mt-1">{label}</div>
-      </div>
-    </Card>
-  );
-}
+const Kpi = KpiTile;
 
 export default function RiskMitigation() {
   const { currentOrganization } = useHSE();
@@ -95,26 +80,26 @@ export default function RiskMitigation() {
   return (
     <div className="h-full flex flex-col space-y-4">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <Kpi icon={Sliders} label="Total Actions" value={total} color="text-amber-400" />
-        <Kpi icon={Clock} label="In Progress" value={inProgress} color="text-blue-400" />
-        <Kpi icon={CheckCircle2} label="Completed" value={completed} color="text-green-400" />
-        <Kpi icon={AlertTriangle} label="Overdue" value={overdue} color="text-red-400" />
+        <Kpi icon={Sliders} label="Total Actions" value={total} />
+        <Kpi icon={Clock} label="In Progress" value={inProgress} />
+        <Kpi icon={CheckCircle2} label="Completed" value={completed} />
+        <Kpi icon={AlertTriangle} label="Overdue" value={overdue} />
       </div>
 
-      <div className="flex justify-between items-center bg-[#1e1e30] p-4 rounded-lg border border-[#2a2a40]">
+      <div className="flex flex-wrap gap-3 justify-between items-center bg-pl-surface p-4 rounded-lg border border-pl-border">
         <div>
-          <h3 className="text-white font-bold">Mitigation Action Plan</h3>
-          <p className="text-xs text-gray-400">Treatment actions across all registered risks</p>
+          <h3 className="text-pl-text font-semibold">Mitigation Action Plan</h3>
+          <p className="text-xs text-pl-muted">Treatment actions across all registered risks</p>
         </div>
-        <Button className="bg-amber-600 hover:bg-amber-700 text-white" onClick={openAdd} disabled={risks.length === 0}>
-          <Plus className="mr-2 h-4 w-4" /> Add Action
+        <Button onClick={openAdd} disabled={risks.length === 0}>
+          <Plus className="mr-2 h-4 w-4" aria-hidden="true" /> Add Action
         </Button>
       </div>
 
-      <Card className="flex-1 bg-[#1e1e30] border-[#2a2a40] overflow-hidden flex flex-col">
+      <Card className="flex-1 overflow-hidden flex flex-col">
         <div className="overflow-auto flex-1">
           <table className="w-full text-sm text-left">
-            <thead className="bg-[#252541] text-gray-400 uppercase text-xs sticky top-0 z-10">
+            <thead className={`${tableHeadClass} sticky top-0 z-10`}>
               <tr>
                 <th className="px-6 py-4 font-medium">Risk</th>
                 <th className="px-6 py-4 font-medium">Action</th>
@@ -125,37 +110,36 @@ export default function RiskMitigation() {
                 <th className="px-6 py-4 font-medium text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#2a2a40]">
+            <tbody className={tableBodyClass}>
               {loading ? (
-                <tr><td colSpan="7" className="p-10 text-center text-gray-500">Loading mitigation plan...</td></tr>
+                <tr><td colSpan="7" className="p-10 text-center text-pl-muted">Loading mitigation plan...</td></tr>
               ) : actions.length === 0 ? (
-                <tr><td colSpan="7" className="p-10 text-center text-gray-500">No mitigation actions yet. Add one to start treating your risks.</td></tr>
+                <tr><td colSpan="7" className="p-10 text-center text-pl-muted">No mitigation actions yet. Add one to start treating your risks.</td></tr>
               ) : (
                 actions.map((a) => (
-                  <tr key={a.id} className="hover:bg-[#252541] transition-colors">
+                  <tr key={a.id} className={tableRowClass}>
                     <td className="px-6 py-4 max-w-[200px]">
-                      <div className="font-mono text-xs text-gray-500">{a.risk?.risk_id}</div>
-                      <div className="text-gray-300 text-xs truncate">{a.risk?.title}</div>
+                      <div className="font-pl-mono text-xs text-pl-muted">{a.risk?.risk_id}</div>
+                      <div className="text-pl-muted text-xs truncate">{a.risk?.title}</div>
                     </td>
-                    <td className="px-6 py-4 max-w-md text-white">{a.description}</td>
+                    <td className="px-6 py-4 max-w-md text-pl-text">{a.description}</td>
                     <td className="px-6 py-4">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#2a2a40] text-gray-300">{a.strategy || '—'}</span>
+                      <Badge variant="neutral">{a.strategy || EMPTY}</Badge>
                     </td>
-                    <td className={`px-6 py-4 text-xs ${isOverdue(a) ? 'text-red-400 font-medium' : 'text-gray-400'}`}>
-                      {a.due_date ? new Date(a.due_date).toLocaleDateString() : '—'}
+                    <td className={`px-6 py-4 text-xs whitespace-nowrap ${isOverdue(a) ? 'text-pl-danger-text font-medium' : 'text-pl-muted'}`}>
+                      <span className="font-pl-mono tabular-nums">{a.due_date ? new Date(a.due_date).toLocaleDateString() : EMPTY}</span>
+                      {isOverdue(a) && <span className="block">Overdue</span>}
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
-                        <div className="flex-1 h-2 bg-[#2a2a40] rounded-full overflow-hidden">
-                          <div className="h-full bg-amber-500 rounded-full" style={{ width: `${a.progress || 0}%` }} />
-                        </div>
-                        <span className="text-xs text-gray-400 w-8 text-right">{a.progress || 0}%</span>
+                        <Track pct={a.progress || 0} className="flex-1 h-2" />
+                        <span className="text-xs text-pl-muted w-8 text-right font-pl-mono tabular-nums">{a.progress || 0}%</span>
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       <Select value={a.status || 'Not Started'} onValueChange={(v) => handleStatusChange(a, v)}>
-                        <SelectTrigger className={`h-7 text-xs border w-36 ${statusColor(a.status)}`}><SelectValue /></SelectTrigger>
-                        <SelectContent className="bg-[#252541] border-[#3a3a5a] text-white">
+                        <SelectTrigger className="h-7 text-xs w-36" aria-label="Action status"><SelectValue /></SelectTrigger>
+                        <SelectContent>
                           {STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
                         </SelectContent>
                       </Select>
@@ -174,7 +158,7 @@ export default function RiskMitigation() {
             </tbody>
           </table>
         </div>
-        <div className="p-4 border-t border-[#2a2a40] text-xs text-gray-500">Showing {actions.length} actions</div>
+        <div className="p-4 border-t border-pl-border text-xs text-pl-muted">Showing {actions.length} actions</div>
       </Card>
 
       <AddMitigationModal isOpen={showAdd} onClose={() => setShowAdd(false)} onSuccess={load} risks={risks} record={editRecord} />

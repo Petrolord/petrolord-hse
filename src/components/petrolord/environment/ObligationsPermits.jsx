@@ -9,6 +9,14 @@ import { useHSE } from '@/context/HSEContext';
 import { useToast } from "@/components/ui/use-toast";
 import AddPermitModal from './AddPermitModal';
 import RowActions from '../common/RowActions';
+import { EMPTY } from '../common/ui';
+
+// Status words on the Badge status variants (the word is the label).
+const permitStatusVariant = (s) => {
+  if (s === 'Active') return 'success';
+  if (s === 'Pending') return 'warning';
+  return 'danger';
+};
 
 export default function ObligationsPermits() {
   const { currentOrganization } = useHSE();
@@ -38,35 +46,35 @@ export default function ObligationsPermits() {
 
   return (
     <div className="space-y-6">
-      <Card className="bg-[#1e1e30] border-[#2a2a40]">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-white">Permit Register</CardTitle>
+      <Card>
+        <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3">
+          <CardTitle>Permit Register</CardTitle>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" className="border-[#3a3a5a] text-gray-300 hover:bg-[#2a2a40]"><Download className="mr-2 h-4 w-4" /> Export</Button>
-            <Button size="sm" className="bg-blue-600 hover:bg-blue-700" onClick={openAdd}><Plus className="mr-2 h-4 w-4" /> Add Permit</Button>
+            <Button variant="outline" size="sm"><Download className="mr-2 h-4 w-4" aria-hidden="true" /> Export</Button>
+            <Button size="sm" onClick={openAdd}><Plus className="mr-2 h-4 w-4" aria-hidden="true" /> Add Permit</Button>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow className="border-[#2a2a40] hover:bg-transparent">
-                <TableHead className="text-gray-400">Permit #</TableHead>
-                <TableHead className="text-gray-400">Type</TableHead>
-                <TableHead className="text-gray-400">Authority</TableHead>
-                <TableHead className="text-gray-400">Expiry</TableHead>
-                <TableHead className="text-gray-400">Status</TableHead>
-                <TableHead className="text-gray-400 text-right">Actions</TableHead>
+              <TableRow className="hover:bg-transparent">
+                <TableHead>Permit #</TableHead>
+                <TableHead>Type</TableHead>
+                <TableHead>Authority</TableHead>
+                <TableHead>Expiry</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {permits.map(p => (
-                <TableRow key={p.id} className="border-[#2a2a40] hover:bg-[#2a2a40]">
-                  <TableCell className="text-white font-medium">{p.permit_number}</TableCell>
-                  <TableCell className="text-gray-300">{p.type}</TableCell>
-                  <TableCell className="text-gray-300">{p.issuing_authority}</TableCell>
-                  <TableCell className="text-gray-300">{p.expiry_date ? new Date(p.expiry_date).toLocaleDateString() : '—'}</TableCell>
+                <TableRow key={p.id}>
+                  <TableCell className="font-medium font-pl-mono">{p.permit_number}</TableCell>
+                  <TableCell className="text-pl-muted">{p.type}</TableCell>
+                  <TableCell className="text-pl-muted">{p.issuing_authority}</TableCell>
+                  <TableCell className="text-pl-muted font-pl-mono tabular-nums">{p.expiry_date ? new Date(p.expiry_date).toLocaleDateString() : EMPTY}</TableCell>
                   <TableCell>
-                    <Badge className={p.status === 'Active' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}>{p.status}</Badge>
+                    <Badge variant={permitStatusVariant(p.status)}>{p.status}</Badge>
                   </TableCell>
                   <TableCell className="text-right">
                     <RowActions
@@ -78,7 +86,7 @@ export default function ObligationsPermits() {
                   </TableCell>
                 </TableRow>
               ))}
-              {permits.length === 0 && <TableRow><TableCell colSpan={6} className="text-center text-gray-500 py-8">No permits found.</TableCell></TableRow>}
+              {permits.length === 0 && <TableRow><TableCell colSpan={6} className="text-center text-pl-muted py-8">No permits found.</TableCell></TableRow>}
             </TableBody>
           </Table>
         </CardContent>

@@ -7,11 +7,14 @@ import { environmentService } from '@/services/environmentService';
 import { useToast } from "@/components/ui/use-toast";
 import SubmitMonitoringModal from './SubmitMonitoringModal';
 import RowActions from '../common/RowActions';
+import { Badge } from "@/components/ui/badge";
+import { EMPTY, tableHeadClass, tableBodyClass, tableRowClass } from '../common/ui';
 
-const statusColor = (s) => {
-  if (s === 'Compliant') return 'text-green-400';
-  if (s === 'Exceedance') return 'text-red-400';
-  return 'text-gray-400';
+// The sample status word on a Badge status variant.
+const statusVariant = (s) => {
+  if (s === 'Compliant') return 'success';
+  if (s === 'Exceedance') return 'danger';
+  return 'neutral';
 };
 
 export default function Monitoring({ openSignal = 0 }) {
@@ -45,15 +48,15 @@ export default function Monitoring({ openSignal = 0 }) {
 
   return (
     <div className="space-y-6">
-      <Card className="bg-[#1e1e30] border-[#2a2a40]">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-white flex items-center gap-2"><Activity className="h-5 w-5 text-blue-500" /> Environmental Monitoring</CardTitle>
-          <Button size="sm" className="bg-blue-600 hover:bg-blue-700" onClick={openAdd}><Plus className="mr-2 h-4 w-4" /> New Sample</Button>
+      <Card>
+        <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3">
+          <CardTitle className="flex items-center gap-2"><Activity className="h-5 w-5 text-pl-muted" aria-hidden="true" /> Environmental Monitoring</CardTitle>
+          <Button size="sm" onClick={openAdd}><Plus className="mr-2 h-4 w-4" aria-hidden="true" /> New Sample</Button>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
             <table className="w-full text-sm text-left">
-              <thead className="text-xs text-gray-400 uppercase bg-[#252541]">
+              <thead className={tableHeadClass}>
                 <tr>
                   <th className="px-4 py-3">Parameter</th>
                   <th className="px-4 py-3">Value</th>
@@ -64,15 +67,15 @@ export default function Monitoring({ openSignal = 0 }) {
                   <th className="px-4 py-3 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#2a2a40]">
+              <tbody className={tableBodyClass}>
                 {results.map(r => (
-                  <tr key={r.id}>
-                    <td className="px-4 py-3 text-white">{r.parameter}</td>
-                    <td className="px-4 py-3 text-white">{r.value} {r.unit}</td>
-                    <td className="px-4 py-3 text-gray-400">{r.limit_value != null ? `${r.limit_value} ${r.unit}` : '—'}</td>
-                    <td className="px-4 py-3 text-gray-400">{r.location_point || '—'}</td>
-                    <td className="px-4 py-3 text-gray-400">{r.sample_date ? new Date(r.sample_date).toLocaleDateString() : '—'}</td>
-                    <td className="px-4 py-3"><span className={statusColor(r.status)}>{r.status || '—'}</span></td>
+                  <tr key={r.id} className={tableRowClass}>
+                    <td className="px-4 py-3 text-pl-text">{r.parameter}</td>
+                    <td className="px-4 py-3 text-pl-text"><span className="font-pl-mono tabular-nums">{r.value}</span> {r.unit}</td>
+                    <td className="px-4 py-3 text-pl-muted font-pl-mono tabular-nums">{r.limit_value != null ? `${r.limit_value} ${r.unit}` : EMPTY}</td>
+                    <td className="px-4 py-3 text-pl-muted">{r.location_point || EMPTY}</td>
+                    <td className="px-4 py-3 text-pl-muted font-pl-mono tabular-nums">{r.sample_date ? new Date(r.sample_date).toLocaleDateString() : EMPTY}</td>
+                    <td className="px-4 py-3"><Badge variant={statusVariant(r.status)}>{r.status || EMPTY}</Badge></td>
                     <td className="px-4 py-3 text-right">
                       <RowActions
                         onEdit={() => openEdit(r)}
@@ -84,7 +87,7 @@ export default function Monitoring({ openSignal = 0 }) {
                   </tr>
                 ))}
                 {results.length === 0 && (
-                  <tr><td colSpan={7} className="px-4 py-8 text-center text-gray-500">No monitoring samples recorded yet.</td></tr>
+                  <tr><td colSpan={7} className="px-4 py-8 text-center text-pl-muted">No monitoring samples recorded yet.</td></tr>
                 )}
               </tbody>
             </table>

@@ -9,6 +9,7 @@ import { useHSE } from '@/context/HSEContext';
 import { riskService } from '@/services/riskService';
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2 } from 'lucide-react';
+import { riskZone } from './RiskHeatMap';
 
 const EMPTY = { title: '', description: '', category: '', likelihood: '1', impact: '1', root_cause: '', consequences: '' };
 
@@ -78,18 +79,17 @@ export default function NewRiskModal({ isOpen, onClose, onSuccess, record }) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[700px] bg-[#1e1e30] border-[#3a3a5a] text-white">
+      <DialogContent className="sm:max-w-[700px]">
         <DialogHeader>
           <DialogTitle>{isEdit ? 'Edit Risk' : 'Register New Risk'}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-2">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="col-span-2 space-y-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="sm:col-span-2 space-y-2">
               <Label>Risk Title *</Label>
               <Input 
                 value={formData.title} 
                 onChange={e => setFormData({...formData, title: e.target.value})}
-                className="bg-[#252541] border-[#3a3a5a]" 
                 required 
                 placeholder="e.g. Failure of Main Generator"
               />
@@ -98,10 +98,10 @@ export default function NewRiskModal({ isOpen, onClose, onSuccess, record }) {
             <div className="space-y-2">
               <Label>Category *</Label>
               <Select value={formData.category} onValueChange={v => setFormData({...formData, category: v})}>
-                <SelectTrigger className="bg-[#252541] border-[#3a3a5a]">
+                <SelectTrigger>
                   <SelectValue placeholder="Select Category" />
                 </SelectTrigger>
-                <SelectContent className="bg-[#252541] border-[#3a3a5a] text-white">
+                <SelectContent>
                   {['Health & Safety', 'Environmental', 'Financial', 'Operational', 'Strategic', 'Reputational', 'Security', 'Compliance'].map(c => (
                     <SelectItem key={c} value={c}>{c}</SelectItem>
                   ))}
@@ -112,10 +112,10 @@ export default function NewRiskModal({ isOpen, onClose, onSuccess, record }) {
             <div className="space-y-2">
               <Label>Likelihood (1-5) *</Label>
               <Select value={formData.likelihood} onValueChange={v => setFormData({...formData, likelihood: v})}>
-                <SelectTrigger className="bg-[#252541] border-[#3a3a5a]">
+                <SelectTrigger>
                   <SelectValue placeholder="Scale 1-5" />
                 </SelectTrigger>
-                <SelectContent className="bg-[#252541] border-[#3a3a5a] text-white">
+                <SelectContent>
                   <SelectItem value="1">1 - Rare</SelectItem>
                   <SelectItem value="2">2 - Unlikely</SelectItem>
                   <SelectItem value="3">3 - Possible</SelectItem>
@@ -128,10 +128,10 @@ export default function NewRiskModal({ isOpen, onClose, onSuccess, record }) {
             <div className="space-y-2">
               <Label>Impact (1-5) *</Label>
               <Select value={formData.impact} onValueChange={v => setFormData({...formData, impact: v})}>
-                <SelectTrigger className="bg-[#252541] border-[#3a3a5a]">
+                <SelectTrigger>
                   <SelectValue placeholder="Scale 1-5" />
                 </SelectTrigger>
-                <SelectContent className="bg-[#252541] border-[#3a3a5a] text-white">
+                <SelectContent>
                   <SelectItem value="1">1 - Insignificant</SelectItem>
                   <SelectItem value="2">2 - Minor</SelectItem>
                   <SelectItem value="3">3 - Moderate</SelectItem>
@@ -142,15 +142,17 @@ export default function NewRiskModal({ isOpen, onClose, onSuccess, record }) {
             </div>
 
             <div className="space-y-2 flex items-end">
-               <div className="w-full p-2 bg-[#252541] border border-[#3a3a5a] rounded text-center">
-                 <span className="text-xs uppercase text-gray-500 block">Risk Score</span>
-                 <span className={`font-bold text-xl ${
-                   (parseInt(formData.likelihood) * parseInt(formData.impact)) >= 15 ? 'text-red-500' : 
-                   (parseInt(formData.likelihood) * parseInt(formData.impact)) >= 8 ? 'text-yellow-500' : 'text-green-500'
-                 }`}>
-                   {parseInt(formData.likelihood) * parseInt(formData.impact)}
-                 </span>
-               </div>
+               {(() => {
+                 const score = parseInt(formData.likelihood) * parseInt(formData.impact);
+                 const zone = riskZone(score);
+                 return (
+                   <div className="w-full p-2 bg-pl-sunken border border-pl-border rounded text-center">
+                     <span className="text-xs uppercase text-pl-muted block">Risk Score</span>
+                     <span className={`font-pl-mono tabular-nums font-semibold text-xl ${zone.text}`}>{score}</span>
+                     <span className={`ml-2 text-xs font-semibold ${zone.text}`}>{zone.word}</span>
+                   </div>
+                 );
+               })()}
             </div>
           </div>
 
@@ -159,18 +161,17 @@ export default function NewRiskModal({ isOpen, onClose, onSuccess, record }) {
             <Textarea 
               value={formData.description} 
               onChange={e => setFormData({...formData, description: e.target.value})}
-              className="bg-[#252541] border-[#3a3a5a]" 
+              
               placeholder="Detailed description of the risk..."
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Root Cause</Label>
               <Textarea 
                 value={formData.root_cause} 
                 onChange={e => setFormData({...formData, root_cause: e.target.value})}
-                className="bg-[#252541] border-[#3a3a5a]" 
                 placeholder="What is the source?"
               />
             </div>
@@ -179,16 +180,15 @@ export default function NewRiskModal({ isOpen, onClose, onSuccess, record }) {
               <Textarea 
                 value={formData.consequences} 
                 onChange={e => setFormData({...formData, consequences: e.target.value})}
-                className="bg-[#252541] border-[#3a3a5a]" 
                 placeholder="What happens if this occurs?"
               />
             </div>
           </div>
 
           <DialogFooter className="mt-4">
-            <Button type="button" variant="ghost" onClick={onClose} className="text-gray-400 hover:text-white">Cancel</Button>
-            <Button type="submit" disabled={loading} className="bg-amber-600 hover:bg-amber-700">
-              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} {isEdit ? 'Save Changes' : 'Submit Risk'}
+            <Button type="button" variant="ghost" onClick={onClose}>Cancel</Button>
+            <Button type="submit" disabled={loading}>
+              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />} {isEdit ? 'Save Changes' : 'Submit Risk'}
             </Button>
           </DialogFooter>
         </form>

@@ -87,69 +87,69 @@ export default function LogSpillModal({ isOpen, onClose, onSuccess, record }) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px] bg-[#1a1a2e] border-[#3a3a5a] text-white max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader><DialogTitle>{isEdit ? 'Edit Spill Incident' : 'Log New Spill'}</DialogTitle></DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-2">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-[#b0b0c0]">Spill ID *</Label>
-              <Input value={form.spill_id} onChange={e => set('spill_id', e.target.value)} className="bg-[#252541] border-[#3a3a5a] text-white" required />
+              <Label>Spill ID *</Label>
+              <Input value={form.spill_id} onChange={e => set('spill_id', e.target.value)} required />
             </div>
             <div className="space-y-2">
-              <Label className="text-[#b0b0c0]">Incident Date *</Label>
-              <Input type="date" value={form.incident_date} onChange={e => set('incident_date', e.target.value)} className="bg-[#252541] border-[#3a3a5a] text-white" required />
+              <Label>Incident Date *</Label>
+              <Input type="date" value={form.incident_date} onChange={e => set('incident_date', e.target.value)} required />
             </div>
           </div>
           <div className="space-y-2">
-            <Label className="text-[#b0b0c0]">Substance</Label>
-            <Input value={form.substance} onChange={e => set('substance', e.target.value)} placeholder="e.g. Crude Oil" className="bg-[#252541] border-[#3a3a5a] text-white" />
+            <Label>Substance</Label>
+            <Input value={form.substance} onChange={e => set('substance', e.target.value)} placeholder="e.g. Crude Oil" />
           </div>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="space-y-2">
-              <Label className="text-[#b0b0c0]">Qty Spilled</Label>
-              <Input type="number" step="any" value={form.quantity_spilled} onChange={e => set('quantity_spilled', e.target.value)} className="bg-[#252541] border-[#3a3a5a] text-white" />
+              <Label>Qty Spilled</Label>
+              <Input type="number" step="any" value={form.quantity_spilled} onChange={e => set('quantity_spilled', e.target.value)} />
             </div>
             <div className="space-y-2">
-              <Label className="text-[#b0b0c0]">Qty Recovered</Label>
-              <Input type="number" step="any" value={form.quantity_recovered} onChange={e => set('quantity_recovered', e.target.value)} className="bg-[#252541] border-[#3a3a5a] text-white" />
+              <Label>Qty Recovered</Label>
+              <Input type="number" step="any" value={form.quantity_recovered} onChange={e => set('quantity_recovered', e.target.value)} />
             </div>
             <div className="space-y-2">
-              <Label className="text-[#b0b0c0]">Unit</Label>
-              <Input value={form.unit} onChange={e => set('unit', e.target.value)} placeholder="bbl" className="bg-[#252541] border-[#3a3a5a] text-white" />
+              <Label>Unit</Label>
+              <Input value={form.unit} onChange={e => set('unit', e.target.value)} placeholder="bbl" />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-[#b0b0c0]">Severity</Label>
+              <Label>Severity</Label>
               <Select value={form.severity} onValueChange={v => set('severity', v)}>
-                <SelectTrigger className="bg-[#252541] border-[#3a3a5a] text-white"><SelectValue /></SelectTrigger>
-                <SelectContent className="bg-[#252541] border-[#3a3a5a] text-white">
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
                   {['Minor', 'Moderate', 'Major', 'Critical'].map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <Label className="text-[#b0b0c0]">Status</Label>
+              <Label>Status</Label>
               <Select value={form.status} onValueChange={v => set('status', v)}>
-                <SelectTrigger className="bg-[#252541] border-[#3a3a5a] text-white"><SelectValue /></SelectTrigger>
-                <SelectContent className="bg-[#252541] border-[#3a3a5a] text-white">
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
                   {['Open', 'Under Remediation', 'Closed'].map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
           </div>
           <div className="space-y-2">
-            <Label className="text-[#b0b0c0]">Location</Label>
-            <Input value={form.location_text} onChange={e => set('location_text', e.target.value)} className="bg-[#252541] border-[#3a3a5a] text-white" />
+            <Label>Location</Label>
+            <Input value={form.location_text} onChange={e => set('location_text', e.target.value)} />
           </div>
           <div className="space-y-2">
-            <Label className="text-[#b0b0c0]">Remediation Plan</Label>
-            <Textarea value={form.remediation_plan} onChange={e => set('remediation_plan', e.target.value)} className="bg-[#252541] border-[#3a3a5a] text-white" />
+            <Label>Remediation Plan</Label>
+            <Textarea value={form.remediation_plan} onChange={e => set('remediation_plan', e.target.value)} />
           </div>
           <DialogFooter>
-            <Button type="button" variant="ghost" onClick={onClose} className="text-[#b0b0c0]">Cancel</Button>
-            <Button type="submit" disabled={loading} className="bg-red-600 hover:bg-red-700 text-white">
-              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} {isEdit ? 'Save Changes' : 'Log Spill'}
+            <Button type="button" variant="ghost" onClick={onClose}>Cancel</Button>
+            <Button type="submit" disabled={loading}>
+              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />} {isEdit ? 'Save Changes' : 'Log Spill'}
             </Button>
           </DialogFooter>
         </form>

@@ -4,9 +4,18 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pi
 import { riskService } from '@/services/riskService';
 import { useHSE } from '@/context/HSEContext';
 import RiskHeatMap from './components/RiskHeatMap';
+import { ChartPanel } from '@/components/ui/chart-panel';
+import { CHART_COLORS, CHART_SERIES, GRID_STYLE, AXIS_PROPS, TOOLTIP_STYLE, LEGEND_PROPS } from '@/utils/chartTheme';
 
-const TOOLTIP = { contentStyle: { backgroundColor: '#1e1e30', borderColor: '#3a3a5a', color: '#fff' }, itemStyle: { color: '#fff' }, labelStyle: { color: '#9ca3af' } };
-const RATING_COLORS = { Critical: '#ef4444', High: '#f97316', Medium: '#eab308', Low: '#22c55e' };
+// Charts stay white in both themes (ChartPanel) with the chart theme colours.
+const TOOLTIP = {
+  contentStyle: TOOLTIP_STYLE,
+  itemStyle: { color: CHART_COLORS.tooltipText },
+  labelStyle: { color: CHART_COLORS.axisText },
+};
+// Severity slices from the validated series; the legend names each one.
+const RATING_COLORS = { Critical: CHART_SERIES[3], High: CHART_SERIES[2], Medium: CHART_SERIES[0], Low: CHART_SERIES[1] };
+const CURSOR = { fill: CHART_COLORS.grid, fillOpacity: 0.4 };
 
 const ratingOf = (score) => {
   if (score >= 15) return 'Critical';
@@ -17,8 +26,8 @@ const ratingOf = (score) => {
 
 function Panel({ title, children }) {
   return (
-    <Card className="bg-[#1e1e30] border-[#2a2a40] p-5">
-      <h4 className="text-white font-bold mb-4">{title}</h4>
+    <Card className="p-5">
+      <h4 className="text-pl-text font-semibold mb-4">{title}</h4>
       {children}
     </Card>
   );
@@ -56,10 +65,10 @@ export default function RiskAnalytics() {
     return Object.entries(m).map(([name, count]) => ({ name, count }));
   }, [risks]);
 
-  if (loading) return <div className="p-10 text-center text-gray-500">Crunching risk analytics...</div>;
+  if (loading) return <div className="p-10 text-center text-pl-muted">Crunching risk analytics...</div>;
   if (risks.length === 0) return (
-    <div className="p-12 text-center border-2 border-dashed border-[#3a3a5a] rounded-xl text-gray-500">
-      <h3 className="text-xl font-bold text-white mb-2">No Data to Analyze</h3>
+    <div className="p-12 text-center border-2 border-dashed border-pl-border-strong rounded-xl text-pl-muted">
+      <h3 className="text-xl font-semibold text-pl-text mb-2">No Data to Analyze</h3>
       <p>Register risks to see distribution, exposure and heat-map analytics.</p>
     </div>
   );
@@ -68,10 +77,10 @@ export default function RiskAnalytics() {
     <div className="space-y-4">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <Panel title="Risk Exposure Heat Map">
-          <div className="h-[300px]"><RiskHeatMap risks={risks} /></div>
+          <div className="h-[320px]"><RiskHeatMap risks={risks} /></div>
         </Panel>
 
-        <Panel title="Severity Distribution">
+        <ChartPanel title="Severity Distribution" className="p-5">
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -79,41 +88,41 @@ export default function RiskAnalytics() {
                   {byRating.map((e) => <Cell key={e.name} fill={RATING_COLORS[e.name]} />)}
                 </Pie>
                 <Tooltip {...TOOLTIP} />
-                <Legend verticalAlign="bottom" height={36} />
+                <Legend {...LEGEND_PROPS} />
               </PieChart>
             </ResponsiveContainer>
           </div>
-        </Panel>
+        </ChartPanel>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <Panel title="Risks by Category">
+        <ChartPanel title="Risks by Category" className="p-5">
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={byCategory} margin={{ top: 5, right: 10, bottom: 5, left: -20 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#2a2a40" />
-                <XAxis dataKey="name" tick={{ fill: '#9ca3af', fontSize: 11 }} interval={0} angle={-20} textAnchor="end" height={60} />
-                <YAxis allowDecimals={false} tick={{ fill: '#9ca3af', fontSize: 11 }} />
-                <Tooltip {...TOOLTIP} cursor={{ fill: '#ffffff10' }} />
-                <Bar dataKey="count" fill="#f59e0b" radius={[4, 4, 0, 0]} />
+                <CartesianGrid {...GRID_STYLE} />
+                <XAxis dataKey="name" {...AXIS_PROPS} interval={0} angle={-20} textAnchor="end" height={60} />
+                <YAxis allowDecimals={false} {...AXIS_PROPS} />
+                <Tooltip {...TOOLTIP} cursor={CURSOR} />
+                <Bar dataKey="count" name="Risks" fill={CHART_SERIES[0]} radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
-        </Panel>
+        </ChartPanel>
 
-        <Panel title="Risks by Status">
+        <ChartPanel title="Risks by Status" className="p-5">
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={byStatus} margin={{ top: 5, right: 10, bottom: 5, left: -20 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#2a2a40" />
-                <XAxis dataKey="name" tick={{ fill: '#9ca3af', fontSize: 11 }} />
-                <YAxis allowDecimals={false} tick={{ fill: '#9ca3af', fontSize: 11 }} />
-                <Tooltip {...TOOLTIP} cursor={{ fill: '#ffffff10' }} />
-                <Bar dataKey="count" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                <CartesianGrid {...GRID_STYLE} />
+                <XAxis dataKey="name" {...AXIS_PROPS} />
+                <YAxis allowDecimals={false} {...AXIS_PROPS} />
+                <Tooltip {...TOOLTIP} cursor={CURSOR} />
+                <Bar dataKey="count" name="Risks" fill={CHART_SERIES[1]} radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
-        </Panel>
+        </ChartPanel>
       </div>
     </div>
   );
