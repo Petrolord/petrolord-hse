@@ -1,5 +1,4 @@
 import React from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import InviteTeamMember from './InviteTeamMember';
 import OrganizationMembers from '@/components/organization/OrganizationMembers';
 import { Users } from 'lucide-react';
@@ -20,14 +19,10 @@ export default function TeamManagementModule() {
       <div className="grid gap-6">
         <InviteTeamMember />
         
-        <Card>
-          <CardHeader>
-            <CardTitle>Active Members</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <OrganizationMembers />
-          </CardContent>
-        </Card>
+        {/* OrganizationMembers draws its own "Team Members" card; the
+            outer "Active Members" card around it is gone, so the page no
+            longer shows a card inside a card. */}
+        <OrganizationMembers />
       </div>
     </div>
   );
