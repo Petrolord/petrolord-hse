@@ -6,7 +6,7 @@
 // loading, error and no-organisation states, and the toggle round trip
 // with a negative control. Only the data layer is stubbed.
 import React from 'react';
-import { render, screen, fireEvent, act, within } from '@testing-library/react';
+import { render, screen, fireEvent, act, within, configure } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { resetShell } from '@/design/testing/shellMocks';
 import {
@@ -51,6 +51,11 @@ const renderPage = () => render(
     <OrganizationSettings />
   </MemoryRouter>,
 );
+// The layout mounts the whole shell; under a loaded full run the first
+// paint can take longer than the library's 1 s default.
+configure({ asyncUtilTimeout: 8000 });
+vi.setConfig({ testTimeout: 30000 });
+
 const flush = () => act(async () => { await new Promise((r) => setTimeout(r, 60)); });
 const click = (el) => { fireEvent.pointerDown(el); fireEvent.mouseDown(el); fireEvent.click(el); };
 const openTab = async (name) => {

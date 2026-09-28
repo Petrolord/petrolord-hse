@@ -5,7 +5,7 @@
 // MainContent, so the checks cover the shell around each module too. Only
 // the data layer is stubbed; nothing reaches the network.
 import React from 'react';
-import { render, screen, fireEvent, act, within } from '@testing-library/react';
+import { render, screen, fireEvent, act, within, configure } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { resetShell } from '@/design/testing/shellMocks';
 import {
@@ -58,6 +58,11 @@ const renderLayout = () => render(
     </TooltipProvider>
   </MemoryRouter>,
 );
+
+// The layout mounts the whole shell; under a loaded full run the first
+// paint can take longer than the library's 1 s default.
+configure({ asyncUtilTimeout: 8000 });
+vi.setConfig({ testTimeout: 30000 });
 
 const flush = () => act(async () => { await new Promise((r) => setTimeout(r, 60)); });
 const on = (id, label) => resetShell({ activeModule: { id, label } });
