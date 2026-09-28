@@ -311,7 +311,9 @@ export async function walkReportWizard(snap) {
   await flush(400);
   snap('step2SearchResults');
   click(byText('1 Quay Road'));
-  await flush();
+  // the picked name re-runs the debounced search (300 ms), which reopens the
+  // list; wait it out so every run sees the same state
+  await flush(400);
   type(document.querySelector('input[type="datetime-local"]'), '2026-09-01T10:00');
   await flush();
   snap('step2Selected');
