@@ -5,7 +5,8 @@ import { settingsService } from '@/services/settingsService';
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
-import { Loader2, Save, RefreshCcw, CheckCircle, Lock } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Loader2, Save, RefreshCcw, CheckCircle, Lock, Info } from 'lucide-react';
 
 // Subcomponents
 import PremiumFeatureLock from './branding/PremiumFeatureLock';
@@ -98,7 +99,7 @@ export default function BrandingTheme() {
       toast({ 
         title: "Settings Saved", 
         description: "Branding updated successfully.",
-        className: "bg-green-600 text-white border-none"
+        variant: "success"
       });
     } catch (error) {
       toast({ title: "Error", description: "Failed to save settings.", variant: "destructive" });
@@ -147,35 +148,35 @@ export default function BrandingTheme() {
     setSettings(prev => ({ ...prev, [keyMap[type]]: null }));
   };
 
-  if (loading) return <div className="p-12 flex justify-center"><Loader2 className="h-8 w-8 animate-spin text-[var(--accent)]" /></div>;
+  if (loading) return <div className="p-12 flex justify-center"><Loader2 className="h-8 w-8 animate-spin text-pl-primary" aria-label="Loading branding settings" /></div>;
 
   return (
     <div className="pb-20">
       <PremiumFeatureLock>
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
           <div>
-            <h2 className="text-2xl font-bold">Branding & Theme</h2>
-            <p className="text-[var(--text-secondary)]">Customize the look and feel of your workspace.</p>
+            <h2 className="text-2xl font-semibold text-pl-text">Branding & Theme</h2>
+            <p className="text-pl-muted">Customize the look and feel of your workspace.</p>
           </div>
-          <div className="flex gap-3">
-            <Button variant="ghost" onClick={() => loadSettings()} className="text-[var(--text-muted)]">
-              <RefreshCcw className="mr-2 h-4 w-4" /> Reset Changes
+          <div className="flex flex-wrap gap-3">
+            <Button variant="ghost" onClick={() => loadSettings()}>
+              <RefreshCcw className="mr-2 h-4 w-4" aria-hidden="true" /> Reset Changes
             </Button>
-            <Button onClick={handleSave} disabled={saving} className="petrolord-button min-w-[140px]">
-              {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+            <Button onClick={handleSave} disabled={saving} className="min-w-[140px]">
+              {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" /> : <Save className="mr-2 h-4 w-4" aria-hidden="true" />}
               Save Changes
             </Button>
           </div>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="bg-[var(--bg-card)] border border-[var(--border-color)] w-full justify-start h-auto p-1 mb-6 flex-wrap">
-            <TabsTrigger value="general" className="data-[state=active]:bg-[var(--accent)] data-[state=active]:text-black py-2 px-4">General</TabsTrigger>
-            <TabsTrigger value="colors" className="data-[state=active]:bg-[var(--accent)] data-[state=active]:text-black py-2 px-4">Colors</TabsTrigger>
-            <TabsTrigger value="typography" className="data-[state=active]:bg-[var(--accent)] data-[state=active]:text-black py-2 px-4">Typography</TabsTrigger>
-            <TabsTrigger value="login" className="data-[state=active]:bg-[var(--accent)] data-[state=active]:text-black py-2 px-4">Login Page</TabsTrigger>
-            <TabsTrigger value="footer" className="data-[state=active]:bg-[var(--accent)] data-[state=active]:text-black py-2 px-4">Footer</TabsTrigger>
-            <TabsTrigger value="advanced" className="data-[state=active]:bg-[var(--accent)] data-[state=active]:text-black py-2 px-4">Advanced</TabsTrigger>
+          <TabsList className="w-full justify-start h-auto p-1 mb-6 flex-wrap">
+            <TabsTrigger value="general" className="py-2 px-4">General</TabsTrigger>
+            <TabsTrigger value="colors" className="py-2 px-4">Colors</TabsTrigger>
+            <TabsTrigger value="typography" className="py-2 px-4">Typography</TabsTrigger>
+            <TabsTrigger value="login" className="py-2 px-4">Login Page</TabsTrigger>
+            <TabsTrigger value="footer" className="py-2 px-4">Footer</TabsTrigger>
+            <TabsTrigger value="advanced" className="py-2 px-4">Advanced</TabsTrigger>
           </TabsList>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -212,10 +213,11 @@ export default function BrandingTheme() {
 
             <div className="space-y-6">
               <ThemePreview settings={settings} />
-              <div className="bg-blue-500/10 border border-blue-500/20 p-4 rounded-lg text-sm text-blue-400">
-                <p className="font-semibold mb-1">Preview Mode</p>
-                <p className="opacity-80">This preview shows a generic layout. Your actual dashboard may vary based on content.</p>
-              </div>
+              <Alert variant="info">
+                <Info className="h-4 w-4" aria-hidden="true" />
+                <AlertTitle>Preview Mode</AlertTitle>
+                <AlertDescription>This preview shows a generic layout. Your actual dashboard may vary based on content.</AlertDescription>
+              </Alert>
             </div>
           </div>
         </Tabs>
