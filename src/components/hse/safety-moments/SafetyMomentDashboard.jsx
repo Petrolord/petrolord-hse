@@ -3,15 +3,17 @@ import { Card, CardContent } from "@/components/ui/card";
 import { BookOpen, Users } from 'lucide-react';
 
 export default function SafetyMomentDashboard({ moments = [] }) {
-  const StatCard = ({ title, value, icon: Icon, color }) => (
-    <Card className="bg-[#252541] border-[#3a3a5a]">
+  // Design family (batch 2C): stat tiles on the theme roles, numbers in the
+  // mono face, icons in a neutral tile (colour is kept for status).
+  const StatCard = ({ title, value, icon: Icon }) => (
+    <Card>
       <CardContent className="p-6 flex items-center justify-between">
         <div>
-          <p className="text-sm font-medium text-[#7a7a9a] uppercase tracking-wider">{title}</p>
-          <h3 className="text-3xl font-bold text-white mt-1">{value}</h3>
+          <p className="text-sm font-medium text-pl-muted uppercase tracking-wider">{title}</p>
+          <h3 className="text-3xl font-semibold text-pl-text mt-1 font-pl-mono tabular-nums">{value}</h3>
         </div>
-        <div className={`p-3 rounded-full bg-opacity-10`} style={{ backgroundColor: `${color}20` }}>
-          <Icon className="h-6 w-6" style={{ color: color }} />
+        <div className="p-3 rounded-full bg-pl-sunken">
+          <Icon className="h-6 w-6 text-pl-muted" aria-hidden="true" />
         </div>
       </CardContent>
     </Card>
@@ -27,36 +29,36 @@ export default function SafetyMomentDashboard({ moments = [] }) {
   const durations = moments.map(m => Number(m.duration)).filter(d => Number.isFinite(d) && d > 0);
   const avgDuration = durations.length
     ? `${Math.round(durations.reduce((a, b) => a + b, 0) / durations.length)}m`
-    : '--';
+    : 'n/a';
   const topCategory = categoryEntries[0];
   const topShare = topCategory && moments.length ? Math.round((topCategory[1] / moments.length) * 100) : 0;
 
   return (
-    <div className="p-6 space-y-8">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <StatCard title="Total Moments" value={moments.length} icon={BookOpen} color="#10b981" />
-        <StatCard title="Categories" value={categoryEntries.length} icon={Users} color="#3b82f6" />
-        <StatCard title="Avg Duration" value={avgDuration} icon={Clock} color="#f59e0b" />
+    <div className="p-4 sm:p-6 space-y-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+        <StatCard title="Total Moments" value={moments.length} icon={BookOpen} />
+        <StatCard title="Categories" value={categoryEntries.length} icon={Users} />
+        <StatCard title="Avg Duration" value={avgDuration} icon={Clock} />
       </div>
 
-      <div className="bg-[#252541] rounded-xl border border-[#3a3a5a] p-6">
-         <h3 className="text-lg font-bold text-white mb-4">Quick Stats</h3>
+      <div className="bg-pl-surface rounded-xl border border-pl-border shadow-pl-sm p-6">
+         <h3 className="text-lg font-semibold text-pl-text mb-4">Quick Stats</h3>
          {topCategory ? (
            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                 <span className="text-[#b0b0c0]">Largest Category</span>
-                 <span className="text-emerald-400 font-medium">{topCategory[0]} ({topCategory[1]} of {moments.length})</span>
+              <div className="flex flex-wrap justify-between items-center gap-2">
+                 <span className="text-pl-muted">Largest Category</span>
+                 <span className="text-pl-text font-medium">{topCategory[0]} (<span className="font-pl-mono tabular-nums">{topCategory[1]}</span> of <span className="font-pl-mono tabular-nums">{moments.length}</span>)</span>
               </div>
-              <div className="w-full bg-[#1a1a2e] h-2 rounded-full overflow-hidden">
-                 <div className="h-full bg-emerald-500" style={{ width: `${topShare}%` }} />
+              <div className="w-full bg-pl-sunken h-2 rounded-full overflow-hidden">
+                 <div className="h-full bg-pl-primary" style={{ width: `${topShare}%` }} />
               </div>
               <div className="flex justify-between items-center mt-4">
-                 <span className="text-[#b0b0c0]">Completion Rate</span>
-                 <span className="text-[#7a7a9a] font-medium">No data yet</span>
+                 <span className="text-pl-muted">Completion Rate</span>
+                 <span className="text-pl-muted font-medium">No data yet</span>
               </div>
            </div>
          ) : (
-           <p className="text-[#7a7a9a] text-sm">No data yet</p>
+           <p className="text-pl-muted text-sm">No data yet</p>
          )}
       </div>
     </div>

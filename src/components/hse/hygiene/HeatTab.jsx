@@ -7,6 +7,7 @@ import {
   evaluateHeat, isRefusal, WBGT_FORMS, HEAT_EQUATION_NOTE,
 } from '@/lib/hygiene/evaluate';
 import { hygieneService } from '@/services/hygieneService';
+import { TOOLTIP_STYLE } from '@/utils/chartTheme';
 import { ChartCard, CHART } from '../safety-stats/common';
 import {
   Panel, PeriodTable, Pick, TextField, Refusal, Warnings, Flag, Stat, SampleHeader, SERIES, fmt, Notice,
@@ -73,14 +74,14 @@ export default function HeatTab({ orgId, form, setForm, sites, canSave, saveBloc
               ]}
             />
           </div>
-          <div className="text-xs text-gray-400">WBGT periods</div>
+          <div className="text-xs text-pl-muted">WBGT periods</div>
           <PeriodTable
             rows={form.wbgtPeriods}
             onChange={setField('wbgtPeriods')}
             blankRow={() => ({ durationMin: '', naturalWetBulbC: '', globeC: '', dryBulbC: '', wbgtC: '' })}
             columns={WBGT_COLUMNS[form.form] || WBGT_COLUMNS.indoor}
           />
-          <div className="text-xs text-gray-400">Metabolic periods (watts; the NIOSH figures span 116 to 580 W)</div>
+          <div className="text-xs text-pl-muted">Metabolic periods (watts; the NIOSH figures span 116 to 580 W)</div>
           <PeriodTable
             rows={form.metabolicPeriods}
             onChange={setField('metabolicPeriods')}
@@ -99,7 +100,7 @@ export default function HeatTab({ orgId, form, setForm, sites, canSave, saveBloc
             <TextField label="Instrument (optional)" value={form.instrument} onChange={setField('instrument')} />
             <TextField label="Notes (optional)" value={form.notes} onChange={setField('notes')} />
           </div>
-          <p className="text-[11px] text-gray-500">
+          <p className="text-[11px] text-pl-muted">
             No clothing adjustment is applied: the clothing field is recorded for the file only.
           </p>
           {canSave !== false && (
@@ -123,11 +124,11 @@ export default function HeatTab({ orgId, form, setForm, sites, canSave, saveBloc
                   </div>
                   <Flag exceeds={a.exceeds} />
                   <Warnings items={a.warnings} />
-                  <div className="grid grid-cols-2 gap-2 border-t border-[#2d2d4a] pt-2">
+                  <div className="grid grid-cols-2 gap-2 border-t border-pl-border pt-2">
                     <Stat label="RAL at this rate (not acclimatized)" value={fmt(result.ral.limitWbgtC, 1)} unit="C WBGT" />
                     <Stat label="REL at this rate (acclimatized)" value={fmt(result.rel.limitWbgtC, 1)} unit="C WBGT" />
                   </div>
-                  <div className="text-[10px] text-gray-500">
+                  <div className="text-[10px] text-pl-muted">
                     WBGT: {result.periodWbgt[0]?.source}. Limits: {a.source}.
                   </div>
                 </div>
@@ -144,7 +145,7 @@ export default function HeatTab({ orgId, form, setForm, sites, canSave, saveBloc
                     <YAxis tick={{ fill: CHART.textSecondary, fontSize: 11 }} axisLine={false} tickLine={false} unit=" C" domain={['auto', 'auto']} />
                     <Tooltip
                       formatter={(v) => [`${fmt(v, 1)} C`, 'WBGT']}
-                      contentStyle={{ background: '#ffffff', border: `1px solid ${CHART.grid}`, borderRadius: 8, fontSize: 12, color: CHART.text }}
+                      contentStyle={TOOLTIP_STYLE}
                       cursor={{ fill: 'rgba(0,0,0,0.04)' }}
                     />
                     <ReferenceLine

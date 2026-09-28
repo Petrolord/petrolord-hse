@@ -7,7 +7,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { safetyStatsService, describeSaveError } from '@/services/safetyStatsService';
 import { WORKFORCES } from '@/lib/safetyStats/definitions';
 import { monthKeyOf } from '@/lib/safetyStats/aggregate';
-import { Pick, MonthField, Notice, fmtMonth, fmtHours, currentMonthKey, controlClass } from './common';
+import { Pick, MonthField, Notice, fmtMonth, fmtHours, currentMonthKey, controlClass, fieldClass } from './common';
 
 const NO_SITE = 'none';
 const workforceLabel = (id) => (WORKFORCES.find((w) => w.id === id) || {}).label || id;
@@ -54,44 +54,44 @@ function HoursForm({ open, initial, sites, onClose, onSaved, orgId }) {
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="bg-[#1a1a2e] text-white border-[#2d2d4a] max-w-lg">
+      <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>{form.id ? 'Edit exposure hours' : 'Add exposure hours'}</DialogTitle>
-          <DialogDescription className="text-slate-400">
+          <DialogDescription>
             Hours actually worked in one calendar month, from payroll, timesheets or the contractor's return.
           </DialogDescription>
         </DialogHeader>
-        <div className="grid grid-cols-2 gap-3 py-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 py-2">
           <MonthField label="Month" value={form.month} onChange={set('month')} />
           <Pick label="Workforce" value={form.workforce} onChange={set('workforce')} options={WORKFORCES.map((w) => ({ value: w.id, label: w.label }))} />
-          <Pick label="Site" value={form.siteId} onChange={set('siteId')} options={siteOptions} className="col-span-2" />
-          <label className="flex flex-col gap-1 text-xs text-gray-400">
+          <Pick label="Site" value={form.siteId} onChange={set('siteId')} options={siteOptions} className="sm:col-span-2" />
+          <label className="flex flex-col gap-1 text-xs text-pl-muted">
             <span>Hours worked</span>
             <Input type="number" min="0" step="any" value={form.hours} onChange={(e) => set('hours')(e.target.value)} className={controlClass} />
           </label>
-          <label className="flex flex-col gap-1 text-xs text-gray-400">
+          <label className="flex flex-col gap-1 text-xs text-pl-muted">
             <span>Headcount (optional)</span>
             <Input type="number" min="0" step="1" value={form.headcount} onChange={(e) => set('headcount')(e.target.value)} className={controlClass} />
           </label>
-          <label className="flex flex-col gap-1 text-xs text-gray-400 col-span-2">
+          <label className="flex flex-col gap-1 text-xs text-pl-muted sm:col-span-2">
             <span>Source (optional)</span>
             <Input value={form.source} placeholder="For example: payroll export, contractor monthly return" onChange={(e) => set('source')(e.target.value)} className={controlClass} />
           </label>
-          <label className="flex flex-col gap-1 text-xs text-gray-400 col-span-2">
+          <label className="flex flex-col gap-1 text-xs text-pl-muted sm:col-span-2">
             <span>Notes (optional)</span>
-            <textarea rows={2} value={form.notes} onChange={(e) => set('notes')(e.target.value)} className="w-full bg-[#151524] border border-[#2d2d4a] rounded-md p-2 text-sm text-white" />
+            <textarea rows={2} value={form.notes} onChange={(e) => set('notes')(e.target.value)} className={`w-full p-2 ${fieldClass}`} />
           </label>
         </div>
         {form.workforce === 'combined' && (
-          <p className="text-[11px] text-gray-500">
+          <p className="text-[11px] text-pl-muted">
             Enter either one combined figure or separate employee and contractor figures for a month and site. If both exist, the combined figure is used and the statistics flag it.
           </p>
         )}
-        {!valid && form.hours !== '' && <p className="text-xs text-amber-300">Hours must be a number above zero; headcount a whole number.</p>}
-        {error && <p className="text-xs text-red-400">{error}</p>}
+        {!valid && form.hours !== '' && <p className="text-xs text-pl-warning-text">Hours must be a number above zero; headcount a whole number.</p>}
+        {error && <p className="text-xs text-pl-danger-text">{error}</p>}
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>Cancel</Button>
-          <Button onClick={save} disabled={!valid || saving} className="bg-[#FFC107] text-black hover:bg-[#FFC107]/90">
+          <Button onClick={save} disabled={!valid || saving}>
             {saving ? 'Saving...' : 'Save'}
           </Button>
         </DialogFooter>
@@ -119,12 +119,12 @@ export default function ExposureHoursPanel({ orgId, rows, sites, canEdit, onChan
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h3 className="text-base font-semibold text-white">Exposure hours</h3>
-          <p className="text-xs text-gray-400">Every rate is events divided by hours worked. A month without a row here has no rate.</p>
+          <h3 className="text-base font-semibold text-pl-text">Exposure hours</h3>
+          <p className="text-xs text-pl-muted">Every rate is events divided by hours worked. A month without a row here has no rate.</p>
         </div>
         {canEdit && (
-          <Button onClick={() => setEditing(blank())} className="bg-[#FFC107] text-black hover:bg-[#FFC107]/90">
-            <Plus className="h-4 w-4 mr-2" /> Add hours
+          <Button onClick={() => setEditing(blank())}>
+            <Plus className="h-4 w-4 mr-2" aria-hidden="true" /> Add hours
           </Button>
         )}
       </div>
@@ -132,17 +132,17 @@ export default function ExposureHoursPanel({ orgId, rows, sites, canEdit, onChan
       {!canEdit && <Notice>Only a supervisor, manager or admin can enter hours. You can read them here.</Notice>}
 
       {rows.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-[#2d2d4a] bg-[#1e1e2d] py-12 text-center">
-          <Clock className="h-10 w-10 text-gray-600 mb-3" />
-          <p className="text-white font-medium">No exposure hours yet</p>
-          <p className="text-sm text-gray-400 max-w-md mt-1">
+        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-pl-border bg-pl-surface px-4 py-12 text-center">
+          <Clock className="h-10 w-10 text-pl-muted mb-3" aria-hidden="true" />
+          <p className="text-pl-text font-medium">No exposure hours yet</p>
+          <p className="text-sm text-pl-muted max-w-md mt-1">
             Add the hours worked for each month. Rates appear for every month that has hours; reports in other months are counted but left out of the rates.
           </p>
         </div>
       ) : (
-        <div className="rounded-xl border border-[#2d2d4a] bg-[#1e1e2d] overflow-x-auto">
+        <div className="rounded-xl border border-pl-border bg-pl-surface overflow-x-auto shadow-pl-sm">
           <table className="w-full text-sm">
-            <thead className="bg-[#252541] text-gray-400 uppercase text-xs">
+            <thead className="bg-pl-sunken text-pl-muted uppercase text-xs">
               <tr>
                 <th className="px-4 py-3 text-left">Month</th>
                 <th className="px-4 py-3 text-left">Site</th>
@@ -153,26 +153,26 @@ export default function ExposureHoursPanel({ orgId, rows, sites, canEdit, onChan
                 {canEdit && <th className="px-4 py-3 text-right">Actions</th>}
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#2d2d4a]">
+            <tbody className="divide-y divide-pl-border">
               {rows.map((r) => (
-                <tr key={r.id} className="text-gray-200">
-                  <td className="px-4 py-2 whitespace-nowrap text-white">{fmtMonth(monthKeyOf(r.period_start))}</td>
+                <tr key={r.id} className="text-pl-text">
+                  <td className="px-4 py-2 whitespace-nowrap text-pl-text">{fmtMonth(monthKeyOf(r.period_start))}</td>
                   <td className="px-4 py-2">{siteName(r.site_id)}</td>
                   <td className="px-4 py-2">{workforceLabel(r.workforce)}</td>
-                  <td className="px-4 py-2 text-right tabular-nums">{fmtHours(r.hours)}</td>
-                  <td className="px-4 py-2 text-right tabular-nums">{r.headcount ?? ''}</td>
-                  <td className="px-4 py-2 text-gray-400 max-w-[220px] truncate" title={[r.source, r.notes].filter(Boolean).join(' | ')}>{r.source || ''}</td>
+                  <td className="px-4 py-2 text-right font-pl-mono tabular-nums">{fmtHours(r.hours)}</td>
+                  <td className="px-4 py-2 text-right font-pl-mono tabular-nums">{r.headcount ?? 'n/a'}</td>
+                  <td className="px-4 py-2 text-pl-muted max-w-[220px] truncate" title={[r.source, r.notes].filter(Boolean).join(' | ')}>{r.source || ''}</td>
                   {canEdit && (
                     <td className="px-4 py-2 text-right whitespace-nowrap">
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-white" title="Edit"
+                      <Button variant="ghost" size="icon" className="h-8 w-8" title="Edit" aria-label="Edit"
                         onClick={() => setEditing({
                           id: r.id, month: monthKeyOf(r.period_start), siteId: r.site_id || NO_SITE, workforce: r.workforce,
                           hours: String(r.hours), headcount: r.headcount ?? '', source: r.source || '', notes: r.notes || '',
                         })}>
-                        <Pencil className="h-4 w-4" />
+                        <Pencil className="h-4 w-4" aria-hidden="true" />
                       </Button>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-red-400" title="Delete" onClick={() => setDeleting(r)}>
-                        <Trash2 className="h-4 w-4" />
+                      <Button variant="ghost" size="icon" className="h-8 w-8 hover:text-pl-danger-text" title="Delete" aria-label="Delete" onClick={() => setDeleting(r)}>
+                        <Trash2 className="h-4 w-4" aria-hidden="true" />
                       </Button>
                     </td>
                   )}
@@ -196,17 +196,17 @@ export default function ExposureHoursPanel({ orgId, rows, sites, canEdit, onChan
 
       {deleting && (
         <Dialog open onOpenChange={(o) => !o && setDeleting(null)}>
-          <DialogContent className="bg-[#1a1a2e] text-white border-[#2d2d4a]">
+          <DialogContent>
             <DialogHeader>
               <DialogTitle>Delete these hours?</DialogTitle>
-              <DialogDescription className="text-slate-400">
+              <DialogDescription>
                 {fmtMonth(monthKeyOf(deleting.period_start))}, {siteName(deleting.site_id)}, {workforceLabel(deleting.workforce)}: {fmtHours(deleting.hours)} h.
                 That month will have no rate until hours are entered again.
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
               <Button variant="outline" onClick={() => setDeleting(null)}>Cancel</Button>
-              <Button className="bg-red-600 hover:bg-red-700" onClick={confirmDelete}>Delete</Button>
+              <Button variant="destructive" onClick={confirmDelete}>Delete</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

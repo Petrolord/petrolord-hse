@@ -7,6 +7,8 @@ import LeaderboardTable from './leaderboard/LeaderboardTable';
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from '@/lib/customSupabaseClient';
 
+// Design family (batch 2C): the Leaderboard renders inside the signed-in
+// scope (src/design/rollout/w2c.js) on the theme roles.
 export default function LeaderboardModule() {
   const { currentOrganization, currentUser } = useHSE();
   const [leaderboardData, setLeaderboardData] = useState([]);
@@ -64,19 +66,19 @@ export default function LeaderboardModule() {
   if (!currentOrganization) return null;
 
   return (
-    <div className="flex flex-col h-full bg-[var(--bg-app)] overflow-hidden">
+    <div className="flex flex-col h-full bg-pl-bg text-pl-text overflow-hidden">
       {/* Header */}
-      <div className="p-6 border-b border-[#3a3a5a] bg-[#1a1a2e]">
+      <div className="p-4 sm:p-6 border-b border-pl-border bg-pl-surface">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-white">Leaderboard</h1>
-            <p className="text-sm text-gray-400">Track performance and earn recognition.</p>
+            <h1 className="font-pl-display text-2xl font-semibold text-pl-text">Leaderboard</h1>
+            <p className="text-sm text-pl-muted">Track performance and earn recognition.</p>
           </div>
           <Tabs value={period} onValueChange={setPeriod} className="w-full md:w-auto">
-            <TabsList className="bg-[#252541] border border-[#3a3a5a]">
-              <TabsTrigger value="all_time" className="data-[state=active]:bg-[#9C27B0]">All Time</TabsTrigger>
-              <TabsTrigger value="this_month" className="data-[state=active]:bg-[#9C27B0]">This Month</TabsTrigger>
-              <TabsTrigger value="this_week" className="data-[state=active]:bg-[#9C27B0]">This Week</TabsTrigger>
+            <TabsList className="w-full md:w-auto">
+              <TabsTrigger value="all_time" className="flex-1 md:flex-none">All Time</TabsTrigger>
+              <TabsTrigger value="this_month" className="flex-1 md:flex-none">This Month</TabsTrigger>
+              <TabsTrigger value="this_week" className="flex-1 md:flex-none">This Week</TabsTrigger>
             </TabsList>
           </Tabs>
         </div>
@@ -85,10 +87,10 @@ export default function LeaderboardModule() {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-hidden p-6">
+      <div className="flex-1 overflow-hidden p-4 sm:p-6">
         {loading ? (
-          <div className="flex items-center justify-center h-full text-white">
-            <Loader2 className="h-8 w-8 animate-spin text-[#9C27B0] mr-2" /> Loading ranking...
+          <div className="flex items-center justify-center h-full text-pl-muted">
+            <Loader2 className="h-8 w-8 animate-spin text-pl-muted mr-2" aria-hidden="true" /> Loading ranking...
           </div>
         ) : (
           <LeaderboardTable 
