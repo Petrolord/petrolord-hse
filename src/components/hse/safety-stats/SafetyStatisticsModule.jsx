@@ -18,7 +18,10 @@ import { Pick, MonthField, Notice, fmtMonth, currentMonthKey } from './common';
 export const STATS_EDITOR_ROLES = ['super_admin', 'org_admin', 'manager', 'supervisor'];
 const WINDOW = 12;
 
-const tabClass = 'data-[state=active]:border-b-2 data-[state=active]:border-amber-500 data-[state=active]:text-amber-400 rounded-none bg-transparent px-0 py-3 text-gray-400 hover:text-white transition-all gap-2';
+// Design family (batch 2B): the module renders inside the signed-in scope
+// (src/design/rollout/w2b.js), so it uses the theme roles directly. The tabs
+// keep their underline look on the roles.
+const tabClass = 'gap-2 rounded-none border-b-2 border-transparent bg-transparent px-0 py-3 text-pl-muted shadow-none hover:text-pl-text data-[state=active]:border-pl-primary data-[state=active]:bg-transparent data-[state=active]:text-pl-primary-text data-[state=active]:shadow-none';
 
 export default function SafetyStatisticsModule() {
   const { currentOrganization, role } = useHSE();
@@ -89,28 +92,28 @@ export default function SafetyStatisticsModule() {
   const siteName = (id) => (siteOptions.find((o) => o.value === id) || {}).label || 'Unknown site';
 
   const header = (
-    <div className="flex flex-col border-b border-[#3a3a5a] bg-[#1a1a2e]">
+    <div className="flex flex-col border-b border-pl-border bg-pl-surface">
       <div className="flex flex-wrap items-center justify-between gap-3 p-4">
-        <div className="flex items-center gap-4">
-          <div className="bg-amber-500/20 p-2 rounded-lg">
-            <Gauge className="h-6 w-6 text-amber-500" />
+        <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+          <div className="hidden sm:block bg-pl-sunken p-2 rounded-lg">
+            <Gauge className="h-6 w-6 text-pl-muted" aria-hidden="true" />
           </div>
-          <div>
-            <h2 className="text-xl font-bold text-white">Safety Statistics</h2>
-            <p className="text-xs text-gray-400">TRIR, DART, LTIF, FAR, severity and process safety event rates from your classified reports and hours worked</p>
+          <div className="min-w-0">
+            <h2 className="font-pl-display text-2xl font-semibold text-pl-text">Safety Statistics</h2>
+            <p className="text-xs text-pl-muted">TRIR, DART, LTIF, FAR, severity and process safety event rates from your classified reports and hours worked</p>
           </div>
         </div>
-        <Button variant="outline" size="sm" onClick={load} disabled={loading} className="bg-transparent border-[#3a3a5a] text-gray-300">
-          <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} /> Refresh
+        <Button variant="outline" size="sm" onClick={load} disabled={loading}>
+          <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} aria-hidden="true" /> Refresh
         </Button>
       </div>
-      <div className="px-4">
+      <div className="px-4 overflow-x-auto">
         <Tabs value={tab} onValueChange={setTab}>
-          <TabsList className="bg-transparent border-b-0 h-auto p-0 space-x-6">
-            <TabsTrigger value="overview" className={tabClass}><LayoutDashboard className="h-4 w-4" /> Rates</TabsTrigger>
-            <TabsTrigger value="trends" className={tabClass}><TrendingUp className="h-4 w-4" /> Trends</TabsTrigger>
-            <TabsTrigger value="compare" className={tabClass}><GitCompare className="h-4 w-4" /> Compare</TabsTrigger>
-            <TabsTrigger value="hours" className={tabClass}><Clock className="h-4 w-4" /> Exposure hours</TabsTrigger>
+          <TabsList className="h-auto justify-start gap-6 rounded-none border-0 bg-transparent p-0">
+            <TabsTrigger value="overview" className={tabClass}><LayoutDashboard className="h-4 w-4" aria-hidden="true" /> Rates</TabsTrigger>
+            <TabsTrigger value="trends" className={tabClass}><TrendingUp className="h-4 w-4" aria-hidden="true" /> Trends</TabsTrigger>
+            <TabsTrigger value="compare" className={tabClass}><GitCompare className="h-4 w-4" aria-hidden="true" /> Compare</TabsTrigger>
+            <TabsTrigger value="hours" className={tabClass}><Clock className="h-4 w-4" aria-hidden="true" /> Exposure hours</TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
@@ -118,7 +121,7 @@ export default function SafetyStatisticsModule() {
   );
 
   const filters = (
-    <div className="flex flex-wrap items-end gap-3 rounded-xl border border-[#2d2d4a] bg-[#1e1e2d] p-4">
+    <div className="flex flex-wrap items-end gap-3 rounded-xl border border-pl-border bg-pl-surface p-4 shadow-pl-sm">
       <MonthField label="From" value={from} max={to} onChange={setFrom} />
       <MonthField label="To" value={to} min={from} onChange={setTo} />
       <Pick label="Site" value={siteId} onChange={setSiteId} options={siteOptions} className="min-w-[180px]" />
@@ -166,7 +169,7 @@ export default function SafetyStatisticsModule() {
   if (!orgId) {
     body = <Notice>Select an organization to see its safety statistics.</Notice>;
   } else if (loading) {
-    body = <div className="py-16 text-center text-gray-400">Loading safety statistics...</div>;
+    body = <div className="py-16 text-center text-pl-muted">Loading safety statistics...</div>;
   } else if (schemaMissing) {
     body = (
       <Notice tone="warn" title="Safety statistics are not switched on yet">
@@ -181,12 +184,12 @@ export default function SafetyStatisticsModule() {
       <div className="space-y-4">
         {filters}
         {coverage}
-        <div className="text-xs text-gray-400">
+        <div className="text-xs text-pl-muted">
           {fmtMonth(from)} to {fmtMonth(to)} · {siteName(siteId)} · {(WORKFORCES.find((w) => w.id === workforce) || {}).label}
           {' '}· {series.all.reports} reports, {series.all.classified} classified · {Math.round(series.hours).toLocaleString()} hours in {series.monthsWithHours} month(s)
         </div>
         <RateCards rates={rates} />
-        <p className="text-[11px] text-gray-500">
+        <p className="text-[11px] text-pl-muted">
           Each rate is events times its base over hours worked, summed over the months that have hours. The interval is the Garwood exact 95% interval for a Poisson count: with few events it is wide, and that width is real.
           LTIF is always per 1,000,000 hours and FAR per 100,000,000.
         </p>
@@ -215,7 +218,7 @@ export default function SafetyStatisticsModule() {
   } else if (tab === 'compare') {
     body = (
       <div className="space-y-4">
-        <div className="flex flex-wrap items-end gap-3 rounded-xl border border-[#2d2d4a] bg-[#1e1e2d] p-4">
+        <div className="flex flex-wrap items-end gap-3 rounded-xl border border-pl-border bg-pl-surface p-4 shadow-pl-sm">
           <Pick label="Workforce" value={workforce} onChange={setWorkforce} options={WORKFORCES.map((w) => ({ value: w.id, label: w.label }))} className="min-w-[200px]" />
           <Pick
             label="Base"
@@ -244,9 +247,9 @@ export default function SafetyStatisticsModule() {
   }
 
   return (
-    <div className="flex h-[calc(100vh-64px)] overflow-hidden bg-[var(--bg-app)] flex-col">
+    <div className="flex h-[calc(100vh-64px)] overflow-hidden bg-pl-bg text-pl-text flex-col">
       {header}
-      <div className="flex-1 overflow-auto p-6 max-w-[1600px] w-full mx-auto">{body}</div>
+      <div className="flex-1 overflow-auto p-4 sm:p-6 max-w-[1600px] w-full mx-auto">{body}</div>
     </div>
   );
 }

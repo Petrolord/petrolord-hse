@@ -28,15 +28,15 @@ export default function SaveBar({ isEdit, blocker, onSave, onNew, savedTitle }) 
 
   return (
     <div className="flex flex-wrap items-center gap-3">
-      <Button onClick={save} disabled={!!blocker || saving} className="bg-[#FFC107] text-black hover:bg-[#FFC107]/90">
-        <Save className="h-4 w-4 mr-2" /> {saving ? 'Saving...' : isEdit ? 'Save changes' : 'Save record'}
+      <Button onClick={save} disabled={!!blocker || saving}>
+        <Save className="h-4 w-4 mr-2" aria-hidden="true" /> {saving ? 'Saving...' : isEdit ? 'Save changes' : 'Save record'}
       </Button>
-      <Button variant="outline" onClick={onNew} className="bg-transparent border-[#3a3a5a] text-gray-300">
-        <FilePlus2 className="h-4 w-4 mr-2" /> New
+      <Button variant="outline" onClick={onNew}>
+        <FilePlus2 className="h-4 w-4 mr-2" aria-hidden="true" /> New
       </Button>
-      {isEdit && <span className="text-xs text-sky-300">Editing a saved record</span>}
-      {blocker && <span className="text-xs text-gray-400">{blocker}</span>}
-      {error && <span className="text-xs text-red-400">{error}</span>}
+      {isEdit && <span className="text-xs text-pl-info-text">Editing a saved record</span>}
+      {blocker && <span className="text-xs text-pl-muted">{blocker}</span>}
+      {error && <span className="text-xs text-pl-danger-text">{error}</span>}
     </div>
   );
 }

@@ -108,26 +108,26 @@ export default function RecordsTab({ orgId, records, sites, canEdit, onOpen, onC
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-end gap-3 rounded-xl border border-[#2d2d4a] bg-[#1e1e2d] p-4">
+      <div className="flex flex-wrap items-end gap-3 rounded-xl border border-pl-border bg-pl-surface p-4 shadow-pl-sm">
         <Pick label="Type" value={kind} onChange={setKind} className="min-w-[160px]" options={[
           { value: 'all', label: 'All types' }, { value: 'noise', label: 'Noise' }, { value: 'chemical', label: 'Chemical' }, { value: 'heat', label: 'Heat' },
         ]} />
         <Pick label="Site" value={siteId} onChange={setSiteId} className="min-w-[180px]" options={[
           { value: 'all', label: 'All sites' }, { value: 'none', label: 'No site' }, ...sites.map((s) => ({ value: s.id, label: s.name })),
         ]} />
-        <div className="text-xs text-gray-400 pb-2">{shown.length} of {list.length} records. Results are recomputed from the stored measurements every time.</div>
+        <div className="text-xs text-pl-muted pb-2">{shown.length} of {list.length} records. Results are recomputed from the stored measurements every time.</div>
       </div>
 
       {shown.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-[#2d2d4a] bg-[#1e1e2d] py-12 text-center">
-          <ClipboardList className="h-10 w-10 text-gray-600 mb-3" />
-          <p className="text-white font-medium">No hygiene records yet</p>
-          <p className="text-sm text-gray-400 max-w-md mt-1">Enter a noise, chemical or heat measurement on its tab and save it. It will be listed here.</p>
+        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-pl-border bg-pl-surface px-4 py-12 text-center">
+          <ClipboardList className="h-10 w-10 text-pl-muted mb-3" aria-hidden="true" />
+          <p className="text-pl-text font-medium">No hygiene records yet</p>
+          <p className="text-sm text-pl-muted max-w-md mt-1">Enter a noise, chemical or heat measurement on its tab and save it. It will be listed here.</p>
         </div>
       ) : (
-        <div className="rounded-xl border border-[#2d2d4a] bg-[#1e1e2d] overflow-x-auto">
+        <div className="rounded-xl border border-pl-border bg-pl-surface overflow-x-auto shadow-pl-sm">
           <table className="w-full text-sm">
-            <thead className="bg-[#252541] text-gray-400 uppercase text-xs">
+            <thead className="bg-pl-sunken text-pl-muted uppercase text-xs">
               <tr>
                 <th className="px-4 py-3 text-left">Date</th>
                 <th className="px-4 py-3 text-left">Type</th>
@@ -138,24 +138,24 @@ export default function RecordsTab({ orgId, records, sites, canEdit, onOpen, onC
                 <th className="px-4 py-3 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#2d2d4a]">
+            <tbody className="divide-y divide-pl-border">
               {shown.map((r) => {
                 const K = KIND[r.kind];
                 return (
-                  <tr key={r.key} className="text-gray-200 align-top">
-                    <td className="px-4 py-2 whitespace-nowrap text-white">{r.date}</td>
-                    <td className="px-4 py-2 whitespace-nowrap"><K.icon className="inline h-4 w-4 mr-1 text-gray-400" />{K.label}</td>
+                  <tr key={r.key} className="text-pl-text align-top">
+                    <td className="px-4 py-2 whitespace-nowrap text-pl-text font-pl-mono tabular-nums">{r.date}</td>
+                    <td className="px-4 py-2 whitespace-nowrap"><K.icon className="inline h-4 w-4 mr-1 text-pl-muted" aria-hidden="true" />{K.label}</td>
                     <td className="px-4 py-2">{r.rows[0].subject_label}</td>
-                    <td className="px-4 py-2 text-gray-400">{siteName(r.rows[0].site_id)}</td>
-                    <td className="px-4 py-2 text-gray-300 max-w-[420px]">{r.text}</td>
+                    <td className="px-4 py-2 text-pl-muted">{siteName(r.rows[0].site_id) || 'n/a'}</td>
+                    <td className="px-4 py-2 text-pl-text max-w-[420px]">{r.text}</td>
                     <td className="px-4 py-2"><Flag exceeds={r.exceeds} yes={r.yes} no={r.no} /></td>
                     <td className="px-4 py-2 text-right whitespace-nowrap">
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-white" title="Open" onClick={() => onOpen(r.kind, r.rows)}>
-                        <FolderOpen className="h-4 w-4" />
+                      <Button variant="ghost" size="icon" className="h-8 w-8" title="Open" aria-label="Open" onClick={() => onOpen(r.kind, r.rows)}>
+                        <FolderOpen className="h-4 w-4" aria-hidden="true" />
                       </Button>
                       {canEdit && (
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-red-400" title="Delete" onClick={() => setDeleting(r)}>
-                          <Trash2 className="h-4 w-4" />
+                        <Button variant="ghost" size="icon" className="h-8 w-8 hover:text-pl-danger-text" title="Delete" aria-label="Delete" onClick={() => setDeleting(r)}>
+                          <Trash2 className="h-4 w-4" aria-hidden="true" />
                         </Button>
                       )}
                     </td>
@@ -169,17 +169,17 @@ export default function RecordsTab({ orgId, records, sites, canEdit, onOpen, onC
 
       {deleting && (
         <Dialog open onOpenChange={(o) => !o && setDeleting(null)}>
-          <DialogContent className="bg-[#1a1a2e] text-white border-[#2d2d4a]">
+          <DialogContent>
             <DialogHeader>
               <DialogTitle>Delete this record?</DialogTitle>
-              <DialogDescription className="text-slate-400">
+              <DialogDescription>
                 {KIND[deleting.kind].label}, {deleting.date}, {deleting.rows[0].subject_label}
                 {deleting.rows.length > 1 ? ` (${deleting.rows.length} agents)` : ''}. This cannot be undone.
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
               <Button variant="outline" onClick={() => setDeleting(null)}>Cancel</Button>
-              <Button className="bg-red-600 hover:bg-red-700" onClick={confirmDelete}>Delete</Button>
+              <Button variant="destructive" onClick={confirmDelete}>Delete</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

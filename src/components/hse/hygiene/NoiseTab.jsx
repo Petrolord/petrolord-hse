@@ -7,6 +7,7 @@ import {
   evaluateNoise, isRefusal, PROTECTOR_METHODS, PROTECTOR_TYPES, EU_NOISE_VALUES, NOISE_CRITERIA,
 } from '@/lib/hygiene/evaluate';
 import { hygieneService } from '@/services/hygieneService';
+import { TOOLTIP_STYLE } from '@/utils/chartTheme';
 import { ChartCard, CHART } from '../safety-stats/common';
 import {
   Panel, PeriodTable, Pick, TextField, Refusal, Warnings, Flag, Stat, SampleHeader, SERIES, fmt, Notice,
@@ -25,11 +26,11 @@ const SHORT = { OSHA_PEL: 'OSHA PEL', OSHA_ACTION_LEVEL: 'OSHA action level', NI
 function CriterionCard({ entry, primary }) {
   const { criterion, result } = entry;
   return (
-    <div className={`rounded-lg border p-3 space-y-2 ${primary ? 'border-amber-500/50 bg-amber-500/5' : 'border-[#2d2d4a] bg-[#151524]'}`}>
+    <div className={`rounded-lg border p-3 space-y-2 ${primary ? 'border-pl-primary bg-pl-surface ring-1 ring-pl-primary' : 'border-pl-border bg-pl-sunken'}`}>
       <div className="flex items-start justify-between gap-2">
         <div>
-          <div className="text-sm font-semibold text-white">{SHORT[entry.id]}</div>
-          <div className="text-[11px] text-gray-500">
+          <div className="text-sm font-semibold text-pl-text">{SHORT[entry.id]}</div>
+          <div className="text-[11px] text-pl-muted">
             {criterion.criterionLevelDbA} dBA criterion, {criterion.exchangeRateDb} dB exchange rate, {criterion.thresholdDbA} dBA threshold, limit {criterion.limitDosePct}% dose
           </div>
         </div>
@@ -44,7 +45,7 @@ function CriterionCard({ entry, primary }) {
           <Warnings items={result.warnings} />
         </>
       )}
-      <div className="text-[10px] text-gray-500">Source: {criterion.source}</div>
+      <div className="text-[10px] text-pl-muted">Source: {criterion.source}</div>
     </div>
   );
 }
@@ -155,24 +156,24 @@ export default function NoiseTab({ orgId, form, setForm, sites, canSave, saveBlo
 
             <Panel title="EU / UK daily exposure (LEX,8h)" subtitle="Each period's level taken as its LAeq, normalised to 8 hours.">
               {isRefusal(lex) ? <Refusal result={lex} /> : (
-                <div className={`rounded-lg border p-3 space-y-2 ${form.criterion === 'EU_LEX' ? 'border-amber-500/50 bg-amber-500/5' : 'border-[#2d2d4a] bg-[#151524]'}`}>
+                <div className={`rounded-lg border p-3 space-y-2 ${form.criterion === 'EU_LEX' ? 'border-pl-primary bg-pl-surface ring-1 ring-pl-primary' : 'border-pl-border bg-pl-sunken'}`}>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     <Stat label="LEX,8h" value={fmt(lex.lexDbA, 1)} unit="dB(A)" />
                     <Stat label="Exposure points" value={fmt(lex.exposurePoints, 0)} sub="100 points = 85 dB(A)" />
                     <div className="space-y-1">
-                      <div className="text-[11px] uppercase tracking-wide text-gray-500">Lower action value {EU_NOISE_VALUES.lowerActionLexDbA}</div>
+                      <div className="text-[11px] uppercase tracking-wide text-pl-muted">Lower action value {EU_NOISE_VALUES.lowerActionLexDbA}</div>
                       <Flag exceeds={lex.exceedsLowerAction} yes="Reached" no="Below" />
                     </div>
                     <div className="space-y-1">
-                      <div className="text-[11px] uppercase tracking-wide text-gray-500">Upper action value {EU_NOISE_VALUES.upperActionLexDbA}</div>
+                      <div className="text-[11px] uppercase tracking-wide text-pl-muted">Upper action value {EU_NOISE_VALUES.upperActionLexDbA}</div>
                       <Flag exceeds={lex.exceedsUpperAction} yes="Reached" no="Below" />
                     </div>
                   </div>
-                  <p className="text-[11px] text-gray-500">
+                  <p className="text-[11px] text-pl-muted">
                     The exposure limit value is {EU_NOISE_VALUES.limitLexDbA} dB(A), and the Regulations judge it after the effect of hearing protection.
                     Per period points: {lex.contributions.map((c, i) => `${i + 1}: ${fmt(c.exposurePoints, 0)}`).join(', ')}.
                   </p>
-                  <div className="text-[10px] text-gray-500">Source: {EU_NOISE_VALUES.source}; exposure points per HSE L108 Appendix 3</div>
+                  <div className="text-[10px] text-pl-muted">Source: {EU_NOISE_VALUES.source}; exposure points per HSE L108 Appendix 3</div>
                 </div>
               )}
             </Panel>
@@ -182,11 +183,11 @@ export default function NoiseTab({ orgId, form, setForm, sites, canSave, saveBlo
                 {isRefusal(al) ? <Refusal result={al} /> : (
                   <div className="space-y-1">
                     <Stat label={`Action level for a ${fmt(al.shiftHours, 1)} hour shift`} value={fmt(al.actionLevelDbA, 1)} unit="dBA" />
-                    <p className="text-[11px] text-gray-500">
+                    <p className="text-[11px] text-pl-muted">
                       A steady level held for the whole shift at this value reaches the 50% action level dose. The OSHA action level dose above
                       already counts every hour of the shift; the PEL is not reduced for a long shift.
                     </p>
-                    <div className="text-[10px] text-gray-500">Source: {al.source}</div>
+                    <div className="text-[10px] text-pl-muted">Source: {al.source}</div>
                   </div>
                 )}
               </Panel>
@@ -203,7 +204,7 @@ export default function NoiseTab({ orgId, form, setForm, sites, canSave, saveBlo
                         <Stat label="Estimated under protector" value={fmt(prot.result.protectedDbA, 1)} unit="dBA" />
                       </div>
                       <Warnings items={prot.result.warnings} />
-                      <div className="text-[10px] text-gray-500">Method: {prot.result.method}. Source: {prot.result.source}</div>
+                      <div className="text-[10px] text-pl-muted">Method: {prot.result.method}. Source: {prot.result.source}</div>
                     </div>
                   )}
               </Panel>
@@ -218,7 +219,7 @@ export default function NoiseTab({ orgId, form, setForm, sites, canSave, saveBlo
                     <YAxis tick={{ fill: CHART.textSecondary, fontSize: 11 }} axisLine={false} tickLine={false} unit="%" />
                     <Tooltip
                       formatter={(v, name) => [`${fmt(v, 1)}%`, SHORT[name] || name]}
-                      contentStyle={{ background: '#ffffff', border: `1px solid ${CHART.grid}`, borderRadius: 8, fontSize: 12, color: CHART.text }}
+                      contentStyle={TOOLTIP_STYLE}
                       cursor={{ fill: 'rgba(0,0,0,0.04)' }}
                     />
                     <Legend formatter={(v) => <span style={{ color: CHART.text }}>{SHORT[v] || v}</span>} />

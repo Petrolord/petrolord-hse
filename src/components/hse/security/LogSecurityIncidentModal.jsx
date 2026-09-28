@@ -84,39 +84,38 @@ export default function LogSecurityIncidentModal({ isOpen, onClose, onSuccess, u
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[700px] bg-[#1a1a2e] border-[#3a3a5a] text-white">
+      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Log Security Incident</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-[#b0b0c0]">Title *</Label>
+              <Label>Title *</Label>
               <Input 
                 value={formData.title} 
                 onChange={(e) => handleChange('title', e.target.value)}
                 placeholder="Brief title"
-                className="bg-[#252541] border-[#3a3a5a] text-white"
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-[#b0b0c0]">Incident ID</Label>
+              <Label>Incident ID</Label>
               <Input 
                 value={formData.incident_code} 
                 disabled
-                className="bg-[#141423] border-[#3a3a5a] text-gray-400 font-mono"
+                className="bg-pl-sunken text-pl-muted font-pl-mono"
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-[#b0b0c0]">Type *</Label>
+              <Label>Type *</Label>
               <Select value={formData.type} onValueChange={(val) => handleChange('type', val)}>
-                <SelectTrigger className="bg-[#252541] border-[#3a3a5a] text-white">
+                <SelectTrigger>
                   <SelectValue placeholder="Select Type" />
                 </SelectTrigger>
-                <SelectContent className="bg-[#252541] border-[#3a3a5a] text-white">
+                <SelectContent>
                   <SelectItem value="Unauthorized Access">Unauthorized Access</SelectItem>
                   <SelectItem value="Theft">Theft/Loss</SelectItem>
                   <SelectItem value="Data Breach">Data Breach</SelectItem>
@@ -126,12 +125,12 @@ export default function LogSecurityIncidentModal({ isOpen, onClose, onSuccess, u
               </Select>
             </div>
             <div className="space-y-2">
-              <Label className="text-[#b0b0c0]">Severity *</Label>
+              <Label>Severity *</Label>
               <Select value={formData.severity} onValueChange={(val) => handleChange('severity', val)}>
-                <SelectTrigger className="bg-[#252541] border-[#3a3a5a] text-white">
+                <SelectTrigger>
                   <SelectValue placeholder="Select Severity" />
                 </SelectTrigger>
-                <SelectContent className="bg-[#252541] border-[#3a3a5a] text-white">
+                <SelectContent>
                   <SelectItem value="Low">Low</SelectItem>
                   <SelectItem value="Medium">Medium</SelectItem>
                   <SelectItem value="High">High</SelectItem>
@@ -141,41 +140,39 @@ export default function LogSecurityIncidentModal({ isOpen, onClose, onSuccess, u
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-[#b0b0c0]">Date</Label>
+              <Label>Date</Label>
               <Input 
                 type="date" 
                 value={formData.date} 
                 onChange={(e) => handleChange('date', e.target.value)}
-                className="bg-[#252541] border-[#3a3a5a] text-white"
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-[#b0b0c0]">Time</Label>
+              <Label>Time</Label>
               <Input 
                 type="time" 
                 value={formData.time} 
                 onChange={(e) => handleChange('time', e.target.value)}
-                className="bg-[#252541] border-[#3a3a5a] text-white"
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label className="text-[#b0b0c0]">Description</Label>
+            <Label>Description</Label>
             <Textarea 
               value={formData.description} 
               onChange={(e) => handleChange('description', e.target.value)}
               placeholder="What happened? Include as much detail as possible..."
-              className="bg-[#252541] border-[#3a3a5a] text-white min-h-[100px]"
+              className="min-h-[100px]"
             />
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="ghost" onClick={onClose} className="text-[#b0b0c0] hover:text-white">Cancel</Button>
-            <Button type="submit" disabled={loading} className="bg-red-600 hover:bg-red-700 text-white">
-              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            <Button type="button" variant="ghost" onClick={onClose}>Cancel</Button>
+            <Button type="submit" disabled={loading}>
+              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />}
               Submit Report
             </Button>
           </DialogFooter>

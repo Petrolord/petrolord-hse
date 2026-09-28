@@ -22,22 +22,22 @@ export default function TeamSecurityDashboard() {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="bg-[#1e1e30] border-[#2a2a40]">
+        <Card>
           <CardContent className="p-6">
-            <h3 className="text-gray-400 text-sm uppercase">Team Avg Risk</h3>
-            <p className="text-xl font-semibold text-gray-400 mt-2">No data yet</p>
+            <h3 className="text-pl-muted text-sm font-semibold uppercase">Team Avg Risk</h3>
+            <p className="text-xl font-semibold text-pl-muted mt-2">No data yet</p>
           </CardContent>
         </Card>
-        <Card className="bg-[#1e1e30] border-[#2a2a40]">
+        <Card>
           <CardContent className="p-6">
-            <h3 className="text-gray-400 text-sm uppercase">Training Compliance</h3>
-            <p className="text-xl font-semibold text-gray-400 mt-2">No data yet</p>
+            <h3 className="text-pl-muted text-sm font-semibold uppercase">Training Compliance</h3>
+            <p className="text-xl font-semibold text-pl-muted mt-2">No data yet</p>
           </CardContent>
         </Card>
-        <Card className="bg-[#1e1e30] border-[#2a2a40]">
+        <Card>
           <CardContent className="p-6">
-            <h3 className="text-gray-400 text-sm uppercase">Open Incidents</h3>
-            <p className="text-3xl font-bold text-yellow-400 mt-2">{openIncidents === null ? '--' : openIncidents}</p>
+            <h3 className="text-pl-muted text-sm font-semibold uppercase">Open Incidents</h3>
+            <p className="font-pl-mono tabular-nums text-3xl font-semibold text-pl-text mt-2">{openIncidents === null ? 'n/a' : openIncidents}</p>
           </CardContent>
         </Card>
       </div>
