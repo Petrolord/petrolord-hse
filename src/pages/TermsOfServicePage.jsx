@@ -2,6 +2,7 @@ import React from 'react';
 import { Helmet } from 'react-helmet';
 import PublicNavbar from '@/components/layout/PublicNavbar';
 import PublicFooter from '@/components/layout/PublicFooter';
+import { PublicPage } from '@/components/public/PublicPage';
 import DocumentationHeader from '@/components/documentation/DocumentationHeader';
 import TableOfContents from '@/components/documentation/TableOfContents';
 import DocumentationSection from '@/components/documentation/DocumentationSection';
@@ -30,13 +31,12 @@ const sections = [
 
 export default function TermsOfServicePage() {
   return (
-    <div className="min-h-screen bg-[#1a1a2e] text-[#b0b0c0] font-sans">
+    // Batch 3C: the public frame (always light) with the site navigation and footer.
+    <PublicPage testId="terms-of-service-theme-scope" header={<PublicNavbar />} footer={<PublicFooter />}>
       <Helmet>
         <title>Terms of Service - Petrolord HSE</title>
         <meta name="description" content="Terms of Service for Petrolord HSE. Read strict guidelines regarding usage, liability, and user responsibilities." />
       </Helmet>
-
-      <PublicNavbar />
 
       <DocumentationHeader
         title="Terms of Service"
@@ -53,7 +53,7 @@ export default function TermsOfServicePage() {
           </aside>
 
           {/* Content */}
-          <main className="lg:col-span-9 max-w-4xl">
+          <article className="lg:col-span-9 max-w-4xl min-w-0">
             <DocumentationSection id="introduction" title="1. Introduction & Acceptance">
               <p>
                 These Terms of Service ("Terms") constitute a legally binding agreement between you ("User," "you," or "your") and Petrolord HSE ("we," "our," "us"). By accessing or using the Petrolord HSE website and platform (collectively, the "Service"), you agree to be bound by these Terms.
@@ -187,16 +187,14 @@ export default function TermsOfServicePage() {
 
             <DocumentationSection id="contact" title="19. Contact & Support">
               <p>For support or questions regarding these Terms, please contact us:</p>
-              <ul className="list-none space-y-2 mt-4 text-white">
+              <ul className="list-none space-y-2 mt-4 text-pl-text">
                 <li><strong>Email:</strong> legal@petrolord.com</li>
                 <li><strong>Support:</strong> support@petrolord.com</li>
               </ul>
             </DocumentationSection>
-          </main>
+          </article>
         </div>
       </div>
-
-      <PublicFooter />
-    </div>
+    </PublicPage>
   );
 }

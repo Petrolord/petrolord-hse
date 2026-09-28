@@ -2,6 +2,7 @@ import React from 'react';
 import { Helmet } from 'react-helmet';
 import PublicNavbar from '@/components/layout/PublicNavbar';
 import PublicFooter from '@/components/layout/PublicFooter';
+import { PublicPage } from '@/components/public/PublicPage';
 import DocumentationHeader from '@/components/documentation/DocumentationHeader';
 import TableOfContents from '@/components/documentation/TableOfContents';
 import DocumentationSection from '@/components/documentation/DocumentationSection';
@@ -24,13 +25,12 @@ const sections = [
 
 export default function PrivacyPolicyPage() {
   return (
-    <div className="min-h-screen bg-[#1a1a2e] text-[#b0b0c0] font-sans">
+    // Batch 3C: the public frame (always light) with the site navigation and footer.
+    <PublicPage testId="privacy-policy-theme-scope" header={<PublicNavbar />} footer={<PublicFooter />}>
       <Helmet>
         <title>Privacy Policy - Petrolord HSE</title>
         <meta name="description" content="Privacy Policy for Petrolord HSE. Learn how we collect, use, and protect your personal and organizational data." />
       </Helmet>
-
-      <PublicNavbar />
 
       <DocumentationHeader
         title="Privacy Policy"
@@ -47,7 +47,7 @@ export default function PrivacyPolicyPage() {
           </aside>
 
           {/* Content */}
-          <main className="lg:col-span-9 max-w-4xl">
+          <article className="lg:col-span-9 max-w-4xl min-w-0">
             <DocumentationSection id="introduction" title="1. Introduction">
               <p>
                 Welcome to Petrolord HSE ("we," "our," or "us"). We value the trust you place in us when you use our health, safety, and environment management platform (the "Service"). This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website or use our Service.
@@ -156,15 +156,13 @@ export default function PrivacyPolicyPage() {
 
             <DocumentationSection id="contact" title="13. Contact Us">
               <p>If you have any questions about this Privacy Policy, please contact us:</p>
-              <ul className="list-none space-y-2 mt-4 text-white">
+              <ul className="list-none space-y-2 mt-4 text-pl-text">
                 <li><strong>By email:</strong> privacy@petrolord.com</li>
               </ul>
             </DocumentationSection>
-          </main>
+          </article>
         </div>
       </div>
-
-      <PublicFooter />
-    </div>
+    </PublicPage>
   );
 }

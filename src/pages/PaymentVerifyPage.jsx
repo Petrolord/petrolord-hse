@@ -5,6 +5,10 @@ import { CheckCircle2, Loader2, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useHSE } from '@/context/HSEContext';
 import { verifyPayment } from '@/services/billingService';
+import { cn } from '@/lib/utils';
+import {
+  PublicPage, AUTH_CARD, AUTH_COLUMN, AUTH_ICON_TILE, TEXT_LINK,
+} from '@/components/public/PublicPage';
 
 // Landing page for provider redirects after checkout:
 //   /payment/verify?provider=paystack&quote_id=QT-HSE-...&reference=...&trxref=...
@@ -53,46 +57,54 @@ export default function PaymentVerifyPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Batch 3C: the public frame (always light, ink brand bar). Each state
+  // pairs its icon colour with a worded heading.
   return (
-    <div className="min-h-screen bg-[#1a1a2e] text-white flex items-center justify-center px-4">
+    <PublicPage testId="payment-verify-theme-scope">
       <Helmet><title>Confirming payment - Petrolord HSE</title></Helmet>
-      <div className="max-w-md w-full p-8 rounded-xl bg-[#1f1f35] border border-[#3a3a5a] text-center">
-        {state === 'verifying' && (
-          <>
-            <Loader2 className="h-12 w-12 text-[#FFC107] animate-spin mx-auto mb-4" />
-            <h1 className="text-2xl font-bold mb-2">Confirming your payment…</h1>
-            <p className="text-[#b0b0c0] text-sm">This usually takes a few seconds. Please don't close this page.</p>
-          </>
-        )}
-        {state === 'success' && (
-          <>
-            <CheckCircle2 className="h-12 w-12 text-emerald-400 mx-auto mb-4" />
-            <h1 className="text-2xl font-bold mb-2">You're on Professional!</h1>
-            <p className="text-[#b0b0c0] text-sm mb-6">Payment confirmed and your organization's upgrade is active. A receipt has been emailed to you.</p>
-            <Button onClick={() => navigate('/dashboard')} className="w-full h-12 bg-[#FFC107] hover:bg-[#FFD54F] text-[#1a1a2e] font-bold">
-              Go to dashboard
-            </Button>
-          </>
-        )}
-        {state === 'failed' && (
-          <>
-            <XCircle className="h-12 w-12 text-red-400 mx-auto mb-4" />
-            <h1 className="text-2xl font-bold mb-2">Payment not confirmed</h1>
-            <p className="text-[#b0b0c0] text-sm mb-6">{message}</p>
-            <div className="flex flex-col gap-3">
-              <Button onClick={runVerify} className="w-full h-11 bg-[#FFC107] hover:bg-[#FFD54F] text-[#1a1a2e] font-bold">
-                Check again
+      <div className={AUTH_COLUMN}>
+        <div className={cn(AUTH_CARD, 'w-full max-w-md text-center')} role={state === 'verifying' ? 'status' : undefined}>
+          {state === 'verifying' && (
+            <>
+              <Loader2 className="h-12 w-12 text-pl-accent-text animate-spin mx-auto mb-4" aria-hidden="true" />
+              <h1 className="text-2xl font-semibold text-pl-text mb-2">Confirming your payment…</h1>
+              <p className="text-pl-muted text-sm">This usually takes a few seconds. Please don't close this page.</p>
+            </>
+          )}
+          {state === 'success' && (
+            <>
+              <div className={cn(AUTH_ICON_TILE, 'bg-pl-success-bg')}>
+                <CheckCircle2 className="h-8 w-8 text-pl-success-text" aria-hidden="true" />
+              </div>
+              <h1 className="text-2xl font-semibold text-pl-text mb-2">You're on Professional!</h1>
+              <p className="text-pl-muted text-sm mb-6">Payment confirmed and your organization's upgrade is active. A receipt has been emailed to you.</p>
+              <Button onClick={() => navigate('/dashboard')} className="w-full h-12 font-semibold">
+                Go to dashboard
               </Button>
-              <Button onClick={() => navigate('/dashboard/upgrade')} variant="outline" className="w-full h-11 border-[#3a3a5a] text-white hover:bg-[#252541]">
-                Back to upgrade page
-              </Button>
-              <a href="mailto:support@petrolord.com" className="text-xs text-[#FFC107] hover:underline">
-                Paid but still seeing this? Email support@petrolord.com
-              </a>
-            </div>
-          </>
-        )}
+            </>
+          )}
+          {state === 'failed' && (
+            <>
+              <div className={cn(AUTH_ICON_TILE, 'bg-pl-danger-bg')}>
+                <XCircle className="h-8 w-8 text-pl-danger-text" aria-hidden="true" />
+              </div>
+              <h1 className="text-2xl font-semibold text-pl-text mb-2">Payment not confirmed</h1>
+              <p className="text-pl-muted text-sm mb-6">{message}</p>
+              <div className="flex flex-col gap-3">
+                <Button onClick={runVerify} className="w-full h-11 font-semibold">
+                  Check again
+                </Button>
+                <Button onClick={() => navigate('/dashboard/upgrade')} variant="outline" className="w-full h-11">
+                  Back to upgrade page
+                </Button>
+                <a href="mailto:support@petrolord.com" className={cn(TEXT_LINK, 'rounded-sm text-xs')}>
+                  Paid but still seeing this? Email support@petrolord.com
+                </a>
+              </div>
+            </>
+          )}
+        </div>
       </div>
-    </div>
+    </PublicPage>
   );
 }
