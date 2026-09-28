@@ -7,6 +7,9 @@ import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
 /**
  * Reusable row action menu: an Edit item and a Delete item that opens a
  * confirmation dialog before invoking onDelete. Pass only the handlers you need.
+ *
+ * Used only by the Environment and Risk modules (design family batch 2A), so
+ * it renders the theme roles directly.
  */
 export default function RowActions({
   onEdit,
@@ -20,33 +23,33 @@ export default function RowActions({
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-white">
-            <MoreHorizontal className="h-4 w-4" />
+          <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Row actions">
+            <MoreHorizontal className="h-4 w-4" aria-hidden="true" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="bg-[#252541] border-[#3a3a5a] text-white">
+        <DropdownMenuContent align="end">
           {onEdit && (
-            <DropdownMenuItem className="cursor-pointer focus:bg-[#3a3a5a] focus:text-white" onClick={onEdit}>
-              <Pencil className="mr-2 h-4 w-4" /> Edit
+            <DropdownMenuItem className="cursor-pointer" onClick={onEdit}>
+              <Pencil className="mr-2 h-4 w-4" aria-hidden="true" /> Edit
             </DropdownMenuItem>
           )}
           {onDelete && (
-            <DropdownMenuItem className="cursor-pointer text-red-400 focus:bg-red-500/10 focus:text-red-400" onClick={() => setConfirmOpen(true)}>
-              <Trash2 className="mr-2 h-4 w-4" /> Delete
+            <DropdownMenuItem className="cursor-pointer text-pl-danger-text focus:bg-pl-danger-bg focus:text-pl-danger-text" onClick={() => setConfirmOpen(true)}>
+              <Trash2 className="mr-2 h-4 w-4" aria-hidden="true" /> Delete
             </DropdownMenuItem>
           )}
         </DropdownMenuContent>
       </DropdownMenu>
 
       <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-        <AlertDialogContent className="bg-[#1a1a2e] border-[#3a3a5a] text-white">
+        <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{deleteTitle}</AlertDialogTitle>
-            <AlertDialogDescription className="text-gray-400">{deleteDescription}</AlertDialogDescription>
+            <AlertDialogDescription>{deleteDescription}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-transparent border-[#3a3a5a] text-gray-300 hover:bg-[#2a2a40] hover:text-white">Cancel</AlertDialogCancel>
-            <AlertDialogAction className="bg-red-600 hover:bg-red-700 text-white" onClick={onDelete}>Delete</AlertDialogAction>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction className="bg-pl-danger text-pl-danger-fg hover:bg-pl-danger/90" onClick={onDelete}>Delete</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

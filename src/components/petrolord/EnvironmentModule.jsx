@@ -10,6 +10,7 @@ import WasteChemicals from './environment/WasteChemicals';
 import StudiesEMP from './environment/StudiesEMP';
 import Decommissioning from './environment/Decommissioning';
 import Reporting from './environment/Reporting';
+import { moduleTabTriggerClass } from './common/ui';
 
 export default function EnvironmentModule() {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -22,23 +23,27 @@ export default function EnvironmentModule() {
   const handleSubmitMonitoring = () => { setActiveTab('monitoring'); setMonitorSignal(s => s + 1); };
 
   return (
-    <div className="flex flex-col h-full bg-[#141423] text-white">
+    <div className="flex flex-col h-full bg-pl-bg text-pl-text">
       {/* Header */}
-      <div className="p-6 border-b border-[#2a2a40] bg-[#1a1a2e]">
-        <h1 className="text-2xl font-bold flex items-center gap-2 text-white">
-          <Activity className="text-green-500 fill-current h-7 w-7" /> 
-          Environment Manager
-        </h1>
-        <p className="text-[#8f8fdb] text-sm mt-1">
-          NUPRC & Global Lender Compliant Environmental Management System
-        </p>
+      <div className="p-4 sm:p-6 border-b border-pl-border bg-pl-surface">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="hidden sm:block shrink-0 bg-pl-sunken p-2 rounded-lg">
+            <Activity className="h-6 w-6 text-pl-muted" aria-hidden="true" />
+          </div>
+          <div className="min-w-0">
+            <h1 className="font-pl-display text-2xl font-semibold text-pl-text">Environment Manager</h1>
+            <p className="text-pl-muted text-sm mt-1">
+              NUPRC & Global Lender Compliant Environmental Management System
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Tabs */}
       <div className="flex-1 overflow-hidden flex flex-col">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-          <div className="px-6 bg-[#1a1a2e] border-b border-[#2a2a40] overflow-x-auto">
-            <TabsList className="bg-transparent space-x-1 h-auto p-0 flex-nowrap w-max">
+          <div className="px-4 sm:px-6 bg-pl-surface border-b border-pl-border overflow-x-auto">
+            <TabsList className="h-auto justify-start gap-6 rounded-none border-0 bg-transparent p-0 flex-nowrap w-max">
               <EnvTabTrigger value="dashboard" label="Dashboard" icon={LayoutDashboard} />
               <EnvTabTrigger value="obligations" label="Obligations & Permits" icon={FileCheck} />
               <EnvTabTrigger value="studies" label="Studies & EMP" icon={BookOpen} />
@@ -51,7 +56,7 @@ export default function EnvironmentModule() {
             </TabsList>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-6 bg-[#141423]">
+          <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-pl-bg">
             <TabsContent value="dashboard" className="m-0 h-full"><EnvironmentDashboard onLogSpill={handleLogSpill} onSubmitMonitoring={handleSubmitMonitoring} /></TabsContent>
             <TabsContent value="obligations" className="m-0 h-full"><ObligationsPermits /></TabsContent>
             <TabsContent value="emissions" className="m-0 h-full"><EmissionsFlaring /></TabsContent>
@@ -70,18 +75,8 @@ export default function EnvironmentModule() {
 
 function EnvTabTrigger({ value, label, icon: Icon }) {
   return (
-    <TabsTrigger 
-      value={value}
-      className="
-        data-[state=active]:bg-transparent 
-        data-[state=active]:text-green-400 
-        data-[state=active]:border-b-2 
-        data-[state=active]:border-green-500 
-        data-[state=active]:shadow-none
-        rounded-none bg-transparent text-[#8f8fdb] hover:text-white px-4 py-4 transition-all text-sm font-medium flex items-center gap-2 border-b-2 border-transparent
-      "
-    >
-      <Icon className="h-4 w-4" />
+    <TabsTrigger value={value} className={moduleTabTriggerClass}>
+      <Icon className="h-4 w-4" aria-hidden="true" />
       {label}
     </TabsTrigger>
   );

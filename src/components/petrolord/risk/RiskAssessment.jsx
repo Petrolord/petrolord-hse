@@ -6,54 +6,54 @@ import { PlusCircle, FileText, Settings } from 'lucide-react';
 export default function RiskAssessment() {
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-wrap gap-3 justify-between items-center">
         <div>
-          <h2 className="text-xl font-bold text-white">Risk Assessments</h2>
-          <p className="text-gray-400 text-sm">Conduct qualitative and quantitative risk analysis</p>
+          <h2 className="text-xl font-semibold text-pl-text">Risk Assessments</h2>
+          <p className="text-pl-muted text-sm">Conduct qualitative and quantitative risk analysis</p>
         </div>
-        <Button className="bg-blue-600 hover:bg-blue-700">
-          <PlusCircle className="mr-2 h-4 w-4" /> Start New Assessment
+        <Button>
+          <PlusCircle className="mr-2 h-4 w-4" aria-hidden="true" /> Start New Assessment
         </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="bg-[#1e1e30] border-[#2a2a40] hover:border-amber-500/50 transition-colors cursor-pointer group">
+        <Card className="hover:border-pl-border-strong transition-colors cursor-pointer group">
           <CardHeader>
-            <CardTitle className="text-white flex items-center gap-2">
-              <FileText className="text-amber-500 group-hover:scale-110 transition-transform" /> 
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="text-pl-muted group-hover:scale-110 transition-transform" aria-hidden="true" /> 
               Qualitative Assessment
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-gray-400 text-sm">
+            <p className="text-pl-muted text-sm">
               Standard 5x5 matrix assessment for operational and safety risks. Uses likelihood and impact scoring.
             </p>
           </CardContent>
         </Card>
 
-        <Card className="bg-[#1e1e30] border-[#2a2a40] hover:border-blue-500/50 transition-colors cursor-pointer group">
+        <Card className="hover:border-pl-border-strong transition-colors cursor-pointer group">
           <CardHeader>
-            <CardTitle className="text-white flex items-center gap-2">
-              <Settings className="text-blue-500 group-hover:rotate-45 transition-transform" /> 
+            <CardTitle className="flex items-center gap-2">
+              <Settings className="text-pl-muted group-hover:rotate-45 transition-transform" aria-hidden="true" /> 
               Bow-Tie Analysis
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-gray-400 text-sm">
+            <p className="text-pl-muted text-sm">
               Visual diagramming for high-consequence risks to identify controls and recovery measures.
             </p>
           </CardContent>
         </Card>
 
-        <Card className="bg-[#1e1e30] border-[#2a2a40] hover:border-purple-500/50 transition-colors cursor-pointer group">
+        <Card className="hover:border-pl-border-strong transition-colors cursor-pointer group">
           <CardHeader>
-            <CardTitle className="text-white flex items-center gap-2">
-              <Activity className="text-purple-500 group-hover:scale-110 transition-transform" /> 
+            <CardTitle className="flex items-center gap-2">
+              <Activity className="text-pl-muted group-hover:scale-110 transition-transform" aria-hidden="true" /> 
               Quantitative (Monte Carlo)
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-gray-400 text-sm">
+            <p className="text-pl-muted text-sm">
               Advanced simulation for financial and schedule risks using probability distributions.
             </p>
           </CardContent>
@@ -61,10 +61,10 @@ export default function RiskAssessment() {
       </div>
 
       {/* Assessment History */}
-      <Card className="bg-[#1e1e30] border-[#2a2a40]">
-        <CardHeader><CardTitle className="text-white">Recent Assessments</CardTitle></CardHeader>
+      <Card>
+        <CardHeader><CardTitle>Recent Assessments</CardTitle></CardHeader>
         <CardContent>
-          <div className="text-center py-12 text-gray-500">
+          <div className="text-center py-12 text-pl-muted">
             No assessment history available. Start a new assessment to see records here.
           </div>
         </CardContent>

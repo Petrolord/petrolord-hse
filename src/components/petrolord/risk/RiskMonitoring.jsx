@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Activity, TrendingUp, AlertTriangle, ShieldCheck } from 'lucide-react';
 import { riskService } from '@/services/riskService';
 import { useHSE } from '@/context/HSEContext';
+import { EMPTY, KpiTile, Track } from '../common/ui';
 
 // KRIs are assumed "higher = worse": a value at/above the critical threshold is a
 // breach, at/above warning is elevated. Thresholds may be null (not configured).
@@ -16,23 +17,13 @@ const breachLevel = (kri) => {
 };
 
 const LEVEL = {
-  critical: { label: 'Critical', badge: 'bg-red-500/10 text-red-400 border-red-500/20', bar: 'bg-red-500' },
-  warning: { label: 'Warning', badge: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20', bar: 'bg-yellow-500' },
-  normal: { label: 'Normal', badge: 'bg-green-500/10 text-green-400 border-green-500/20', bar: 'bg-green-500' },
-  unknown: { label: 'No Data', badge: 'bg-gray-500/10 text-gray-400 border-gray-500/20', bar: 'bg-gray-600' },
+  critical: { label: 'Critical', badge: 'danger', bar: 'bg-pl-danger' },
+  warning: { label: 'Warning', badge: 'warning', bar: 'bg-pl-warning' },
+  normal: { label: 'Normal', badge: 'success', bar: 'bg-pl-success' },
+  unknown: { label: 'No Data', badge: 'neutral', bar: 'bg-pl-border-strong' },
 };
 
-function Kpi({ icon: Icon, label, value, color }) {
-  return (
-    <Card className="bg-[#1e1e30] border-[#2a2a40] p-4 flex items-center gap-3">
-      <div className={`p-2 rounded-lg bg-[#252541] ${color}`}><Icon className="h-5 w-5" /></div>
-      <div>
-        <div className="text-2xl font-bold text-white leading-none">{value}</div>
-        <div className="text-xs text-gray-400 mt-1">{label}</div>
-      </div>
-    </Card>
-  );
-}
+const Kpi = KpiTile;
 
 function KriCard({ kri }) {
   const level = breachLevel(kri);
@@ -42,25 +33,23 @@ function KriCard({ kri }) {
   const pct = kri.current_value != null ? Math.min(100, Math.round((kri.current_value / scale) * 100)) : 0;
 
   return (
-    <Card className="bg-[#1e1e30] border-[#2a2a40] p-5 space-y-3">
+    <Card className="p-5 space-y-3">
       <div className="flex justify-between items-start gap-2">
         <div>
-          <h4 className="text-white font-bold">{kri.name}</h4>
-          <p className="text-xs text-gray-500">{kri.risk?.title || 'Unlinked'}</p>
+          <h4 className="text-pl-text font-semibold">{kri.name}</h4>
+          <p className="text-xs text-pl-muted">{kri.risk?.title || 'Unlinked'}</p>
         </div>
-        <Badge variant="outline" className={cfg.badge}>{cfg.label}</Badge>
+        <Badge variant={cfg.badge}>{cfg.label}</Badge>
       </div>
-      {kri.description && <p className="text-xs text-gray-400">{kri.description}</p>}
+      {kri.description && <p className="text-xs text-pl-muted">{kri.description}</p>}
       <div className="flex items-end gap-2">
-        <span className="text-3xl font-bold text-white leading-none">{kri.current_value ?? '—'}</span>
-        <span className="text-xs text-gray-500 mb-1">{kri.unit}</span>
+        <span className="font-pl-mono tabular-nums text-3xl font-semibold text-pl-text leading-none">{kri.current_value ?? EMPTY}</span>
+        <span className="text-xs text-pl-muted mb-1">{kri.unit}</span>
       </div>
-      <div className="h-2 bg-[#2a2a40] rounded-full overflow-hidden">
-        <div className={`h-full rounded-full ${cfg.bar}`} style={{ width: `${pct}%` }} />
-      </div>
-      <div className="flex justify-between text-[11px] text-gray-500">
-        <span>Warn: {kri.threshold_warning ?? '—'}</span>
-        <span>Critical: {kri.threshold_critical ?? '—'}</span>
+      <Track pct={pct} fill={cfg.bar} />
+      <div className="flex justify-between gap-2 text-[11px] text-pl-muted">
+        <span>Warn: <span className="font-pl-mono tabular-nums">{kri.threshold_warning ?? EMPTY}</span></span>
+        <span>Critical: <span className="font-pl-mono tabular-nums">{kri.threshold_critical ?? EMPTY}</span></span>
         <span>{kri.frequency || 'Ad-hoc'}</span>
       </div>
     </Card>
@@ -88,18 +77,18 @@ export default function RiskMonitoring() {
   return (
     <div className="h-full flex flex-col space-y-4">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <Kpi icon={TrendingUp} label="Tracked KRIs" value={kris.length} color="text-amber-400" />
-        <Kpi icon={AlertTriangle} label="Critical Breaches" value={critical} color="text-red-400" />
-        <Kpi icon={Activity} label="Warnings" value={warning} color="text-yellow-400" />
-        <Kpi icon={ShieldCheck} label="Within Tolerance" value={normal} color="text-green-400" />
+        <Kpi icon={TrendingUp} label="Tracked KRIs" value={kris.length} />
+        <Kpi icon={AlertTriangle} label="Critical Breaches" value={critical} />
+        <Kpi icon={Activity} label="Warnings" value={warning} />
+        <Kpi icon={ShieldCheck} label="Within Tolerance" value={normal} />
       </div>
 
       {loading ? (
-        <div className="p-10 text-center text-gray-500">Loading key risk indicators...</div>
+        <div className="p-10 text-center text-pl-muted">Loading key risk indicators...</div>
       ) : kris.length === 0 ? (
-        <div className="p-12 text-center border-2 border-dashed border-[#3a3a5a] rounded-xl text-gray-500">
-          <Activity className="h-16 w-16 mx-auto mb-4 opacity-30" />
-          <h3 className="text-xl font-bold text-white mb-2">No Key Risk Indicators</h3>
+        <div className="p-12 text-center border-2 border-dashed border-pl-border-strong rounded-xl text-pl-muted">
+          <Activity className="h-16 w-16 mx-auto mb-4 opacity-30" aria-hidden="true" />
+          <h3 className="text-xl font-semibold text-pl-text mb-2">No Key Risk Indicators</h3>
           <p>KRIs defined against your risks will appear here for monitoring.</p>
         </div>
       ) : (

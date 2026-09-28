@@ -76,46 +76,46 @@ export default function SubmitMonitoringModal({ isOpen, onClose, onSuccess, reco
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[560px] bg-[#1a1a2e] border-[#3a3a5a] text-white">
+      <DialogContent className="sm:max-w-[560px]">
         <DialogHeader><DialogTitle>{isEdit ? 'Edit Monitoring Sample' : 'Submit Monitoring Data'}</DialogTitle></DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-2">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-[#b0b0c0]">Parameter *</Label>
-              <Input value={form.parameter} onChange={e => set('parameter', e.target.value)} placeholder="e.g. pH, Oil & Grease" className="bg-[#252541] border-[#3a3a5a] text-white" required />
+              <Label>Parameter *</Label>
+              <Input value={form.parameter} onChange={e => set('parameter', e.target.value)} placeholder="e.g. pH, Oil & Grease" required />
             </div>
             <div className="space-y-2">
-              <Label className="text-[#b0b0c0]">Sample Date *</Label>
-              <Input type="date" value={form.sample_date} onChange={e => set('sample_date', e.target.value)} className="bg-[#252541] border-[#3a3a5a] text-white" required />
+              <Label>Sample Date *</Label>
+              <Input type="date" value={form.sample_date} onChange={e => set('sample_date', e.target.value)} required />
             </div>
           </div>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="space-y-2">
-              <Label className="text-[#b0b0c0]">Value *</Label>
-              <Input type="number" step="any" value={form.value} onChange={e => set('value', e.target.value)} className="bg-[#252541] border-[#3a3a5a] text-white" required />
+              <Label>Value *</Label>
+              <Input type="number" step="any" value={form.value} onChange={e => set('value', e.target.value)} required />
             </div>
             <div className="space-y-2">
-              <Label className="text-[#b0b0c0]">Unit *</Label>
-              <Input value={form.unit} onChange={e => set('unit', e.target.value)} placeholder="mg/l" className="bg-[#252541] border-[#3a3a5a] text-white" required />
+              <Label>Unit *</Label>
+              <Input value={form.unit} onChange={e => set('unit', e.target.value)} placeholder="mg/l" required />
             </div>
             <div className="space-y-2">
-              <Label className="text-[#b0b0c0]">Limit</Label>
-              <Input type="number" step="any" value={form.limit_value} onChange={e => set('limit_value', e.target.value)} className="bg-[#252541] border-[#3a3a5a] text-white" />
+              <Label>Limit</Label>
+              <Input type="number" step="any" value={form.limit_value} onChange={e => set('limit_value', e.target.value)} />
             </div>
           </div>
           <div className="space-y-2">
-            <Label className="text-[#b0b0c0]">Location</Label>
-            <Input value={form.location_point} onChange={e => set('location_point', e.target.value)} placeholder="e.g. Outfall 1" className="bg-[#252541] border-[#3a3a5a] text-white" />
+            <Label>Location</Label>
+            <Input value={form.location_point} onChange={e => set('location_point', e.target.value)} placeholder="e.g. Outfall 1" />
           </div>
           {form.value !== '' && form.limit_value !== '' && (
-            <p className={`text-xs ${computeStatus(form.value, form.limit_value) === 'Compliant' ? 'text-green-400' : 'text-red-400'}`}>
+            <p className={`text-xs font-medium ${computeStatus(form.value, form.limit_value) === 'Compliant' ? 'text-pl-success-text' : 'text-pl-danger-text'}`}>
               Status will be recorded as: {computeStatus(form.value, form.limit_value)}
             </p>
           )}
           <DialogFooter>
-            <Button type="button" variant="ghost" onClick={onClose} className="text-[#b0b0c0]">Cancel</Button>
-            <Button type="submit" disabled={loading} className="bg-blue-600 hover:bg-blue-700 text-white">
-              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} {isEdit ? 'Save Changes' : 'Save Sample'}
+            <Button type="button" variant="ghost" onClick={onClose}>Cancel</Button>
+            <Button type="submit" disabled={loading}>
+              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />} {isEdit ? 'Save Changes' : 'Save Sample'}
             </Button>
           </DialogFooter>
         </form>

@@ -82,67 +82,67 @@ export default function AddWasteManifestModal({ isOpen, onClose, onSuccess, reco
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px] bg-[#1a1a2e] border-[#3a3a5a] text-white max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader><DialogTitle>{isEdit ? 'Edit Waste Manifest' : 'New Waste Manifest'}</DialogTitle></DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-2">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-[#b0b0c0]">Manifest # *</Label>
-              <Input value={form.manifest_number} onChange={e => set('manifest_number', e.target.value)} className="bg-[#252541] border-[#3a3a5a] text-white" required />
+              <Label>Manifest # *</Label>
+              <Input value={form.manifest_number} onChange={e => set('manifest_number', e.target.value)} required />
             </div>
             <div className="space-y-2">
-              <Label className="text-[#b0b0c0]">Waste Type *</Label>
-              <Input value={form.waste_type} onChange={e => set('waste_type', e.target.value)} placeholder="e.g. Drill Cuttings" className="bg-[#252541] border-[#3a3a5a] text-white" required />
+              <Label>Waste Type *</Label>
+              <Input value={form.waste_type} onChange={e => set('waste_type', e.target.value)} placeholder="e.g. Drill Cuttings" required />
             </div>
           </div>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="space-y-2">
-              <Label className="text-[#b0b0c0]">Quantity *</Label>
-              <Input type="number" step="any" value={form.quantity} onChange={e => set('quantity', e.target.value)} className="bg-[#252541] border-[#3a3a5a] text-white" required />
+              <Label>Quantity *</Label>
+              <Input type="number" step="any" value={form.quantity} onChange={e => set('quantity', e.target.value)} required />
             </div>
             <div className="space-y-2">
-              <Label className="text-[#b0b0c0]">Unit</Label>
-              <Input value={form.unit} onChange={e => set('unit', e.target.value)} placeholder="tonnes" className="bg-[#252541] border-[#3a3a5a] text-white" />
+              <Label>Unit</Label>
+              <Input value={form.unit} onChange={e => set('unit', e.target.value)} placeholder="tonnes" />
             </div>
             <div className="space-y-2">
-              <Label className="text-[#b0b0c0]">Classification</Label>
+              <Label>Classification</Label>
               <Select value={form.classification} onValueChange={v => set('classification', v)}>
-                <SelectTrigger className="bg-[#252541] border-[#3a3a5a] text-white"><SelectValue /></SelectTrigger>
-                <SelectContent className="bg-[#252541] border-[#3a3a5a] text-white">
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
                   {['Non-Hazardous', 'Hazardous', 'Recyclable'].map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-[#b0b0c0]">Transporter</Label>
-              <Input value={form.transporter} onChange={e => set('transporter', e.target.value)} className="bg-[#252541] border-[#3a3a5a] text-white" />
+              <Label>Transporter</Label>
+              <Input value={form.transporter} onChange={e => set('transporter', e.target.value)} />
             </div>
             <div className="space-y-2">
-              <Label className="text-[#b0b0c0]">Disposal Facility</Label>
-              <Input value={form.disposal_facility} onChange={e => set('disposal_facility', e.target.value)} className="bg-[#252541] border-[#3a3a5a] text-white" />
+              <Label>Disposal Facility</Label>
+              <Input value={form.disposal_facility} onChange={e => set('disposal_facility', e.target.value)} />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-[#b0b0c0]">Disposal Date</Label>
-              <Input type="date" value={form.disposal_date} onChange={e => set('disposal_date', e.target.value)} className="bg-[#252541] border-[#3a3a5a] text-white" />
+              <Label>Disposal Date</Label>
+              <Input type="date" value={form.disposal_date} onChange={e => set('disposal_date', e.target.value)} />
             </div>
             <div className="space-y-2">
-              <Label className="text-[#b0b0c0]">Status</Label>
+              <Label>Status</Label>
               <Select value={form.status} onValueChange={v => set('status', v)}>
-                <SelectTrigger className="bg-[#252541] border-[#3a3a5a] text-white"><SelectValue /></SelectTrigger>
-                <SelectContent className="bg-[#252541] border-[#3a3a5a] text-white">
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
                   {['Generated', 'In Transit', 'Disposed'].map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
           </div>
           <DialogFooter>
-            <Button type="button" variant="ghost" onClick={onClose} className="text-[#b0b0c0]">Cancel</Button>
-            <Button type="submit" disabled={loading} className="bg-blue-600 hover:bg-blue-700 text-white">
-              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} {isEdit ? 'Save Changes' : 'Save Manifest'}
+            <Button type="button" variant="ghost" onClick={onClose}>Cancel</Button>
+            <Button type="submit" disabled={loading}>
+              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />} {isEdit ? 'Save Changes' : 'Save Manifest'}
             </Button>
           </DialogFooter>
         </form>

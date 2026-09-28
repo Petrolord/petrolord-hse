@@ -79,28 +79,28 @@ export default function AddMitigationModal({ isOpen, onClose, onSuccess, risks =
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[640px] bg-[#1e1e30] border-[#3a3a5a] text-white max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[640px] max-h-[90vh] overflow-y-auto">
         <DialogHeader><DialogTitle>{isEdit ? 'Edit Mitigation Action' : 'Add Mitigation Action'}</DialogTitle></DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-2">
           <div className="space-y-2">
             <Label>Risk *</Label>
             <Select value={form.risk_id} onValueChange={v => set('risk_id', v)} disabled={!!defaultRiskId || isEdit}>
-              <SelectTrigger className="bg-[#252541] border-[#3a3a5a]"><SelectValue placeholder="Link to a risk" /></SelectTrigger>
-              <SelectContent className="bg-[#252541] border-[#3a3a5a] text-white max-h-64">
-                {risks.map(r => <SelectItem key={r.id} value={r.id}>{r.risk_id} — {r.title}</SelectItem>)}
+              <SelectTrigger><SelectValue placeholder="Link to a risk" /></SelectTrigger>
+              <SelectContent className="max-h-64">
+                {risks.map(r => <SelectItem key={r.id} value={r.id}>{r.risk_id}: {r.title}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
           <div className="space-y-2">
             <Label>Action Description *</Label>
-            <Textarea value={form.description} onChange={e => set('description', e.target.value)} className="bg-[#252541] border-[#3a3a5a]" required placeholder="What will be done to treat this risk?" />
+            <Textarea value={form.description} onChange={e => set('description', e.target.value)} required placeholder="What will be done to treat this risk?" />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Strategy</Label>
               <Select value={form.strategy} onValueChange={v => set('strategy', v)}>
-                <SelectTrigger className="bg-[#252541] border-[#3a3a5a]"><SelectValue /></SelectTrigger>
-                <SelectContent className="bg-[#252541] border-[#3a3a5a] text-white">
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
                   {STRATEGIES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
                 </SelectContent>
               </Select>
@@ -108,31 +108,31 @@ export default function AddMitigationModal({ isOpen, onClose, onSuccess, risks =
             <div className="space-y-2">
               <Label>Status</Label>
               <Select value={form.status} onValueChange={v => set('status', v)}>
-                <SelectTrigger className="bg-[#252541] border-[#3a3a5a]"><SelectValue /></SelectTrigger>
-                <SelectContent className="bg-[#252541] border-[#3a3a5a] text-white">
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
                   {STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
           </div>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label>Due Date</Label>
-              <Input type="date" value={form.due_date} onChange={e => set('due_date', e.target.value)} className="bg-[#252541] border-[#3a3a5a]" />
+              <Input type="date" value={form.due_date} onChange={e => set('due_date', e.target.value)} />
             </div>
             <div className="space-y-2">
               <Label>Progress (%)</Label>
-              <Input type="number" min="0" max="100" value={form.progress} onChange={e => set('progress', e.target.value)} className="bg-[#252541] border-[#3a3a5a]" />
+              <Input type="number" min="0" max="100" value={form.progress} onChange={e => set('progress', e.target.value)} />
             </div>
             <div className="space-y-2">
               <Label>Budget</Label>
-              <Input type="number" step="any" value={form.budget} onChange={e => set('budget', e.target.value)} className="bg-[#252541] border-[#3a3a5a]" />
+              <Input type="number" step="any" value={form.budget} onChange={e => set('budget', e.target.value)} />
             </div>
           </div>
           <DialogFooter className="mt-4">
-            <Button type="button" variant="ghost" onClick={onClose} className="text-gray-400 hover:text-white">Cancel</Button>
-            <Button type="submit" disabled={loading} className="bg-amber-600 hover:bg-amber-700">
-              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} {isEdit ? 'Save Changes' : 'Add Action'}
+            <Button type="button" variant="ghost" onClick={onClose}>Cancel</Button>
+            <Button type="submit" disabled={loading}>
+              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />} {isEdit ? 'Save Changes' : 'Add Action'}
             </Button>
           </DialogFooter>
         </form>

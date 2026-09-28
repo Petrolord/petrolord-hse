@@ -67,15 +67,15 @@ export default function Reporting() {
 
   return (
     <div className="space-y-6">
-      <Card className="bg-[#1e1e30] border-[#2a2a40] p-6">
-        <h3 className="text-xl text-white font-bold mb-1 flex items-center gap-2"><FileText className="h-5 w-5 text-green-500" /> Compliance Reporting</h3>
-        <p className="text-sm text-gray-400 mb-4">{currentOrganization?.name} · Generated {new Date().toLocaleDateString()}</p>
-        <div className="flex flex-wrap gap-4">
-          <Button variant="outline" className="border-[#3a3a5a] text-white hover:bg-[#252541]" onClick={nuprcMonthlyPack} disabled={loading}>
-            <FileDown className="mr-2 h-4 w-4" /> NUPRC Monthly Pack
+      <Card className="p-4 sm:p-6">
+        <h3 className="text-xl text-pl-text font-semibold mb-1 flex items-center gap-2"><FileText className="h-5 w-5 text-pl-muted" aria-hidden="true" /> Compliance Reporting</h3>
+        <p className="text-sm text-pl-muted mb-4">{currentOrganization?.name} · Generated {new Date().toLocaleDateString()}</p>
+        <div className="flex flex-wrap gap-3">
+          <Button variant="outline" onClick={nuprcMonthlyPack} disabled={loading}>
+            <FileDown className="mr-2 h-4 w-4" aria-hidden="true" /> NUPRC Monthly Pack
           </Button>
-          <Button variant="outline" className="border-[#3a3a5a] text-white hover:bg-[#252541]" onClick={annualReport} disabled={loading}>
-            <FileDown className="mr-2 h-4 w-4" /> Annual Environmental Report
+          <Button variant="outline" onClick={annualReport} disabled={loading}>
+            <FileDown className="mr-2 h-4 w-4" aria-hidden="true" /> Annual Environmental Report
           </Button>
         </div>
       </Card>
@@ -84,19 +84,19 @@ export default function Reporting() {
         {registers.map(r => {
           const count = data[r.key].length;
           return (
-            <Card key={r.key} className="bg-[#1e1e30] border-[#2a2a40] p-5 flex flex-col justify-between">
+            <Card key={r.key} className="p-5 flex flex-col justify-between">
               <div>
-                <h4 className="text-white font-bold">{r.label}</h4>
-                <p className="text-xs text-gray-400 mt-1">{loading ? 'Loading…' : `${count} record${count === 1 ? '' : 's'}`}</p>
+                <h4 className="text-pl-text font-semibold">{r.label}</h4>
+                <p className="text-xs text-pl-muted mt-1">{loading ? 'Loading…' : <><span className="font-pl-mono tabular-nums">{count}</span>{` record${count === 1 ? '' : 's'}`}</>}</p>
               </div>
               <Button
                 variant="outline"
                 size="sm"
-                className="mt-4 self-start border-[#3a3a5a] text-gray-300 hover:text-white hover:bg-[#252541]"
+                className="mt-4 self-start"
                 disabled={loading}
                 onClick={() => doExport(`${r.key}-${stamp()}.csv`, r.rows())}
               >
-                <FileDown className="mr-2 h-4 w-4" /> Export CSV
+                <FileDown className="mr-2 h-4 w-4" aria-hidden="true" /> Export CSV
               </Button>
             </Card>
           );
