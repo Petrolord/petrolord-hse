@@ -28,10 +28,10 @@ export default function SuperAdminLogoUpload({ settings, onChange }) {
 
   return (
     <div className="space-y-6">
-      <Card className="bg-[#1a1a2e] border-[#3a3a5a]">
+      <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="text-white text-base">Branding Status</CardTitle>
+            <CardTitle className="text-base">Branding Status</CardTitle>
             <Switch 
               checked={settings.is_branding_enabled}
               onCheckedChange={(v) => onChange('is_branding_enabled', v)}
@@ -40,22 +40,22 @@ export default function SuperAdminLogoUpload({ settings, onChange }) {
         </CardHeader>
       </Card>
 
-      <Card className="bg-[#1a1a2e] border-[#3a3a5a]">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-white text-base">Visual Assets</CardTitle>
+          <CardTitle className="text-base">Visual Assets</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-gray-400">Primary Logo</Label>
+              <Label>Primary Logo</Label>
               <div 
-                className="h-32 border-2 border-dashed border-[#3a3a5a] rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 transition-colors bg-[#111827]"
+                className="h-32 border-2 border-dashed border-pl-border-strong rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-pl-primary transition-colors bg-pl-sunken"
                 onClick={() => logoInput.current?.click()}
               >
                 {settings.logo_url ? (
                   <img src={settings.logo_url} alt="Logo" className="h-full object-contain p-2" />
                 ) : (
-                  <div className="text-center text-gray-500">
+                  <div className="text-center text-pl-muted">
                     <ImageIcon className="h-8 w-8 mx-auto mb-2" />
                     <span className="text-xs">Upload Logo</span>
                   </div>
@@ -65,15 +65,15 @@ export default function SuperAdminLogoUpload({ settings, onChange }) {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-gray-400">Favicon</Label>
+              <Label>Favicon</Label>
               <div 
-                className="h-32 border-2 border-dashed border-[#3a3a5a] rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 transition-colors bg-[#111827]"
+                className="h-32 border-2 border-dashed border-pl-border-strong rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-pl-primary transition-colors bg-pl-sunken"
                 onClick={() => faviconInput.current?.click()}
               >
                 {settings.favicon_url ? (
                   <img src={settings.favicon_url} alt="Favicon" className="h-8 w-8 object-contain" />
                 ) : (
-                  <div className="text-center text-gray-500">
+                  <div className="text-center text-pl-muted">
                     <Upload className="h-8 w-8 mx-auto mb-2" />
                     <span className="text-xs">Upload Favicon</span>
                   </div>
@@ -85,33 +85,30 @@ export default function SuperAdminLogoUpload({ settings, onChange }) {
         </CardContent>
       </Card>
 
-      <Card className="bg-[#1a1a2e] border-[#3a3a5a]">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-white text-base">Organization Details</CardTitle>
+          <CardTitle className="text-base">Organization Details</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-2">
-            <Label className="text-gray-400">Company Name</Label>
+            <Label>Company Name</Label>
             <Input 
               value={settings.company_name || ''} 
               onChange={(e) => onChange('company_name', e.target.value)}
-              className="bg-[#111827] border-[#3a3a5a] text-white"
             />
           </div>
           <div className="grid gap-2">
-            <Label className="text-gray-400">Tagline</Label>
+            <Label>Tagline</Label>
             <Input 
               value={settings.company_tagline || ''} 
               onChange={(e) => onChange('company_tagline', e.target.value)}
-              className="bg-[#111827] border-[#3a3a5a] text-white"
             />
           </div>
           <div className="grid gap-2">
-            <Label className="text-gray-400">Website URL</Label>
+            <Label>Website URL</Label>
             <Input 
               value={settings.website_url || ''} 
               onChange={(e) => onChange('website_url', e.target.value)}
-              className="bg-[#111827] border-[#3a3a5a] text-white"
             />
           </div>
         </CardContent>

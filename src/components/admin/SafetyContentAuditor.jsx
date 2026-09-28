@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { CheckCircle2, XCircle, RefreshCw, AlertTriangle, FileText, ChevronDown, ChevronUp } from 'lucide-react';
 import { cn } from "@/lib/utils";
+import { AccountScope, AccountPage, AccountHeader } from '@/components/account/accountChrome';
 
 export default function SafetyContentAuditor() {
   const [moments, setMoments] = useState([]);
@@ -53,8 +54,8 @@ export default function SafetyContentAuditor() {
   };
 
   const StatusIcon = ({ status }) => {
-    if (status === 'ok') return <CheckCircle2 className="h-4 w-4 text-green-500" />;
-    return <XCircle className="h-4 w-4 text-red-500" />;
+    if (status === 'ok') return <CheckCircle2 className="h-4 w-4 text-pl-success-text" aria-hidden="true" />;
+    return <XCircle className="h-4 w-4 text-pl-danger-text" aria-hidden="true" />;
   };
 
   const toggleExpand = (id) => {
@@ -70,39 +71,44 @@ export default function SafetyContentAuditor() {
     'Spill Response'
   ];
 
+  // /auditor sits outside the signed-in layout, so it opens its own
+  // design-system scope (AccountScope) with the light/dark toggle in its
+  // header (docs/scope/DesignSystem-Rollout.md section 4.2, batch 3A).
   return (
-    <div className="p-6 bg-[#1a1a2e] min-h-screen text-white">
-      <div className="max-w-7xl mx-auto space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold">Safety Content Auditor</h1>
-            <p className="text-[#7a7a9a]">Inspect database content population for Safety Moments</p>
-          </div>
-          <Button onClick={fetchMoments} variant="outline" className="gap-2 border-[#3a3a5a] text-white hover:bg-[#252541]">
-            <RefreshCw className={cn("h-4 w-4", loading && "animate-spin")} /> Refresh Data
-          </Button>
-        </div>
+    <AccountScope testId="safety-content-auditor-theme-scope" className="text-pl-text">
+      <AccountPage width="max-w-7xl">
+        <AccountHeader
+          eyebrow="Admin"
+          icon={FileText}
+          title="Safety Content Auditor"
+          description="Inspect database content population for Safety Moments"
+          actions={(
+            <Button onClick={fetchMoments} variant="outline" className="gap-2">
+              <RefreshCw className={cn("h-4 w-4", loading && "animate-spin")} aria-hidden="true" /> Refresh Data
+            </Button>
+          )}
+        />
 
-        <Card className="bg-[#252541] border-[#3a3a5a]">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-white">Database Content Status</CardTitle>
-            <CardDescription className="text-[#7a7a9a]">
-              Found {moments.length} safety moments in the database.
+            <CardTitle>Database Content Status</CardTitle>
+            <CardDescription>
+              Found <span className="font-pl-mono tabular-nums">{moments.length}</span> safety moments in the database.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <ScrollArea className="h-[600px] rounded-md border border-[#3a3a5a]">
+            <ScrollArea className="h-[600px] rounded-md border border-pl-border">
               <Table>
-                <TableHeader className="bg-[#1a1a2e] sticky top-0 z-10">
-                  <TableRow className="border-[#3a3a5a] hover:bg-[#1a1a2e]">
-                    <TableHead className="text-white w-[50px]"></TableHead>
-                    <TableHead className="text-white">Topic Title</TableHead>
-                    <TableHead className="text-white">Recap</TableHead>
-                    <TableHead className="text-white">Key Points</TableHead>
-                    <TableHead className="text-white">Do/Don't</TableHead>
-                    <TableHead className="text-white">Scenario</TableHead>
-                    <TableHead className="text-white">Checklist</TableHead>
-                    <TableHead className="text-white">Status</TableHead>
+                <TableHeader className="bg-pl-sunken sticky top-0 z-10">
+                  <TableRow className="hover:bg-pl-sunken">
+                    <TableHead className="w-[50px]"><span className="sr-only">Expand</span></TableHead>
+                    <TableHead>Topic Title</TableHead>
+                    <TableHead>Recap</TableHead>
+                    <TableHead>Key Points</TableHead>
+                    <TableHead>Do/Don't</TableHead>
+                    <TableHead>Scenario</TableHead>
+                    <TableHead>Checklist</TableHead>
+                    <TableHead>Status</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -123,85 +129,85 @@ export default function SafetyContentAuditor() {
                       <React.Fragment key={moment.id}>
                         <TableRow 
                           className={cn(
-                            "border-[#3a3a5a] hover:bg-[#2a2a45] cursor-pointer transition-colors",
-                            isTarget && "bg-[#2a2a45]/50"
+                            "cursor-pointer transition-colors",
+                            isTarget && "bg-pl-sunken/60"
                           )}
                           onClick={() => toggleExpand(moment.id)}
                         >
                           <TableCell>
-                            {expandedId === moment.id ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                            {expandedId === moment.id ? <ChevronUp className="h-4 w-4 text-pl-muted" aria-hidden="true" /> : <ChevronDown className="h-4 w-4 text-pl-muted" aria-hidden="true" />}
                           </TableCell>
-                          <TableCell className="font-medium text-white">
+                          <TableCell className="font-medium text-pl-text">
                             <div className="flex items-center gap-2">
                               {moment.title}
-                              {isTarget && <Badge variant="secondary" className="bg-blue-900/50 text-blue-200 text-[10px] border-0">Target</Badge>}
+                              {isTarget && <Badge variant="neutral" className="text-[10px]">Target</Badge>}
                             </div>
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
                               <StatusIcon status={recapCheck.status} />
-                              <span className="text-xs text-[#b0b0c0]">{recapCheck.label}</span>
+                              <span className="text-xs text-pl-muted">{recapCheck.label}</span>
                             </div>
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
                               <StatusIcon status={pointsCheck.status} />
-                              <span className="text-xs text-[#b0b0c0]">{pointsCheck.label}</span>
+                              <span className="text-xs text-pl-muted">{pointsCheck.label}</span>
                             </div>
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
                               <StatusIcon status={doCheck.status} />
-                              <span className="text-xs text-[#b0b0c0]">{doCheck.label}</span>
+                              <span className="text-xs text-pl-muted">{doCheck.label}</span>
                             </div>
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
                               <StatusIcon status={scenarioCheck.status} />
-                              <span className="text-xs text-[#b0b0c0]">{scenarioCheck.label}</span>
+                              <span className="text-xs text-pl-muted">{scenarioCheck.label}</span>
                             </div>
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
                               <StatusIcon status={checklistCheck.status} />
-                              <span className="text-xs text-[#b0b0c0]">{checklistCheck.label}</span>
+                              <span className="text-xs text-pl-muted">{checklistCheck.label}</span>
                             </div>
                           </TableCell>
                           <TableCell>
                             {isComplete ? (
-                              <Badge className="bg-green-900/50 text-green-200 border-green-800">Complete</Badge>
+                              <Badge variant="success">Complete</Badge>
                             ) : (
-                              <Badge className="bg-red-900/50 text-red-200 border-red-800">Incomplete</Badge>
+                              <Badge variant="danger">Incomplete</Badge>
                             )}
                           </TableCell>
                         </TableRow>
                         {expandedId === moment.id && (
-                          <TableRow className="bg-[#151525] border-[#3a3a5a] hover:bg-[#151525]">
+                          <TableRow className="bg-pl-sunken hover:bg-pl-sunken">
                             <TableCell colSpan={8} className="p-4">
-                              <div className="grid grid-cols-2 gap-4 text-sm text-[#b0b0c0]">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-pl-muted">
                                 <div>
-                                  <h4 className="font-bold text-white mb-2 flex items-center gap-2">
-                                    <FileText className="h-4 w-4 text-[#FFC107]" /> Why It Matters
+                                  <h4 className="font-semibold text-pl-text mb-2 flex items-center gap-2">
+                                    <FileText className="h-4 w-4 text-pl-accent-text" aria-hidden="true" /> Why It Matters
                                   </h4>
-                                  <p className="bg-[#1a1a2e] p-3 rounded border border-[#3a3a5a]">
+                                  <p className="bg-pl-surface p-3 rounded border border-pl-border">
                                     {moment.why_it_matters || "No content available."}
                                   </p>
                                 </div>
                                 <div>
-                                  <h4 className="font-bold text-white mb-2 flex items-center gap-2">
-                                    <AlertTriangle className="h-4 w-4 text-orange-500" /> Incident Scenario
+                                  <h4 className="font-semibold text-pl-text mb-2 flex items-center gap-2">
+                                    <AlertTriangle className="h-4 w-4 text-pl-warning-text" aria-hidden="true" /> Incident Scenario
                                   </h4>
-                                  <div className="bg-[#1a1a2e] p-3 rounded border border-[#3a3a5a]">
+                                  <div className="bg-pl-surface p-3 rounded border border-pl-border">
                                     {moment.incident_scenario ? (
-                                      <pre className="whitespace-pre-wrap font-sans text-xs">
+                                      <pre className="whitespace-pre-wrap font-pl-mono text-xs">
                                         {JSON.stringify(moment.incident_scenario, null, 2)}
                                       </pre>
                                     ) : "No scenario data."}
                                   </div>
                                 </div>
-                                <div className="col-span-2">
-                                  <h4 className="font-bold text-white mb-2">Raw Data Preview</h4>
-                                  <div className="flex gap-4">
+                                <div className="md:col-span-2">
+                                  <h4 className="font-semibold text-pl-text mb-2">Raw Data Preview</h4>
+                                  <div className="flex flex-col sm:flex-row gap-4">
                                      <div className="flex-1">
                                         <p className="text-xs font-semibold mb-1">Key Points (First 3)</p>
                                         <ul className="list-disc pl-4 text-xs space-y-1">
@@ -230,7 +236,7 @@ export default function SafetyContentAuditor() {
             </ScrollArea>
           </CardContent>
         </Card>
-      </div>
-    </div>
+      </AccountPage>
+    </AccountScope>
   );
 }

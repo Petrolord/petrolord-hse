@@ -7,6 +7,8 @@ import { superAdminBrandingService } from '@/services/superAdminBrandingService'
 import { useToast } from '@/components/ui/use-toast';
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from 'lucide-react';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
+import { AccountScope } from '@/components/account/accountChrome';
 
 const DEFAULT_SETTINGS = {
   primary_color: '#FFC107',
@@ -105,20 +107,27 @@ export default function SuperAdminBrandingPage() {
     }));
   };
 
+  // /dashboard/super-admin/branding sits outside the signed-in layout, so it
+  // opens its own design-system scope (AccountScope) with the light/dark
+  // toggle in its header bar (docs/scope/DesignSystem-Rollout.md section
+  // 4.2, batch 3A). The live preview keeps the organisation's own colours
+  // (a document canvas in SuperAdminBrandingPreview).
   return (
-    <div className="h-screen flex flex-col bg-[#111827]">
+    <AccountScope testId="branding-manager-theme-scope" className="h-screen flex flex-col text-pl-text">
       {/* Header */}
-      <div className="h-14 border-b border-[#3a3a5a] bg-[#1a1a2e] flex items-center px-4 shrink-0">
+      <div className="h-14 border-b border-pl-border bg-pl-surface flex items-center gap-2 px-2 sm:px-4 shrink-0">
         <Button 
           variant="ghost" 
-          className="text-gray-400 hover:text-white hover:bg-[#252541] gap-2 mr-4"
+          className="gap-2 px-2 sm:px-4"
           onClick={() => navigate('/dashboard/super-admin')}
         >
-          <ArrowLeft className="h-4 w-4" />
-          Back to Dashboard
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+          <span className="hidden sm:inline">Back to Dashboard</span>
+          <span className="sr-only sm:hidden">Back to Dashboard</span>
         </Button>
-        <div className="h-6 w-px bg-[#3a3a5a] mr-4" />
-        <h1 className="text-sm font-semibold text-white uppercase tracking-wider">Branding Manager</h1>
+        <div className="h-6 w-px bg-pl-border mx-1 sm:mx-2" aria-hidden="true" />
+        <h1 className="min-w-0 flex-1 truncate text-sm font-semibold uppercase tracking-wider text-pl-text">Branding Manager</h1>
+        <ThemeToggle />
       </div>
 
       <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
@@ -132,7 +141,7 @@ export default function SuperAdminBrandingPage() {
         </div>
 
         {/* Middle Panel: Customizer */}
-        <div className="flex-1 flex flex-col md:flex-row overflow-hidden h-[60vh] md:h-full border-l border-[#3a3a5a]">
+        <div className="flex-1 flex flex-col md:flex-row overflow-hidden h-[60vh] md:h-full border-t md:border-t-0 md:border-l border-pl-border">
           <div className="flex-1 h-full overflow-hidden">
             <SuperAdminBrandingCustomizer 
               settings={currentSettings} 
@@ -145,11 +154,11 @@ export default function SuperAdminBrandingPage() {
           </div>
 
           {/* Right Panel: Preview (Hidden on small screens or toggleable) */}
-          <div className="hidden lg:block w-[400px] border-l border-[#3a3a5a] bg-black">
+          <div className="hidden lg:block w-[400px] border-l border-pl-border bg-pl-sunken">
             <SuperAdminBrandingPreview settings={currentSettings} />
           </div>
         </div>
       </div>
-    </div>
+    </AccountScope>
   );
 }
