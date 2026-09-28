@@ -154,9 +154,11 @@ export default function MyProfileTab() {
               <div className="min-w-0">
                 <h3 className="text-lg font-semibold text-pl-text">{fullName || 'User'}</h3>
                 <p className="text-pl-muted break-all">{currentUser?.email}</p>
-                <div className="flex gap-2 mt-1">
-                  <span className="text-xs px-2 py-0.5 rounded border border-pl-border bg-pl-sunken text-pl-text capitalize">{currentUser?.role?.replace('_', ' ')}</span>
-                </div>
+                {currentUser?.role && (
+                  <div className="flex gap-2 mt-1">
+                    <span className="text-xs px-2 py-0.5 rounded border border-pl-border bg-pl-sunken text-pl-text capitalize">{currentUser.role.replace('_', ' ')}</span>
+                  </div>
+                )}
               </div>
             </div>
 

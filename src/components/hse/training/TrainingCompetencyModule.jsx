@@ -13,15 +13,15 @@ import TrainingCompetencyDashboard from './TrainingCompetencyDashboard';
 
 // Inline simplified list components for immediate visibility
 const GenericTable = ({ data, columns, emptyMessage }) => (
-  <div className="flex-1 overflow-auto p-4">
+  <div className="h-full overflow-auto p-4">
     <table className="w-full min-w-[640px] text-sm text-left border-collapse bg-pl-surface border border-pl-border">
       <thead className="bg-pl-sunken text-pl-muted uppercase text-xs font-medium sticky top-0 z-10">
-        <tr>{columns.map((c, i) => <th key={i} className="px-6 py-4">{c.header}</th>)}</tr>
+        <tr>{columns.map((c, i) => <th key={i} className="px-4 py-3">{c.header}</th>)}</tr>
       </thead>
       <tbody className={tableBodyClass}>
         {data.map((row, i) => (
           <tr key={row.id || i} className={tableRowClass}>
-            {columns.map((c, j) => <td key={j} className="px-6 py-4 text-pl-text">{c.render ? c.render(row) : row[c.accessor]}</td>)}
+            {columns.map((c, j) => <td key={j} className="px-4 py-3 text-pl-text">{c.render ? c.render(row) : row[c.accessor]}</td>)}
           </tr>
         ))}
         {data.length === 0 && <tr><td colSpan={columns.length} className="p-8 text-center text-pl-muted">{emptyMessage}</td></tr>}
@@ -99,7 +99,7 @@ export default function TrainingCompetencyModule() {
             data={data.programs} 
             emptyMessage="No training programs found."
             columns={[
-              { header: 'ID', accessor: 'program_id' },
+              { header: 'ID', render: r => <span className="font-pl-mono tabular-nums whitespace-nowrap">{r.program_id}</span> },
               { header: 'Name', accessor: 'program_name' },
               { header: 'Category', accessor: 'category' },
               { header: 'Duration (Hrs)', render: r => <span className="font-pl-mono tabular-nums">{r.duration}</span> },
@@ -132,7 +132,7 @@ export default function TrainingCompetencyModule() {
             data={data.competencies} 
             emptyMessage="No competency framework defined."
             columns={[
-              { header: 'ID', accessor: 'competency_id' },
+              { header: 'ID', render: r => <span className="font-pl-mono tabular-nums whitespace-nowrap">{r.competency_id}</span> },
               { header: 'Name', accessor: 'competency_name' },
               { header: 'Category', accessor: 'category' },
               { header: 'Level', accessor: 'level' }

@@ -13,7 +13,7 @@ export default function OrgAdminSettings() {
   if (!currentOrganization) return null;
 
   return (
-    <div className="space-y-6 text-pl-text">
+    <div className="p-4 sm:p-6 space-y-6 text-pl-text">
       <div className="mb-6">
         <h1 className="font-pl-display text-2xl font-semibold text-pl-text">Organization Settings</h1>
         <p className="text-pl-muted">Manage your organization's branding, users, and compliance rules.</p>

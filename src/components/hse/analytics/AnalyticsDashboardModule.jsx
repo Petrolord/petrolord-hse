@@ -25,6 +25,9 @@ const TOOLTIP = {
   itemStyle: { color: CHART_COLORS.tooltipText },
   labelStyle: { color: CHART_COLORS.axisText },
 };
+// Severity slices from the validated series, in the Risk module's order; the
+// legend names each one.
+const SEVERITY_COLORS = { critical: CHART_SERIES[3], high: CHART_SERIES[2], medium: CHART_SERIES[0], low: CHART_SERIES[1] };
 
 const AnalyticsDashboardModule = () => {
   const { currentOrganization } = useHSE();
@@ -188,7 +191,7 @@ const AnalyticsDashboardModule = () => {
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <Select value={timeRange} onValueChange={setTimeRange}>
-            <SelectTrigger className="w-[140px]" aria-label="Time range">
+            <SelectTrigger className="w-[160px]" aria-label="Time range">
               <SelectValue placeholder="Time Range" />
             </SelectTrigger>
             <SelectContent>
@@ -271,7 +274,7 @@ const AnalyticsDashboardModule = () => {
                   dataKey="value"
                 >
                   {severityData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={CHART_SERIES[index % CHART_SERIES.length]} />
+                    <Cell key={`cell-${index}`} fill={SEVERITY_COLORS[entry.name] || CHART_SERIES[4]} />
                   ))}
                 </Pie>
                 <RechartsTooltip {...TOOLTIP} />
