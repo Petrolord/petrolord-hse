@@ -51,9 +51,9 @@ check "backfill rows keep the report date" "$(echo "select min(created_at)::date
 check "A summary org1 27 (was 0)" "$(sumof $A)" "$O1:27:27"
 check "B summary inserted, forged 999 clamped to 17" "$(sumof $B)" "$O2:17:17"
 check "A last_report_date and stale streak 0" "$(echo "select last_report_date||':'||current_streak from user_points_summary where user_id='$A'" | Q -d t)" "2026-08-03:0"
-before=$(echo "select md5(string_agg(e::text,'|' order by id)) from hse_points_events e" | Q -d t)":"$(echo "select md5(string_agg(user_id||total_points||points_earned||current_streak||coalesce(last_report_date::text,''),'|' order by user_id)) from user_points_summary" | Q -d t)
+before=$(echo "select md5(string_agg(e::text,'|' order by id)) from hse_points_events e" | Q -d t)":"$(echo "select md5(string_agg(user_id::text||total_points||points_earned||current_streak||coalesce(last_report_date::text,''),'|' order by user_id)) from user_points_summary" | Q -d t)
 wrapped | P -d t && echo "  third apply ok"
-after=$(echo "select md5(string_agg(e::text,'|' order by id)) from hse_points_events e" | Q -d t)":"$(echo "select md5(string_agg(user_id||total_points||points_earned||current_streak||coalesce(last_report_date::text,''),'|' order by user_id)) from user_points_summary" | Q -d t)
+after=$(echo "select md5(string_agg(e::text,'|' order by id)) from hse_points_events e" | Q -d t)":"$(echo "select md5(string_agg(user_id::text||total_points||points_earned||current_streak||coalesce(last_report_date::text,''),'|' order by user_id)) from user_points_summary" | Q -d t)
 check "backfill idempotent: ledger and summaries unchanged by a third apply" "$after" "$before"
 
 echo "=== 3. insert trigger awards once, by the server's rule ==="
@@ -88,7 +88,7 @@ as authenticated $X "insert into quick_reports(id, organization_id, created_by_u
 check "X (summary row in org2) gets the org1 ledger row" "$(echo "select count(*) from hse_points_events where source_report_id='$R4' and organization_id='$O1'" | Q -d t)" "1"
 check "X's org2 summary row is left alone" "$(sumof $X)" "$O2:0:0"
 as authenticated - "insert into quick_reports(organization_id, created_by_user_id, status) values ('$O1',null,'submitted');" >/dev/null
-check "service-role/anonymous report (no author) awards nothing" "$(echo "select count(*) from hse_points_events where user_id is null" | Q -d t)" "0"
+check "service-role/anonymous report (no author) awards nothing" "$(echo "select count(*) from hse_points_events e join quick_reports q on q.id = e.source_report_id where q.created_by_user_id is null" | Q -d t)" "0"
 
 echo "=== 6. RLS and grants ==="
 check "A reads org1 rows only" "$(as authenticated $A "select count(*)||':'||count(*) filter (where organization_id='$O2') from hse_points_events;")" "6:0"

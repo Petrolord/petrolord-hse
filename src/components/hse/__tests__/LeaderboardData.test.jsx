@@ -28,7 +28,15 @@ const db = {
       { quality_score: 60, leaderboard_points: 15, created_at: '2026-09-02T10:00:00Z', status: 'closed' },
       { quality_score: 90, leaderboard_points: 30, created_at: '2026-08-20T10:00:00Z', status: 'closed' },
     ],
+    // the dated ledger (migration 20260929120000); the stub filters by gte
+    hse_points_events: [
+      { user_id: 'u1', points: 17, created_at: '2026-09-28T09:00:00Z' },
+      { user_id: 'u1', points: 12, created_at: '2026-09-27T09:00:00Z' },
+      { user_id: 'u2', points: 10, created_at: '2026-09-15T09:00:00Z' },
+      { user_id: 'u2', points: 17, created_at: '2026-08-15T09:00:00Z' },
+    ],
   },
+  missing: new Set(),
 };
 function from(table) {
   const call = { table, select: null, filters: [] };
@@ -38,14 +46,19 @@ function from(table) {
     eq: (c, v) => { call.filters.push(['eq', c, v]); return q; },
     neq: (c, v) => { call.filters.push(['neq', c, v]); return q; },
     in: (c, v) => { call.filters.push(['in', c, v]); return q; },
+    gte: (c, v) => { call.filters.push(['gte', c, v]); return q; },
     order: () => q,
     limit: (n) => { call.limit = n; return q; },
     maybeSingle: () => q,
     then: (res, rej) => {
       const bad = /\branking\b|user:user_id/.test(call.select || '');
-      const out = bad
-        ? { data: null, error: { message: 'column user_points_summary.ranking does not exist' } }
-        : { data: db.tables[table] || [], error: null };
+      const gte = call.filters.find((f) => f[0] === 'gte');
+      const rows = (db.tables[table] || []).filter((r) => !gte || r[gte[1]] >= gte[2]);
+      const out = db.missing.has(table)
+        ? { data: null, error: { code: 'PGRST205', message: `Could not find the table 'public.${table}' in the schema cache` } }
+        : bad
+          ? { data: null, error: { message: 'column user_points_summary.ranking does not exist' } }
+          : { data: rows, error: null };
       return Promise.resolve(out).then(res, rej);
     },
   };
@@ -69,7 +82,7 @@ const { default: LeaderboardTable } = await import('@/components/hse/leaderboard
 
 const flush = () => act(async () => { await new Promise((r) => setTimeout(r, 30)); });
 
-afterEach(() => { cleanup(); db.calls = []; vi.restoreAllMocks(); });
+afterEach(() => { cleanup(); db.calls = []; db.missing = new Set(); vi.useRealTimers(); vi.restoreAllMocks(); });
 
 describe('gamificationService (batch 4B)', () => {
   it('getLeaderboard reads real columns and joins the names itself', async () => {
@@ -108,15 +121,92 @@ describe('LeaderboardModule (batch 4B)', () => {
     expect(screen.getByText('Quality Score').parentElement.querySelector('h3')).toHaveTextContent(/^\d+%$/);
   });
 
-  it('says why the week and month tabs have no ranking', async () => {
+  it('ranks This Month and This Week from the dated points ledger', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-09-29T12:00:00Z'));
+    render(<LeaderboardModule />);
+    await screen.findByText('Ada Obi');
+    const month = screen.getByRole('tab', { name: /This Month/ });
+    fireEvent.mouseDown(month);
+    fireEvent.click(month);
+    await flush();
+    const ledger = db.calls.filter((c) => c.table === 'hse_points_events');
+    expect(ledger.length).toBeGreaterThan(0);
+    expect(ledger[0].filters).toEqual(expect.arrayContaining([['eq', 'organization_id', 'o1']]));
+    const table = screen.getByRole('table');
+    // September: Test Lead 29 (two reports), Ada Obi 10; August's 17 is out
+    const body = table.querySelectorAll('tbody tr');
+    expect(body[0]).toHaveTextContent('Test Lead');
+    expect(body[0]).toHaveTextContent('29');
+    expect(body[1]).toHaveTextContent('Ada Obi');
+    expect(body[1]).toHaveTextContent('10');
+    expect(screen.queryByRole('status')).toBeNull();
+
+    const week = screen.getByRole('tab', { name: /This Week/ });
+    fireEvent.mouseDown(week);
+    fireEvent.click(week);
+    await flush();
+    // the week from Monday 28 September (local): Test Lead's 17 only
+    const rows = screen.getByRole('table').querySelectorAll('tbody tr');
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toHaveTextContent('Test Lead');
+    expect(rows[0]).toHaveTextContent('17');
+  });
+
+  it('says the history is not switched on when the ledger table is missing', async () => {
+    db.missing.add('hse_points_events');
     render(<LeaderboardModule />);
     await screen.findByText('Ada Obi');
     const tab = screen.getByRole('tab', { name: /This Month/ });
     fireEvent.mouseDown(tab);
     fireEvent.click(tab);
     await flush();
-    expect(screen.getByRole('status')).toHaveTextContent('need a points history');
+    expect(screen.getByRole('status')).toHaveTextContent('points history is switched on');
     expect(screen.queryByText('Ada Obi')).toBeNull();
+  });
+
+  it('opens no realtime channel on leaderboard_scores, which nothing writes', async () => {
+    const { supabase } = await import('@/lib/customSupabaseClient');
+    const spy = vi.spyOn(supabase, 'channel');
+    render(<LeaderboardModule />);
+    await screen.findByText('Ada Obi');
+    expect(spy).not.toHaveBeenCalled();
+  });
+});
+
+describe('gamificationService.getPeriodLeaderboard', () => {
+  it('sums the ledger per person from the period start and ranks it', async () => {
+    const res = await svc.getPeriodLeaderboard('o1', 'this_month', new Date(2026, 8, 29, 12));
+    const call = db.calls.find((c) => c.table === 'hse_points_events');
+    expect(call.filters).toEqual(expect.arrayContaining([
+      ['eq', 'organization_id', 'o1'], ['gte', 'created_at', new Date(2026, 8, 1).toISOString()],
+    ]));
+    expect(res.available).toBe(true);
+    expect(res.rows.map((r) => [r.rank, r.user_id, r.name, r.period_points, r.reports])).toEqual([
+      [1, 'u1', 'Test Lead', 29, 2],
+      [2, 'u2', 'Ada Obi', 10, 1],
+    ]);
+  });
+
+  it('reports available false when the ledger table does not exist yet', async () => {
+    db.missing.add('hse_points_events');
+    expect(await svc.getPeriodLeaderboard('o1', 'this_week')).toEqual({ available: false, rows: [] });
+  });
+
+  it('starts the week on Monday', () => {
+    expect(svc.periodStart('this_week', new Date(2026, 8, 27, 15))).toEqual(new Date(2026, 8, 21));
+    expect(svc.periodStart('this_week', new Date(2026, 8, 28, 1))).toEqual(new Date(2026, 8, 28));
+  });
+});
+
+describe('no client-side points writes', () => {
+  it('quickReportService and ReportWizard call no addPoints or updateStreak', async () => {
+    const fs = await import('node:fs');
+    const path = await import('node:path');
+    for (const f of ['src/services/quickReportService.js', 'src/components/hse/ReportWizard.jsx']) {
+      const src = fs.readFileSync(path.resolve(process.cwd(), f), 'utf8');
+      expect(src, f).not.toMatch(/addPoints|updateStreak/);
+    }
   });
 });
 

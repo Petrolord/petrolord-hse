@@ -7,7 +7,6 @@ import { departmentService } from '@/services/departmentService';
 import { siteService } from '@/services/siteService'; 
 import { locationService } from '@/services/locationService';
 import { offlineManager } from '@/lib/offlineManager';
-import { gamificationService } from '@/services/gamificationService'; 
 import { supabase } from '@/lib/customSupabaseClient';
 import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
@@ -481,14 +480,10 @@ export default function ReportWizard({ onSuccess, onCancel, initialType = '' }) 
           }
           // --- NOTIFICATION LOGIC END ---
 
-          // Add Points
-          const pointsEarned = formData.report_type === 'Incident' 
-            ? gamificationService.POINTS.incident_report 
-            : gamificationService.POINTS.observation_report;
-            
-          await gamificationService.addPoints(currentUser.id, finalOrgId, pointsEarned, `${formData.report_type} Submitted`);
-          await gamificationService.updateStreak(currentUser.id, finalOrgId);
-          
+          // Points are awarded by the database for Quick Reports only
+          // (migration 20260929120000_hse_points_ledger); the wizard's
+          // records earn none, so there is no client points call here.
+
           // Enhanced Toast
           toast({ 
             title: "Submitted Successfully! 🎉", 
