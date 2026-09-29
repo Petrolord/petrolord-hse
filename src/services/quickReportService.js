@@ -1,8 +1,8 @@
 import { supabase } from '@/lib/customSupabaseClient';
 // PETROLORD QUICK REPORT DEFENSIVE FIX v1 (2026-05-06)
 // PETROLORD QUICK REPORT DEFENSIVE FIX v2 (2026-05-07)
-// v2: gamificationService methods may be undefined (addPoints, awardBadge, etc).
-//     Wrap all gamification calls in a guard so a missing method does not crash the submit.
+// v2: gamification reads are wrapped in a guard so a failure does not crash the submit.
+//     Points are written by the database, never from here (2026-09-29).
 import { gamificationService } from './gamificationService';
 
 const safeGamification = async (methodName, ...args) => {
@@ -627,12 +627,13 @@ export const quickReportService = {
 
       if (insertError) throw insertError;
 
-      // 6. Trigger Gamification Update, then read back the stored streak and rank
+      // 6. Points are awarded by the database (quick_reports triggers, migration
+      // 20260929120000_hse_points_ledger): it stamps leaderboard_points from its
+      // own rule, writes the points ledger once per report and updates
+      // user_points_summary. Read back the stored points, streak and rank.
       let streak = null;
       let ranking = null;
       if (!options.isAnonymous && !options.saveAsDraft) {
-        await safeGamification('addPoints', user.id, organization.id, totalPoints, 'Quick Report Submission');
-        await safeGamification('updateStreak', user.id, organization.id);
         const score = await safeGamification('getUserScore', user.id);
         streak = score?.current_streak || null;
         ranking = score?.ranking || null;
@@ -641,7 +642,9 @@ export const quickReportService = {
       return {
         success: true,
         reportId: insertedReport.id, // Use actual DB ID
-        points: totalPoints,
+        points: Number.isFinite(Number(insertedReport?.leaderboard_points)) && insertedReport?.leaderboard_points !== null
+          ? Number(insertedReport.leaderboard_points)
+          : totalPoints,
         streak,
         ranking,
       };

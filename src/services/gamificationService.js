@@ -29,6 +29,29 @@ export const getUserScore = async (userId) => {
 // `ranking` and `user:user_id(...)` always failed and returned [] (batch 4B).
 // Read only. Each row: { id, user_id, name, email, avatar, points,
 // total_points, current_streak, rank }.
+// Names for a set of user ids: user_profiles (name, avatar) with users as the
+// e-mail and metadata fallback. Read only.
+const lookupPeople = async (ids) => {
+  const people = {};
+  if (!ids.length) return people;
+  const [{ data: profiles }, { data: users }] = await Promise.all([
+    supabase.from('user_profiles').select('id, full_name, avatar_url').in('id', ids),
+    supabase.from('users').select('id, email, raw_user_meta_data').in('id', ids),
+  ]);
+  (users || []).forEach((u) => { people[u.id] = { ...people[u.id], email: u.email, meta: u.raw_user_meta_data || {} }; });
+  (profiles || []).forEach((p) => { people[p.id] = { ...people[p.id], full_name: p.full_name, avatar_url: p.avatar_url }; });
+  return people;
+};
+
+const personFields = (who = {}) => {
+  const meta = who.meta || {};
+  return {
+    name: who.full_name || meta.full_name || who.email?.split('@')[0] || 'Unknown',
+    email: who.email || null,
+    avatar: who.avatar_url || meta.avatar_url,
+  };
+};
+
 export const getLeaderboard = async (orgId, limit = 10) => {
   try {
     if (!orgId) return [];
@@ -45,25 +68,13 @@ export const getLeaderboard = async (orgId, limit = 10) => {
     const rows = data || [];
     const ids = rows.map((r) => r.user_id).filter(Boolean);
 
-    const people = {};
-    if (ids.length) {
-      const [{ data: profiles }, { data: users }] = await Promise.all([
-        supabase.from('user_profiles').select('id, full_name, avatar_url').in('id', ids),
-        supabase.from('users').select('id, email, raw_user_meta_data').in('id', ids),
-      ]);
-      (users || []).forEach((u) => { people[u.id] = { ...people[u.id], email: u.email, meta: u.raw_user_meta_data || {} }; });
-      (profiles || []).forEach((p) => { people[p.id] = { ...people[p.id], full_name: p.full_name, avatar_url: p.avatar_url }; });
-    }
+    const people = await lookupPeople(ids);
 
     return rows.map((entry, index) => {
-      const who = people[entry.user_id] || {};
-      const meta = who.meta || {};
       return {
         id: entry.user_id || index,
         user_id: entry.user_id,
-        name: who.full_name || meta.full_name || who.email?.split('@')[0] || 'Unknown',
-        email: who.email || null,
-        avatar: who.avatar_url || meta.avatar_url,
+        ...personFields(people[entry.user_id]),
         points: entry.total_points ?? 0,
         total_points: entry.total_points ?? 0,
         current_streak: entry.current_streak ?? 0,
@@ -73,6 +84,74 @@ export const getLeaderboard = async (orgId, limit = 10) => {
   } catch (error) {
     console.error('Error fetching leaderboard:', error);
     return [];
+  }
+};
+
+// Where a period starts, in the viewer's local time: this_week from Monday
+// 00:00, this_month from the 1st at 00:00. Anything else has no start.
+export const periodStart = (period, now = new Date()) => {
+  if (period === 'this_month') return new Date(now.getFullYear(), now.getMonth(), 1);
+  if (period === 'this_week') {
+    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+    return d;
+  }
+  return null;
+};
+
+// The ledger table is missing until migration 20260929120000 is applied.
+const isMissingTable = (error) => {
+  if (!error) return false;
+  if (error.code === '42P01' || error.code === 'PGRST205') return true;
+  return /hse_points_events/.test(error.message || '') && /(does not exist|could not find|schema cache)/i.test(error.message || '');
+};
+
+// Ranking for a dated period, from the points ledger (hse_points_events,
+// one row per award, written only by the database). Read only.
+// Returns { available, rows }: available is false when the ledger is not
+// there yet, so the page can say so; rows are ranked like getLeaderboard's,
+// plus period_points and reports (awards in the period).
+export const getPeriodLeaderboard = async (orgId, period, now = new Date()) => {
+  const start = periodStart(period, now);
+  if (!orgId || !start) return { available: true, rows: [] };
+  try {
+    const { data, error } = await supabase
+      .from('hse_points_events')
+      .select('user_id, points, created_at')
+      .eq('organization_id', orgId)
+      .gte('created_at', start.toISOString())
+      .order('created_at', { ascending: false })
+      .limit(10000);
+    if (error) {
+      if (isMissingTable(error)) return { available: false, rows: [] };
+      throw error;
+    }
+    const byUser = new Map();
+    (data || []).forEach((e) => {
+      if (!e.user_id) return;
+      const cur = byUser.get(e.user_id) || { points: 0, reports: 0 };
+      cur.points += Number(e.points) || 0;
+      cur.reports += 1;
+      byUser.set(e.user_id, cur);
+    });
+    const ranked = [...byUser.entries()]
+      .sort((a, b) => b[1].points - a[1].points || b[1].reports - a[1].reports);
+    const people = await lookupPeople(ranked.map(([id]) => id));
+    return {
+      available: true,
+      rows: ranked.map(([userId, agg], index) => ({
+        id: userId,
+        user_id: userId,
+        ...personFields(people[userId]),
+        points: agg.points,
+        period_points: agg.points,
+        reports: agg.reports,
+        rank: index + 1,
+      })),
+    };
+  } catch (error) {
+    console.error('Error fetching period leaderboard:', error);
+    return { available: true, rows: [] };
   }
 };
 
@@ -143,6 +222,7 @@ export const getUserBadges = async (userId, orgId) => {
 export const gamificationService = {
   getUserScore,
   getLeaderboard,
+  getPeriodLeaderboard,
   getMyReportStats,
   getAllBadges,
   getUserBadges

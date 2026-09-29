@@ -120,7 +120,7 @@ export default function PrivacyPolicyPage() {
 
             <DocumentationSection id="international" title="8. International Data Transfers">
               <p>
-                Your information, including Personal Data, may be transferred to — and maintained on — computers located outside of your state, province, country, or other governmental jurisdiction where the data protection laws may differ from those from your jurisdiction.
+                Your information, including Personal Data, may be transferred to, and maintained on, computers located outside of your state, province, country, or other governmental jurisdiction where the data protection laws may differ from those from your jurisdiction.
               </p>
               <p>
                 If you are located outside the United States and choose to provide information to us, please note that we transfer the data, including Personal Data, to secure cloud servers and process it there. We utilize Standard Contractual Clauses (SCCs) and other mechanisms to ensure GDPR compliance for data transfers from the EU.

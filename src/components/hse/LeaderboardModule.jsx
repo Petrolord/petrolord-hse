@@ -5,7 +5,6 @@ import { Loader2 } from 'lucide-react';
 import LeaderboardStats from './leaderboard/LeaderboardStats';
 import LeaderboardTable from './leaderboard/LeaderboardTable';
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { supabase } from '@/lib/customSupabaseClient';
 
 // Design family (batch 2C): the Leaderboard renders inside the signed-in
 // scope (src/design/SignedInScope.jsx) on the theme roles.
@@ -13,9 +12,11 @@ import { supabase } from '@/lib/customSupabaseClient';
 // rank in any HSE organisation.
 export const LEADERBOARD_SIZE = 200;
 
-// Points are kept as running totals (user_points_summary); nothing records
-// when a point was earned, so the week and month tabs have no data to rank.
-export const PERIOD_NOTE = 'Rankings for this period need a points history, which is not recorded yet. All Time shows the running totals.';
+// All Time ranks the running totals (user_points_summary). This Month and
+// This Week rank the dated points ledger (hse_points_events), which the
+// database writes when a report is submitted. Until the ledger is switched on
+// (migration 20260929120000) the period tabs show this note.
+export const PERIOD_NOTE = 'Rankings for this period start once the points history is switched on. All Time shows the running totals.';
 
 // A leaderboard row (gamificationService.getLeaderboard) in the shape the
 // rankings table reads. Reports and quality per person are not in the
@@ -24,8 +25,8 @@ export const toTableRow = (row) => ({
   user_id: row.user_id,
   rank: row.rank,
   total_points: row.total_points ?? row.points ?? 0,
-  period_points: 0,
-  total_reports: null,
+  period_points: row.period_points ?? 0,
+  total_reports: row.reports ?? null,
   quality_score: null,
   user: { email: row.email || undefined, raw_user_meta_data: { full_name: row.name, avatar_url: row.avatar } },
 });
@@ -36,6 +37,9 @@ export default function LeaderboardModule() {
   const [myStats, setMyStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [period, setPeriod] = useState('all_time');
+  const [periodRows, setPeriodRows] = useState([]);
+  const [periodAvailable, setPeriodAvailable] = useState(true);
+  const [periodLoading, setPeriodLoading] = useState(false);
 
   const fetchData = async () => {
     if (!currentOrganization || !currentUser) return;
@@ -64,36 +68,25 @@ export default function LeaderboardModule() {
     }
   };
 
-  // The period tabs do not change the query (see PERIOD_NOTE).
   useEffect(() => {
     fetchData();
   }, [currentOrganization, currentUser]);
 
-  // Real-time subscription
+  // This Month and This Week read the dated ledger.
   useEffect(() => {
-    if (!currentOrganization) return;
-
-    const channel = supabase
-      .channel('leaderboard-updates')
-      .on(
-        'postgres_changes',
-        {
-          event: '*', // Listen for any change to scores
-          schema: 'public',
-          table: 'leaderboard_scores',
-          filter: `organization_id=eq.${currentOrganization.id}`
-        },
-        () => {
-          // Refresh on update
-          fetchData(); 
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [currentOrganization]);
+    if (!currentOrganization || period === 'all_time') return undefined;
+    let live = true;
+    setPeriodLoading(true);
+    gamificationService.getPeriodLeaderboard(currentOrganization.id, period)
+      .then((res) => {
+        if (!live) return;
+        setPeriodAvailable(res?.available !== false);
+        setPeriodRows((res?.rows || []).map(toTableRow));
+      })
+      .catch(() => { if (live) setPeriodRows([]); })
+      .finally(() => { if (live) setPeriodLoading(false); });
+    return () => { live = false; };
+  }, [currentOrganization, period]);
 
   if (!currentOrganization) return null;
 
@@ -120,18 +113,18 @@ export default function LeaderboardModule() {
 
       {/* Content */}
       <div className="flex-1 overflow-hidden p-4 sm:p-6">
-        {loading ? (
+        {loading || (period !== 'all_time' && periodLoading) ? (
           <div className="flex items-center justify-center h-full text-pl-muted">
             <Loader2 className="h-8 w-8 animate-spin text-pl-muted mr-2" aria-hidden="true" /> Loading ranking...
           </div>
-        ) : period !== 'all_time' ? (
+        ) : period !== 'all_time' && !periodAvailable ? (
           <div className="bg-pl-surface border border-pl-border shadow-pl-sm rounded-lg p-8 text-center text-sm text-pl-muted" role="status">
             {PERIOD_NOTE}
           </div>
         ) : (
-          <LeaderboardTable 
-            data={leaderboardData} 
-            currentUserId={currentUser.id} 
+          <LeaderboardTable
+            data={period === 'all_time' ? leaderboardData : periodRows}
+            currentUserId={currentUser.id}
           />
         )}
       </div>
