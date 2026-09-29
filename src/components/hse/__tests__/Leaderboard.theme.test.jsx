@@ -42,6 +42,8 @@ vi.mock('@/services/gamificationService', () => {
     getUserScore: async () => ({ total_points: 180, current_streak: 3, level: 2 }),
     getLeaderboard: async () => (lb.hold ? new Promise(() => {}) : lb.ranks),
     getMyReportStats: async () => MINE,
+    // the ledger is not switched on here, so the period tabs show the note
+    getPeriodLeaderboard: async () => ({ available: false, rows: [] }),
     getAllBadges: async () => [],
     getUserBadges: async () => [],
   };
@@ -108,11 +110,11 @@ describe('Leaderboard', () => {
       expectNoLegacyChrome();
     });
 
-    it('says why the week and month tabs have no ranking, on the kit tabs, and the dark theme', async () => {
+    it('shows the note while the points history is off, on the kit tabs, and the dark theme', async () => {
       renderLayout();
       await ready();
       await clickTab(/This Week/);
-      await screen.findByText(/need a points history/);
+      await screen.findByText(/points history is switched on/);
       expect(screen.getByRole('tab', { name: /This Week/ })).toHaveAttribute('data-state', 'active');
       expectNoLegacyChrome();
       toDark();
