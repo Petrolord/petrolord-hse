@@ -60,7 +60,7 @@ export const OrganizationMembers = ({ organization, onUpdate }) => {
   const handleRemoveMember = async () => {
     if (!memberToDelete) return;
     try {
-      await removeMember(memberToDelete);
+      await removeMember(memberToDelete, organization?.id);
       loadMembers();
       onUpdate && onUpdate();
       setDeleteDialogOpen(false);

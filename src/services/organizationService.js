@@ -16,7 +16,7 @@ export const fetchOrganization = async (organizationId) => {
 
     // Fetch stats
     const { count: memberCount } = await supabase
-      .from('organization_users')
+      .from('organization_members')
       .select('*', { count: 'exact', head: true })
       .eq('organization_id', organizationId);
 
@@ -59,34 +59,41 @@ export const updateOrganization = async (organizationId, updates) => {
 };
 
 /**
- * Fetch organization members
+ * Fetch organization members.
+ * Reads organization_members, the membership table the rest of HSE reads
+ * (HSEContext, quick reports, safety audits): it carries each member's
+ * full_name and email. Avatars come from user_profiles when present, the
+ * same lookup the leaderboard uses. The old read of organization_users with
+ * an auth.users embed failed (the API cannot embed auth.users, and
+ * organization_users is no longer a table), so the card showed
+ * "No members yet".
  */
 export const fetchOrganizationMembers = async (organizationId) => {
   try {
-    // Join with users table to get email and metadata
-    // This requires a foreign key from organization_users.user_id to public.users.id
     const { data, error } = await supabase
-      .from('organization_users')
-      .select(`
-        id,
-        role,
-        created_at,
-        user_id,
-        user:user_id (
-          email,
-          raw_user_meta_data
-        )
-      `)
-      .eq('organization_id', organizationId);
+      .from('organization_members')
+      .select('id, user_id, full_name, email, role, status, created_at, joined_at')
+      .eq('organization_id', organizationId)
+      .order('created_at', { ascending: true });
 
     if (error) throw error;
+    const rows = data || [];
 
-    // Flatten the structure for easier consumption by UI
-    return data.map(member => ({
+    let avatars = {};
+    const ids = [...new Set(rows.map((m) => m.user_id).filter(Boolean))];
+    if (ids.length) {
+      const { data: profiles } = await supabase
+        .from('user_profiles')
+        .select('id, avatar_url')
+        .in('id', ids);
+      avatars = Object.fromEntries((profiles || []).map((p) => [p.id, p.avatar_url]));
+    }
+
+    return rows.map((member) => ({
       ...member,
-      email: member.user?.email || 'Unknown',
-      full_name: member.user?.raw_user_meta_data?.full_name || 'User',
-      avatar_url: member.user?.raw_user_meta_data?.avatar_url
+      email: member.email || 'Unknown',
+      full_name: member.full_name || member.email?.split('@')[0] || 'User',
+      avatar_url: (member.user_id && avatars[member.user_id]) || null,
     }));
   } catch (error) {
     console.error('Error fetching members:', error);
@@ -125,12 +132,15 @@ export const inviteMember = async (organizationId, email, role) => {
 /**
  * Remove member from organization
  */
-export const removeMember = async (userId) => {
+export const removeMember = async (memberId, organizationId) => {
   try {
-    const { error } = await supabase
-      .from('organization_users')
+    // memberId is the organization_members row id the Members card lists.
+    let query = supabase
+      .from('organization_members')
       .delete()
-      .eq('id', userId); // user_id in organization_users table pk
+      .eq('id', memberId);
+    if (organizationId) query = query.eq('organization_id', organizationId);
+    const { error } = await query;
 
     if (error) throw error;
   } catch (error) {
