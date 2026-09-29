@@ -42,7 +42,7 @@ export default function SecurityPage() {
 
       <DocumentationHeader
         title="Security at Petrolord HSE"
-        subtitle="Security is not just a feature; it's our foundation. We employ enterprise-grade security measures to protect your critical safety data."
+        subtitle="Security is the foundation of our platform. We employ enterprise-grade security measures to protect your critical safety data."
         lastUpdated="December 17, 2025"
         version="4.0"
       />
