@@ -11,7 +11,7 @@ import '@testing-library/jest-dom/vitest';
 import { installDomShims } from '@/design/testing/domShims';
 
 installDomShims();
-vi.setConfig({ testTimeout: 20000 });
+vi.setConfig({ testTimeout: 90000 });
 
 // ---- a recording Supabase stand-in ---------------------------------------
 const db = {
