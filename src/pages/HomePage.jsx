@@ -418,7 +418,7 @@ export default function HomePage() {
             <Link className="brand" to="/" aria-label="Petrolord HSE home">
               <img className="wordmark" src={WORDMARK} alt="Petrolord HSE" width="979" height="108" />
             </Link>
-            <p>The HSE component of the digital operating system for the modern energy enterprise. A Lordsway Energy company.</p>
+            <p>The HSE component of the digital operating system for the modern energy enterprise. A <a href="https://lordswayenergy.com">Lordsway Energy</a> company.</p>
           </div>
           <FooterCol title="Product">
             <a href="#features">Features</a>
