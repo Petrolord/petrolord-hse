@@ -224,7 +224,7 @@ describe('further auth states on the public frame', () => {
     expect(auth.updateUser).toHaveBeenCalledWith({ password: 'N3w!password' });
   });
 
-  it('accept invite, new user: signUp keeps the invited role and primary_app', async () => {
+  it('accept invite, new user: signUp sends the invitation token and primary_app, never org or role', async () => {
     auth.signUp = vi.fn(async () => ({ data: { user: { id: 'new' } }, error: null }));
     mount(InvitationAcceptance, '/accept-invite/t1', '/accept-invite/:token');
     await screen.findByText('Set up your account');
@@ -235,7 +235,7 @@ describe('further auth states on the public frame', () => {
     expect(auth.signUp).toHaveBeenCalledWith({
       email: INVITE.email,
       password: 'Passw0rd1',
-      options: { data: { full_name: 'Ada Obi', organization_id: 'o1', role: 'supervisor', primary_app: 'hse' } },
+      options: { data: { full_name: 'Ada Obi', invitation_token: 't1', primary_app: 'hse' } },
     });
   });
 
